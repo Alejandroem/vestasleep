@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../../../application/cubit/authentication_cubit.dart';
+import '../common/vesta_outline_button.dart';
 
 class Landing extends StatelessWidget {
   const Landing({super.key});
@@ -22,12 +26,13 @@ class Landing extends StatelessWidget {
           ),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset("assets/svg/vesta_icon.svg"),
+            const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text.rich(
+              child: const Text.rich(
                 TextSpan(
                   children: [
                     TextSpan(
@@ -55,37 +60,14 @@ class Landing extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            Container(
-              width: 312,
-              height: 55,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(width: 2, color: Colors.white),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                shadows: [
-                  const BoxShadow(
-                    color: Color(0x33000000),
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Get Started',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontFamily: 'SF Pro Text',
-                    fontWeight: FontWeight.w400,
-                    height: 0.07,
-                    letterSpacing: 0.85,
-                  ),
-                ),
-              ),
+            const SizedBox(height: 20),
+            VestaOutlineButton(
+              onPressed: () {
+                context.read<AuthenticationCubit>().setStatus(
+                      Status.choosingAuthenticationMethod,
+                    );
+              },
+              buttonText: 'Get Started',
             ),
           ],
         ),

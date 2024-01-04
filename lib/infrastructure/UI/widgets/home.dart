@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
+import 'choose_authentication_method.dart';
 import 'landing.dart';
 
 class Home extends StatelessWidget {
@@ -11,11 +12,12 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthenticationCubit, AuthenticationState>(
       builder: (context, state) {
+        Widget child = Container();
         switch (state.status) {
           case Status.justLanded:
-            return Landing();
+            child = const Landing();
           case Status.choosingAuthenticationMethod:
-          // TODO: Handle this case.
+            child = const ChooseAuthenticationMethod();
           case Status.creatingAccount:
           // TODO: Handle this case.
           case Status.loggingIn:
@@ -29,7 +31,16 @@ class Home extends StatelessWidget {
           case Status.authenticated:
           // TODO: Handle this case.
         }
-        return const Scaffold();
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: child,
+        );
       },
     );
   }
