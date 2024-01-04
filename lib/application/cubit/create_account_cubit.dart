@@ -82,17 +82,6 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     );
   }
 
-  void setValidUsername(String validUsername) {
-    //validate username with a regex username
-
-    emit(
-      state.copyWith(
-        usernameTouched: true,
-        validUsername: validUsername,
-      ),
-    );
-  }
-
   void setEmail(String email) {
     //validate email with a regex email
     bool isEmailValid =
@@ -107,20 +96,18 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     );
   }
 
-  void setValidEmail(String validEmail) {
-    emit(state.copyWith(validEmail: validEmail));
-  }
-
   void setPassword(String password) {
-    emit(state.copyWith(password: password));
-  }
+    //validate password with a regex password
+    bool isPasswordValid =
+        RegExp(r"^[a-zA-Z0-9!@#$%^&*()]+").hasMatch(password);
 
-  void setValidPassword(String validPassword) {
-    emit(state.copyWith(validPassword: validPassword));
-  }
-
-  void setObscurePassword(bool obscurePassword) {
-    emit(state.copyWith(obscurePassword: obscurePassword));
+    emit(
+      state.copyWith(
+        passwordTouched: true,
+        password: password,
+        validPassword: isPasswordValid ? "" : "Invalid password",
+      ),
+    );
   }
 
   void setIsSubmitting(bool isSubmitting) {

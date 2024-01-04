@@ -151,11 +151,19 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: SvgPicture.asset(
-                          "assets/svg/done_icon.svg",
-                        ),
+                      suffixIcon:
+                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                        builder: (context, state) {
+                          if (state.emailTouched && state.validEmail == "") {
+                            return Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: SvgPicture.asset(
+                                "assets/svg/done_icon.svg",
+                              ),
+                            );
+                          }
+                          return SizedBox.shrink();
+                        },
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -175,10 +183,37 @@ class CreateAccount extends StatelessWidget {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
+                    onChanged: (String value) {
+                      context.read<CreateAccountCubit>().setEmail(value);
+                    },
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                builder: (context, state) {
+                  if (state.emailTouched && state.validEmail != "") {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        12,
+                        4,
+                        12,
+                        4,
+                      ),
+                      child: Text(
+                        state.validEmail,
+                        style: const TextStyle(
+                          color: Color(0xFFE02020),
+                          fontSize: 14,
+                          fontFamily: 'M PLUS 1',
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.70,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox(height: 30);
+                },
+              ),
               Container(
                 width: 311,
                 height: 60,
@@ -200,11 +235,20 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: SvgPicture.asset(
-                          "assets/svg/done_icon.svg",
-                        ),
+                      suffixIcon:
+                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                        builder: (context, state) {
+                          if (state.passwordTouched &&
+                              state.validPassword == "") {
+                            return Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: SvgPicture.asset(
+                                "assets/svg/done_icon.svg",
+                              ),
+                            );
+                          }
+                          return SizedBox.shrink();
+                        },
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -224,10 +268,37 @@ class CreateAccount extends StatelessWidget {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
+                    onChanged: (String value) {
+                      context.read<CreateAccountCubit>().setPassword(value);
+                    },
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                builder: (context, state) {
+                  if (state.passwordTouched && state.validPassword != "") {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        12,
+                        4,
+                        12,
+                        4,
+                      ),
+                      child: Text(
+                        state.validPassword,
+                        style: const TextStyle(
+                          color: Color(0xFFE02020),
+                          fontSize: 14,
+                          fontFamily: 'M PLUS 1',
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.70,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox(height: 30);
+                },
+              ),
               Container(
                 width: 311,
                 height: 55,
