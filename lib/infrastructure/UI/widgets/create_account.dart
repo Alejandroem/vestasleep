@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
+import '../../../application/cubit/create_account_cubit.dart';
 
 class CreateAccount extends StatelessWidget {
   const CreateAccount({super.key});
@@ -63,6 +64,21 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
+                      suffixIcon:
+                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                        builder: (context, state) {
+                          if (state.usernameTouched &&
+                              state.validUsername == "") {
+                            return Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: SvgPicture.asset(
+                                "assets/svg/done_icon.svg",
+                              ),
+                            );
+                          }
+                          return SizedBox.shrink();
+                        },
+                      ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: SvgPicture.asset(
@@ -81,11 +97,39 @@ class CreateAccount extends StatelessWidget {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
+                    onChanged: (String value) {
+                      context.read<CreateAccountCubit>().setUsername(value);
+                    },
                   ),
                 ),
               ),
+              //text with errors
+              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                builder: (context, state) {
+                  if (state.usernameTouched && state.validUsername != "") {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        12,
+                        4,
+                        12,
+                        4,
+                      ),
+                      child: Text(
+                        state.validUsername,
+                        style: const TextStyle(
+                          color: Color(0xFFE02020),
+                          fontSize: 14,
+                          fontFamily: 'M PLUS 1',
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.70,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox(height: 30);
+                },
+              ),
               //EMAIL
-              const SizedBox(height: 30),
               Container(
                 width: 311,
                 height: 60,
@@ -107,6 +151,12 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: SvgPicture.asset(
+                          "assets/svg/done_icon.svg",
+                        ),
+                      ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: SvgPicture.asset(
@@ -150,6 +200,12 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: SvgPicture.asset(
+                          "assets/svg/done_icon.svg",
+                        ),
+                      ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: SvgPicture.asset(
