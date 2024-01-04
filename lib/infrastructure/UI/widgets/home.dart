@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
 import 'choose_authentication_method.dart';
+import 'create_account.dart';
 import 'landing.dart';
 
 class Home extends StatelessWidget {
@@ -19,7 +20,7 @@ class Home extends StatelessWidget {
           case Status.choosingAuthenticationMethod:
             child = const ChooseAuthenticationMethod();
           case Status.creatingAccount:
-          // TODO: Handle this case.
+            child = const CreateAccount();
           case Status.loggingIn:
           // TODO: Handle this case.
           case Status.resettingPassword:
