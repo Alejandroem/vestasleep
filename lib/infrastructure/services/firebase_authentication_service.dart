@@ -15,7 +15,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
     throw UnimplementedError();
   }
 
-  @override
+   @override
   Future<VestaUser?> getCurrentUserOrNull() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {

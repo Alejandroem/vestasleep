@@ -91,11 +91,13 @@ class CreateAccount extends StatelessWidget {
                         fontSize: 17,
                         fontFamily: 'SF Pro Text',
                         fontWeight: FontWeight.w400,
-                        height: 0.07,
                         letterSpacing: 0.85,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                     ),
                     onChanged: (String value) {
                       context.read<CreateAccountCubit>().setUsername(value);
@@ -181,7 +183,10 @@ class CreateAccount extends StatelessWidget {
                         letterSpacing: 0.85,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                     ),
                     onChanged: (String value) {
                       context.read<CreateAccountCubit>().setEmail(value);
@@ -266,7 +271,10 @@ class CreateAccount extends StatelessWidget {
                         letterSpacing: 0.85,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                     ),
                     onChanged: (String value) {
                       context.read<CreateAccountCubit>().setPassword(value);
@@ -299,39 +307,46 @@ class CreateAccount extends StatelessWidget {
                   return const SizedBox(height: 30);
                 },
               ),
-              Container(
-                width: 311,
-                height: 55,
-                decoration: ShapeDecoration(
-                  color: const Color(0xFF37A2E7),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
+              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                  builder: (context, state) {
+                return Container(
+                  width: 311,
+                  height: 55,
+                  decoration: ShapeDecoration(
+                    color: state.validUser()
+                        ? const Color(0xFF37A2E7)
+                        : const Color(0x4D37A2E7),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    shadows: const [
+                      BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
+                        spreadRadius: 0,
+                      )
+                    ],
                   ),
-                  shadows: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                      spreadRadius: 0,
-                    )
-                  ],
-                ),
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Create Account',
-                    // ignore: unnecessary_const
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontFamily: 'SF Pro Text',
-                      fontWeight: FontWeight.w700,
-                      height: 0.07,
-                      letterSpacing: 0.85,
+                  child: TextButton(
+                    onPressed: state.validUser() ? () {} : null,
+                    child: Text(
+                      'Create Account',
+                      // ignore: unnecessary_const
+                      style: TextStyle(
+                        color: state.validUser()
+                            ? Colors.white
+                            : const Color(0x4DFFFFFF),
+                        fontSize: 17,
+                        fontFamily: 'SF Pro Text',
+                        fontWeight: FontWeight.w700,
+                        height: 0.07,
+                        letterSpacing: 0.85,
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              }),
               const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),

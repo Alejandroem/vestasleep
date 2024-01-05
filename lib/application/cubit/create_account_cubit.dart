@@ -59,6 +59,15 @@ class CreateAccountState {
       isSuccess: isSuccess ?? this.isSuccess,
     );
   }
+
+  bool validUser() {
+    return validUsername.isEmpty &&
+        validEmail.isEmpty &&
+        validPassword.isEmpty &&
+        username.isNotEmpty &&
+        email.isNotEmpty &&
+        password.isNotEmpty;
+  }
 }
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
