@@ -5,8 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import '../../../application/cubit/authentication_cubit.dart';
 import '../common/vesta_outline_button.dart';
 
-class ChooseAuthenticationMethod extends StatelessWidget {
-  const ChooseAuthenticationMethod({super.key});
+class ChooseAuthMethod extends StatelessWidget {
+  const ChooseAuthMethod({super.key});
 
   @override
   Widget build(BuildContext context) {

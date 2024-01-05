@@ -76,7 +76,7 @@ class CreateAccount extends StatelessWidget {
                               ),
                             );
                           }
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         },
                       ),
                       prefixIcon: Padding(
@@ -162,7 +162,7 @@ class CreateAccount extends StatelessWidget {
                               ),
                             );
                           }
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         },
                       ),
                       prefixIcon: Padding(
@@ -247,7 +247,7 @@ class CreateAccount extends StatelessWidget {
                               ),
                             );
                           }
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         },
                       ),
                       prefixIcon: Padding(
