@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/services/authentication_service.dart';
+import '../../domain/services/usernames_service.dart';
 import '../../domain/services/users_service.dart';
 
 class CreateAccountState {
@@ -84,9 +85,11 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
   Timer? _debounce;
   AuthenticationService authenticationService;
   UsersService usersService;
+  UserNamesService userNameService;
   CreateAccountCubit(
     this.authenticationService,
     this.usersService,
+    this.userNameService,
   ) : super(const CreateAccountState());
 
   void setUsername(String username) {
@@ -108,7 +111,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     );
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      usersService.readBy("username", username).then((value) {
+      userNameService.readBy("username", username).then((value) {
         if (value.isEmpty) {
           emit(
             state.copyWith(
@@ -177,8 +180,11 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
         state.email,
         state.password,
       );
+      
       emit(state.copyWith(isSuccess: true, isSubmitting: false));
     } catch (e) {
+      //TODO handle auth errors
+      
       emit(state.copyWith(isSuccess: false, isSubmitting: false));
     }
   }

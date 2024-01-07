@@ -7,7 +7,9 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../domain/models/vesta_exception.dart';
 import '../../domain/models/vesta_user.dart';
+import '../../domain/models/vesta_usernames.dart';
 import '../../domain/services/authentication_service.dart';
+import 'firebase_vestausernames_service.dart';
 import 'firebase_vestausers_service.dart';
 
 class FirebaseAuthenticationService extends AuthenticationService {
@@ -22,7 +24,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
           FirebaseVestaUsersService usersService = FirebaseVestaUsersService();
           VestaUser vestaUser = VestaUser(
             id: user.uid,
-            username: user.displayName ?? 'Guest',
+            username: user.displayName!,
             email: user.email ?? '',
             photoURL: user.photoURL ?? '',
             isAnonymous: user.isAnonymous,
@@ -32,6 +34,18 @@ class FirebaseAuthenticationService extends AuthenticationService {
           }).catchError((error) {
             log("Failed to update or create user: $error");
           });
+
+          FirebaseVestaUserNamesService userNamesService =
+              FirebaseVestaUserNamesService();
+          VestaUserName username = VestaUserName(
+            username: user.displayName ?? 'Guest',
+          );
+          userNamesService.updateOrCreate(username).then((value) {
+            log("User name updated or created successfully.");
+          }).catchError((error) {
+            log("Failed to update or create user name: $error");
+          });
+
           return vestaUser;
         },
       );
@@ -49,7 +63,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
       await user!.updateDisplayName(username);
       return VestaUser(
         id: user.uid,
-        username: user.displayName ?? 'Guest',
+        username: username,
         email: user.email ?? '',
         photoURL: user.photoURL ?? '',
         isAnonymous: user.isAnonymous,
@@ -397,5 +411,15 @@ class FirebaseAuthenticationService extends AuthenticationService {
       log("Failed to delete user data due to an exception");
     }
     return false;
+  }
+
+  @override
+  Future<bool> forgotPassword({required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

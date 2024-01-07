@@ -16,4 +16,6 @@ abstract class AuthenticationService {
   Future<bool> changePassword(String oldPassword, String newPassword);
 
   Future<bool> deleteAccount(String id);
+
+  Future<bool> forgotPassword({required String email});
 }

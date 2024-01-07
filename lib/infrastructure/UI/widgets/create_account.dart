@@ -406,45 +406,53 @@ class CreateAccount extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'By creating an account or signing you',
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 14,
-                          fontFamily: 'M PLUS 1',
-                          fontWeight: FontWeight.w400,
-                          height: 0.09,
-                          letterSpacing: 0.70,
+              InkWell(
+                onTap: () {
+                  context.read<AuthenticationCubit>().setStatus(
+                        Status.readingTosAndPp,
+                      );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text.rich(
+                    TextSpan(
+                      //on tap
+                      children: [
+                        TextSpan(
+                          text: 'By creating an account or signing you',
+                          style: TextStyle(
+                            color: Color(0xFFCDCDCD),
+                            fontSize: 14,
+                            fontFamily: 'M PLUS 1',
+                            fontWeight: FontWeight.w400,
+                            height: 0.09,
+                            letterSpacing: 0.70,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: ' ',
-                        style: TextStyle(
-                          color: Color(0xFF010102),
-                          fontSize: 14,
-                          fontFamily: 'M PLUS 1',
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 0.70,
+                        TextSpan(
+                          text: ' ',
+                          style: TextStyle(
+                            color: Color(0xFF010102),
+                            fontSize: 14,
+                            fontFamily: 'M PLUS 1',
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0.70,
+                          ),
                         ),
-                      ),
-                      TextSpan(
-                        text: 'agree to our Terms and Conditions.',
-                        style: TextStyle(
-                          color: Color(0xFF37A2E7),
-                          fontSize: 14,
-                          fontFamily: 'M PLUS 1',
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.70,
+                        TextSpan(
+                          text: 'agree to our Terms and Conditions.',
+                          style: TextStyle(
+                            color: Color(0xFF37A2E7),
+                            fontSize: 14,
+                            fontFamily: 'M PLUS 1',
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.70,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
             ],

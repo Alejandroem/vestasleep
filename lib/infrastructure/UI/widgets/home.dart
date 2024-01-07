@@ -3,13 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/create_account_cubit.dart';
+import '../../../application/cubit/forgot_password_cubit.dart';
 import '../../../application/cubit/login_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
 import 'choose_auth_method.dart';
 import 'create_account.dart';
+import 'forgot_password.dart';
 import 'landing.dart';
 import 'login.dart';
+import 'terms_and_privacy.dart';
 import 'vesta_home.dart';
 
 class Home extends StatelessWidget {
@@ -32,6 +36,7 @@ class Home extends StatelessWidget {
               create: (context) => CreateAccountCubit(
                 context.read<AuthenticationService>(),
                 context.read<UsersService>(),
+                context.read<UserNamesService>(),
               ),
               child: const CreateAccount(),
             );
@@ -43,16 +48,26 @@ class Home extends StatelessWidget {
               ),
               child: const Login(),
             );
+            break;
           case Status.resettingPassword:
-          // TODO: Handle this case.
+            child = BlocProvider(
+              create: (context) => ForgotPasswordCubit(
+                context.read<AuthenticationService>(),
+              ),
+              child: const ForgotPassword(),
+            );
+            break;
           case Status.readingTosAndPp:
-          // TODO: Handle this case.
+            child = const TermsAndPrivacy();
+            break;
           case Status.authenticating:
-          // TODO: Handle this case.
+            break;
           case Status.authenticated:
             child = const VestaHome();
+            break;
           default:
             child = const Landing();
+            break;
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),

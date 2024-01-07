@@ -96,14 +96,13 @@ class LoginCubit extends Cubit<LoginState> {
       );
       emit(state.copyWith(isSubmitting: false));
     } on VestaException catch (e) {
-      if (e.message == "invalid-credentials") {
+      if (e.message == "invalid-credential") {
         emit(state.copyWith(
           isSubmitting: false,
           validEmail: "Invalid email",
           validPassword: "Invalid password",
         ));
       }
-      emit(state.copyWith(isSubmitting: false));
     } catch (e) {
       emit(state.copyWith(isSubmitting: false));
       rethrow;

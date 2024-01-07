@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
 import '../../services/firebase_authentication_service.dart';
+import '../../services/firebase_vestausernames_service.dart';
 import '../../services/firebase_vestausers_service.dart';
 import 'home.dart';
 
@@ -25,6 +27,9 @@ class App extends StatelessWidget {
           ),
           RepositoryProvider<UsersService>(
             create: (context) => FirebaseVestaUsersService(),
+          ),
+          RepositoryProvider<UserNamesService>(
+            create: (context) => FirebaseVestaUserNamesService(),
           ),
         ],
         child: MultiBlocProvider(
