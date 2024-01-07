@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
-import '../../../application/cubit/forgot_password_cubit.dart';
 
 class TermsAndPrivacy extends StatelessWidget {
   const TermsAndPrivacy({super.key});

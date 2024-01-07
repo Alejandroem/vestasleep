@@ -11,6 +11,7 @@ class CreateAccount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //TODO add google and apple login
     return Scaffold(
       backgroundColor: const Color(0xff1B1464),
       body: PopScope(
