@@ -9,13 +9,53 @@ import '../../domain/models/vesta_user.dart';
 import '../../domain/services/authentication_service.dart';
 
 class FirebaseAuthenticationService extends AuthenticationService {
+  //stream to listen to auth changes
+  @override
+  Stream<VestaUser?> get authStateChanges =>
+      FirebaseAuth.instance.authStateChanges().map(
+        (user) {
+          if (user == null) {
+            return null;
+          }
+          return VestaUser(
+            id: user.uid,
+            username: user.displayName ?? 'Guest',
+            email: user.email ?? '',
+            photoURL: user.photoURL ?? '',
+            isAnonymous: user.isAnonymous,
+          );
+        },
+      );
+
   @override
   Future<VestaUser> createUserWithEmailAndPassword(
-      String email, String password) {
-    throw UnimplementedError();
+    String username,
+    String email,
+    String password,
+  ) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      User? user = userCredential.user;
+      await user!.updateDisplayName(username);
+      return VestaUser(
+        id: user.uid,
+        username: user.displayName ?? 'Guest',
+        email: user.email ?? '',
+        photoURL: user.photoURL ?? '',
+        isAnonymous: user.isAnonymous,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw Exception('email-already-in-use');
+      }
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
   }
 
-   @override
+  @override
   Future<VestaUser?> getCurrentUserOrNull() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -206,7 +246,6 @@ class FirebaseAuthenticationService extends AuthenticationService {
         email: userCredential.user?.email ?? '',
         photoURL: userCredential.user?.photoURL ?? '',
         isAnonymous: userCredential.user?.isAnonymous ?? false,
-        
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'credential-already-in-use') {

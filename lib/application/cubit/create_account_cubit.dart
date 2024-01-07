@@ -1,6 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/services/authentication_service.dart';
+import '../../domain/services/users_service.dart';
+
 class CreateAccountState {
+  final bool validatingUsername;
   final String username;
   final bool usernameTouched;
   final String validUsername;
@@ -28,6 +34,7 @@ class CreateAccountState {
     this.obscurePassword = true,
     this.isSubmitting = false,
     this.isSuccess = false,
+    this.validatingUsername = false,
   });
 
   CreateAccountState copyWith({
@@ -43,6 +50,7 @@ class CreateAccountState {
     bool? obscurePassword,
     bool? isSubmitting,
     bool? isSuccess,
+    bool? validatingUsername,
   }) {
     return CreateAccountState(
       username: username ?? this.username,
@@ -57,6 +65,7 @@ class CreateAccountState {
       obscurePassword: obscurePassword ?? this.obscurePassword,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isSuccess: isSuccess ?? this.isSuccess,
+      validatingUsername: validatingUsername ?? this.validatingUsername,
     );
   }
 
@@ -66,12 +75,19 @@ class CreateAccountState {
         validPassword.isEmpty &&
         username.isNotEmpty &&
         email.isNotEmpty &&
-        password.isNotEmpty;
+        password.isNotEmpty &&
+        !validatingUsername;
   }
 }
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
-  CreateAccountCubit() : super(const CreateAccountState());
+  Timer? _debounce;
+  AuthenticationService authenticationService;
+  UsersService usersService;
+  CreateAccountCubit(
+    this.authenticationService,
+    this.usersService,
+  ) : super(const CreateAccountState());
 
   void setUsername(String username) {
     String isUsernameValid = "";
@@ -86,9 +102,19 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
       state.copyWith(
         usernameTouched: true,
         username: username,
+        validatingUsername: true,
         validUsername: isUsernameValid,
       ),
     );
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      usersService.readBy("username", username).then((value) {
+        if (value.isEmpty) {
+          return null;
+        }
+        return value.first;
+      });
+    });
   }
 
   void setEmail(String email) {
@@ -129,5 +155,19 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
   void reset() {
     emit(const CreateAccountState());
+  }
+
+  void createAccount() async {
+    emit(state.copyWith(isSubmitting: true));
+    try {
+      await authenticationService.createUserWithEmailAndPassword(
+        state.username,
+        state.email,
+        state.password,
+      );
+      emit(state.copyWith(isSuccess: true));
+    } catch (e) {
+      emit(state.copyWith(isSuccess: false));
+    }
   }
 }

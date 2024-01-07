@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
+import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/users_service.dart';
+import '../../services/firebase_authentication_service.dart';
+import '../../services/firebase_balance_service.dart';
 import 'home.dart';
 
 class App extends StatelessWidget {
@@ -14,13 +18,25 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MultiBlocProvider(
+      home: MultiRepositoryProvider(
         providers: [
-          BlocProvider<AuthenticationCubit>(
-            create: (context) => AuthenticationCubit(),
+          RepositoryProvider<AuthenticationService>(
+            create: (context) => FirebaseAuthenticationService(),
+          ),
+          RepositoryProvider<UsersService>(
+            create: (context) => FirebaseVestaUsersService(),
           ),
         ],
-        child: const Home(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthenticationCubit>(
+              create: (context) => AuthenticationCubit(
+                context.read<AuthenticationService>(),
+              ),
+            ),
+          ],
+          child: const Home(),
+        ),
       ),
     );
   }

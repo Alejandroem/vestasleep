@@ -67,6 +67,18 @@ class CreateAccount extends StatelessWidget {
                       suffixIcon:
                           BlocBuilder<CreateAccountCubit, CreateAccountState>(
                         builder: (context, state) {
+                          if (state.validatingUsername) {
+                            return const Padding(
+                              padding: EdgeInsets.all(6),
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          }
                           if (state.usernameTouched &&
                               state.validUsername == "") {
                             return Padding(
@@ -76,6 +88,7 @@ class CreateAccount extends StatelessWidget {
                               ),
                             );
                           }
+
                           return const SizedBox.shrink();
                         },
                       ),
@@ -329,7 +342,11 @@ class CreateAccount extends StatelessWidget {
                     ],
                   ),
                   child: TextButton(
-                    onPressed: state.validUser() ? () {} : null,
+                    onPressed: state.validUser()
+                        ? () {
+                            context.read<CreateAccountCubit>().createAccount();
+                          }
+                        : null,
                     child: Text(
                       'Create Account',
                       // ignore: unnecessary_const

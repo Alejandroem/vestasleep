@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vestasleep/domain/services/authentication_service.dart';
 
 enum Status {
   justLanded,
@@ -32,7 +35,21 @@ class AuthenticationState {
 }
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
-  AuthenticationCubit() : super(AuthenticationState());
+  AuthenticationService authenticationService;
+  StreamSubscription? authStateChangesSubscription;
+  AuthenticationCubit(
+    this.authenticationService,
+  ) : super(AuthenticationState()) {
+    //We won't subscribe if we are already subscribed
+    authStateChangesSubscription ??=
+        authenticationService.authStateChanges.listen((user) {
+      if (user == null) {
+        emit(state.copyWith(status: Status.justLanded));
+      } else {
+        emit(state.copyWith(status: Status.authenticated));
+      }
+    });
+  }
 
   void setStatus(Status status) {
     emit(state.copyWith(status: status));
@@ -40,5 +57,9 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   void setErrorMessage(String errorMessage) {
     emit(state.copyWith(errorMessage: errorMessage));
+  }
+
+  void logOut() {
+    authenticationService.signOut();
   }
 }

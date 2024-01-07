@@ -1,12 +1,13 @@
 import '../models/vesta_user.dart';
 
 abstract class AuthenticationService {
+  Stream<VestaUser?> get authStateChanges;
   Future<VestaUser?> getCurrentUserOrNull();
   Future<VestaUser> signInWithEmailAndPassword(String email, String password);
   Future<VestaUser> signInWithApple();
   Future<VestaUser> signInWithGoogle();
   Future<VestaUser> createUserWithEmailAndPassword(
-      String email, String password);
+      String username, String email, String password);
   Future<VestaUser> signInAnonymously();
   Future<VestaUser> turnAnonymousUserIntoUser(
       VestaUser vestaUser, String password);

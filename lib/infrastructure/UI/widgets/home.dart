@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/create_account_cubit.dart';
+import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/users_service.dart';
 import 'choose_auth_method.dart';
 import 'create_account.dart';
 import 'landing.dart';
+import 'vesta_home.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -22,7 +25,10 @@ class Home extends StatelessWidget {
             child = const ChooseAuthMethod();
           case Status.creatingAccount:
             child = BlocProvider<CreateAccountCubit>(
-              create: (context) => CreateAccountCubit(),
+              create: (context) => CreateAccountCubit(
+                context.read<AuthenticationService>(),
+                context.read<UsersService>(),
+              ),
               child: const CreateAccount(),
             );
           case Status.loggingIn:
@@ -34,7 +40,7 @@ class Home extends StatelessWidget {
           case Status.authenticating:
           // TODO: Handle this case.
           case Status.authenticated:
-          // TODO: Handle this case.
+            child = const VestaHome();
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
