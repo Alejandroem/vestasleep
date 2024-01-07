@@ -5,7 +5,7 @@ import '../../../application/cubit/authentication_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/users_service.dart';
 import '../../services/firebase_authentication_service.dart';
-import '../../services/firebase_balance_service.dart';
+import '../../services/firebase_vestausers_service.dart';
 import 'home.dart';
 
 class App extends StatelessWidget {

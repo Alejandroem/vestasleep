@@ -1,13 +1,12 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
-import '../../../application/cubit/create_account_cubit.dart';
+import '../../../application/cubit/login_cubit.dart';
 
-class CreateAccount extends StatelessWidget {
-  const CreateAccount({super.key});
+class Login extends StatelessWidget {
+  const Login({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,108 +41,6 @@ class CreateAccount extends StatelessWidget {
                 height: 120,
               ),
               const SizedBox(height: 30),
-              //USERNAME
-              Container(
-                width: 311,
-                height: 60,
-                decoration: ShapeDecoration(
-                  color: Colors.white.withOpacity(0.699999988079071),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  shadows: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
-                      spreadRadius: 0,
-                    )
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon:
-                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
-                        builder: (context, state) {
-                          if (state.validatingUsername) {
-                            return const Padding(
-                              padding: EdgeInsets.all(6),
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            );
-                          }
-                          if (state.usernameTouched &&
-                              state.validUsername == "") {
-                            return Padding(
-                              padding: const EdgeInsets.all(6),
-                              child: SvgPicture.asset(
-                                "assets/svg/done_icon.svg",
-                              ),
-                            );
-                          }
-
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: SvgPicture.asset(
-                          "assets/svg/username_icon.svg",
-                        ),
-                      ),
-                      hintText: "Username",
-                      hintStyle: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        fontFamily: 'SF Pro Text',
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.85,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
-                      ),
-                    ),
-                    onChanged: (String value) {
-                      context.read<CreateAccountCubit>().setUsername(value);
-                    },
-                  ),
-                ),
-              ),
-              //text with errors
-              BlocBuilder<CreateAccountCubit, CreateAccountState>(
-                builder: (context, state) {
-                  if (state.usernameTouched && state.validUsername != "") {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        12,
-                        4,
-                        12,
-                        4,
-                      ),
-                      child: Text(
-                        state.validUsername,
-                        style: const TextStyle(
-                          color: Color(0xFFE02020),
-                          fontSize: 14,
-                          fontFamily: 'M PLUS 1',
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.70,
-                        ),
-                      ),
-                    );
-                  }
-                  return const SizedBox(height: 30);
-                },
-              ),
               //EMAIL
               Container(
                 width: 311,
@@ -166,8 +63,7 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
-                      suffixIcon:
-                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                      suffixIcon: BlocBuilder<LoginCubit, LoginState>(
                         builder: (context, state) {
                           if (state.emailTouched && state.validEmail == "") {
                             return Padding(
@@ -202,12 +98,12 @@ class CreateAccount extends StatelessWidget {
                       ),
                     ),
                     onChanged: (String value) {
-                      context.read<CreateAccountCubit>().setEmail(value);
+                      context.read<LoginCubit>().setEmail(value);
                     },
                   ),
                 ),
               ),
-              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+              BlocBuilder<LoginCubit, LoginState>(
                 builder: (context, state) {
                   if (state.emailTouched && state.validEmail != "") {
                     return Padding(
@@ -253,8 +149,7 @@ class CreateAccount extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     decoration: InputDecoration(
-                      suffixIcon:
-                          BlocBuilder<CreateAccountCubit, CreateAccountState>(
+                      suffixIcon: BlocBuilder<LoginCubit, LoginState>(
                         builder: (context, state) {
                           if (state.passwordTouched &&
                               state.validPassword == "") {
@@ -290,12 +185,12 @@ class CreateAccount extends StatelessWidget {
                       ),
                     ),
                     onChanged: (String value) {
-                      context.read<CreateAccountCubit>().setPassword(value);
+                      context.read<LoginCubit>().setPassword(value);
                     },
                   ),
                 ),
               ),
-              BlocBuilder<CreateAccountCubit, CreateAccountState>(
+              BlocBuilder<LoginCubit, LoginState>(
                 builder: (context, state) {
                   if (state.passwordTouched && state.validPassword != "") {
                     return Padding(
@@ -320,13 +215,12 @@ class CreateAccount extends StatelessWidget {
                   return const SizedBox(height: 30);
                 },
               ),
-              BlocBuilder<CreateAccountCubit, CreateAccountState>(
-                  builder: (context, state) {
+              BlocBuilder<LoginCubit, LoginState>(builder: (context, state) {
                 return Container(
                   width: 311,
                   height: 55,
                   decoration: ShapeDecoration(
-                    color: state.validUser()
+                    color: state.validForm()
                         ? const Color(0xFF37A2E7)
                         : const Color(0x4D37A2E7),
                     shape: RoundedRectangleBorder(
@@ -342,18 +236,18 @@ class CreateAccount extends StatelessWidget {
                     ],
                   ),
                   child: TextButton(
-                    onPressed: state.validUser() && !state.isSubmitting
+                    onPressed: state.validForm() && !state.isSubmitting
                         ? () {
-                            context.read<CreateAccountCubit>().createAccount();
+                            context.read<LoginCubit>().logIn();
                           }
                         : null,
                     child: state.isSubmitting
                         ? const CircularProgressIndicator()
                         : Text(
-                            'Create Account',
+                            'Log In',
                             // ignore: unnecessary_const
                             style: TextStyle(
-                              color: state.validUser()
+                              color: state.validForm()
                                   ? Colors.white
                                   : const Color(0x4DFFFFFF),
                               fontSize: 17,
@@ -366,46 +260,30 @@ class CreateAccount extends StatelessWidget {
                   ),
                 );
               }),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Have a Vesta Sleep account already?  ',
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 15,
-                          fontFamily: 'Lato',
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 0.75,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Log In',
-                        style: const TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 17,
-                          fontFamily: 'Lato',
-                          fontWeight: FontWeight.w700,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.white,
-                          letterSpacing: 0.85,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            context.read<AuthenticationCubit>().setStatus(
-                                  Status.loggingIn,
-                                );
-                          },
-                      ),
-                    ],
+                child: TextButton(
+                  onPressed: () {
+                    context.read<AuthenticationCubit>().setStatus(
+                          Status.resettingPassword,
+                        );
+                  },
+                  child: const Text(
+                    'Forgot password?',
+                    style: TextStyle(
+                      color: Color(0xFFCDCDCD),
+                      fontSize: 17,
+                      fontFamily: 'M PLUS 1',
+                      fontWeight: FontWeight.w400,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Color(0xFFCDCDCD),
+                      letterSpacing: 0.85,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Text.rich(

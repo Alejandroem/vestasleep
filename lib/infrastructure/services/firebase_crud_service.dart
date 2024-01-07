@@ -106,4 +106,20 @@ abstract class FirebaseCrudService<T> extends CrudService<T> {
       return null as T;
     }
   }
+
+  @override
+  Future<T> updateOrCreate(T entity) async {
+    try {
+      if ((entity as Model).id?.isEmpty ?? true) {
+        return create(entity);
+      }
+      if (await read((entity).id!) == null) {
+        return create(entity);
+      }
+      return update(entity);
+    } catch (e) {
+      log(e.toString());
+      return null as T;
+    }
+  }
 }

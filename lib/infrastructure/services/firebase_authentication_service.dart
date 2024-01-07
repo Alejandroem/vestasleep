@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../domain/models/vesta_exception.dart';
 import '../../domain/models/vesta_user.dart';
 import '../../domain/services/authentication_service.dart';
+import 'firebase_vestausers_service.dart';
 
 class FirebaseAuthenticationService extends AuthenticationService {
   //stream to listen to auth changes
@@ -17,13 +19,20 @@ class FirebaseAuthenticationService extends AuthenticationService {
           if (user == null) {
             return null;
           }
-          return VestaUser(
+          FirebaseVestaUsersService usersService = FirebaseVestaUsersService();
+          VestaUser vestaUser = VestaUser(
             id: user.uid,
             username: user.displayName ?? 'Guest',
             email: user.email ?? '',
             photoURL: user.photoURL ?? '',
             isAnonymous: user.isAnonymous,
           );
+          usersService.updateOrCreate(vestaUser).then((value) {
+            log("User updated or created successfully.");
+          }).catchError((error) {
+            log("Failed to update or create user: $error");
+          });
+          return vestaUser;
         },
       );
 
@@ -189,10 +198,10 @@ class FirebaseAuthenticationService extends AuthenticationService {
         isAnonymous: userCredential.user?.isAnonymous ?? true,
       );
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'credential-already-in-use') {
-        throw Exception('credential-already-in-use');
-      }
-      rethrow;
+      throw VestaException(
+        message: e.code,
+        code: e.code,
+      );
     } catch (e) {
       rethrow;
     }

@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vestasleep/domain/services/authentication_service.dart';
+
+import '../../domain/services/authentication_service.dart';
 
 enum Status {
   justLanded,
@@ -59,7 +60,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     emit(state.copyWith(errorMessage: errorMessage));
   }
 
-  void logOut() {
-    authenticationService.signOut();
+  void logOut() async {
+    await authenticationService.signOut();
   }
 }

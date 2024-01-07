@@ -1,4 +1,4 @@
-import 'package:vestasleep/domain/models/model.dart';
+import 'model.dart';
 
 class VestaUser implements Model {
   @override

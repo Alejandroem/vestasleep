@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/create_account_cubit.dart';
+import '../../../application/cubit/login_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/users_service.dart';
 import 'choose_auth_method.dart';
 import 'create_account.dart';
 import 'landing.dart';
+import 'login.dart';
 import 'vesta_home.dart';
 
 class Home extends StatelessWidget {
@@ -21,8 +23,10 @@ class Home extends StatelessWidget {
         switch (state.status) {
           case Status.justLanded:
             child = const Landing();
+            break;
           case Status.choosingAuthenticationMethod:
             child = const ChooseAuthMethod();
+            break;
           case Status.creatingAccount:
             child = BlocProvider<CreateAccountCubit>(
               create: (context) => CreateAccountCubit(
@@ -31,8 +35,14 @@ class Home extends StatelessWidget {
               ),
               child: const CreateAccount(),
             );
+            break;
           case Status.loggingIn:
-          // TODO: Handle this case.
+            child = BlocProvider(
+              create: (context) => LoginCubit(
+                context.read<AuthenticationService>(),
+              ),
+              child: const Login(),
+            );
           case Status.resettingPassword:
           // TODO: Handle this case.
           case Status.readingTosAndPp:
@@ -41,6 +51,8 @@ class Home extends StatelessWidget {
           // TODO: Handle this case.
           case Status.authenticated:
             child = const VestaHome();
+          default:
+            child = const Landing();
         }
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),

@@ -110,8 +110,20 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       usersService.readBy("username", username).then((value) {
         if (value.isEmpty) {
+          emit(
+            state.copyWith(
+              validatingUsername: false,
+              validUsername: "",
+            ),
+          );
           return null;
         }
+        emit(
+          state.copyWith(
+            validatingUsername: false,
+            validUsername: "Username already used",
+          ),
+        );
         return value.first;
       });
     });
@@ -165,9 +177,9 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
         state.email,
         state.password,
       );
-      emit(state.copyWith(isSuccess: true));
+      emit(state.copyWith(isSuccess: true, isSubmitting: false));
     } catch (e) {
-      emit(state.copyWith(isSuccess: false));
+      emit(state.copyWith(isSuccess: false, isSubmitting: false));
     }
   }
 }
