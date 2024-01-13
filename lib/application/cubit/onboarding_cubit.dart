@@ -1,23 +1,26 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-enum OnboardingPage {
+import '../../domain/services/health_service.dart';
+
+enum CurrentPage {
   getStarted,
+  connectToHealthKit, dashboard,
 }
 
-class OnboardingState {
+class VestaAppState {
   final bool hasFinishedOnboarding;
-  final OnboardingPage page;
+  final CurrentPage page;
 
-  OnboardingState({
+  VestaAppState({
     this.hasFinishedOnboarding = false,
-    this.page = OnboardingPage.getStarted,
+    this.page = CurrentPage.getStarted,
   });
 
-  OnboardingState copyWith({
+  VestaAppState copyWith({
     bool? hasFinishedOnboarding,
-    OnboardingPage? page,
+    CurrentPage? page,
   }) {
-    return OnboardingState(
+    return VestaAppState(
       hasFinishedOnboarding:
           hasFinishedOnboarding ?? this.hasFinishedOnboarding,
       page: page ?? this.page,
@@ -25,14 +28,33 @@ class OnboardingState {
   }
 }
 
-class OnboardingCubit extends Cubit<OnboardingState> {
-  OnboardingCubit() : super(OnboardingState());
+class VestaAppCubit extends HydratedCubit<VestaAppState> {
+  final HealthService healthService;
+  VestaAppCubit(this.healthService) : super(VestaAppState()) {
+    healthService.requestPermission();
+  }
 
   void setHasFinishedOnboarding(bool hasFinishedOnboarding) {
     emit(state.copyWith(hasFinishedOnboarding: hasFinishedOnboarding));
   }
 
-  void setPage(OnboardingPage page) {
+  void setPage(CurrentPage page) {
     emit(state.copyWith(page: page));
   }
-}   
+
+  @override
+  VestaAppState? fromJson(Map<String, dynamic> json) {
+    return VestaAppState(
+      hasFinishedOnboarding: json["hasFinishedOnboarding"],
+      page: CurrentPage.values[json["page"]],
+    );
+  }
+
+  @override
+  Map<String, dynamic>? toJson(VestaAppState state) {
+    return {
+      "hasFinishedOnboarding": state.hasFinishedOnboarding,
+      "page": state.page.index,
+    };
+  }
+}

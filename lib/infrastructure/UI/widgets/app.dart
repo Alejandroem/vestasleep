@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
+import '../../../application/cubit/onboarding_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/health_service.dart';
 import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
 import '../../services/firebase_authentication_service.dart';
 import '../../services/firebase_vestausernames_service.dart';
 import '../../services/firebase_vestausers_service.dart';
+import '../../services/google_apple_health_service.dart';
 import 'home.dart';
 
 class App extends StatelessWidget {
@@ -31,12 +34,20 @@ class App extends StatelessWidget {
           RepositoryProvider<UserNamesService>(
             create: (context) => FirebaseVestaUserNamesService(),
           ),
+          RepositoryProvider<HealthService>(
+            create: (context) => GoogleAppleHealthService(),
+          ),
         ],
         child: MultiBlocProvider(
           providers: [
             BlocProvider<AuthenticationCubit>(
               create: (context) => AuthenticationCubit(
                 context.read<AuthenticationService>(),
+              ),
+            ),
+            BlocProvider<VestaAppCubit>(
+              create: (context) => VestaAppCubit(
+                context.read<HealthService>(),
               ),
             ),
           ],
