@@ -24,7 +24,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
           FirebaseVestaUsersService usersService = FirebaseVestaUsersService();
           VestaUser vestaUser = VestaUser(
             id: user.uid,
-            username: user.displayName!,
+            username: user.displayName ?? '',
             email: user.email ?? '',
             photoURL: user.photoURL ?? '',
             isAnonymous: user.isAnonymous,

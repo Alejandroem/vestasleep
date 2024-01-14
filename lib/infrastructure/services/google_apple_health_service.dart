@@ -8,7 +8,7 @@ class GoogleAppleHealthService implements HealthService {
   HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
 
   @override
-  Future<bool> requestPermission() async {
+  Future<bool> requestPermissions() async {
     //Request permissions for
     //   HealthDataType.BLOOD_GLUCOSE,
     //   HealthDataType.BLOOD_PRESSURE_SYSTOLIC,

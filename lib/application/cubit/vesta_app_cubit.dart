@@ -1,24 +1,23 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-import '../../domain/services/health_service.dart';
-
-enum CurrentPage {
+enum VestaPages {
   getStarted,
-  connectToHealthKit, dashboard,
+  connectToHealthKit,
+  dashboard, selectGender,
 }
 
 class VestaAppState {
   final bool hasFinishedOnboarding;
-  final CurrentPage page;
+  final VestaPages page;
 
   VestaAppState({
     this.hasFinishedOnboarding = false,
-    this.page = CurrentPage.getStarted,
+    this.page = VestaPages.getStarted,
   });
 
   VestaAppState copyWith({
     bool? hasFinishedOnboarding,
-    CurrentPage? page,
+    VestaPages? page,
   }) {
     return VestaAppState(
       hasFinishedOnboarding:
@@ -29,16 +28,13 @@ class VestaAppState {
 }
 
 class VestaAppCubit extends HydratedCubit<VestaAppState> {
-  final HealthService healthService;
-  VestaAppCubit(this.healthService) : super(VestaAppState()) {
-    healthService.requestPermission();
-  }
+  VestaAppCubit() : super(VestaAppState());
 
   void setHasFinishedOnboarding(bool hasFinishedOnboarding) {
     emit(state.copyWith(hasFinishedOnboarding: hasFinishedOnboarding));
   }
 
-  void setPage(CurrentPage page) {
+  void setPage(VestaPages page) {
     emit(state.copyWith(page: page));
   }
 
@@ -46,7 +42,7 @@ class VestaAppCubit extends HydratedCubit<VestaAppState> {
   VestaAppState? fromJson(Map<String, dynamic> json) {
     return VestaAppState(
       hasFinishedOnboarding: json["hasFinishedOnboarding"],
-      page: CurrentPage.values[json["page"]],
+      page: VestaPages.values[json["page"]],
     );
   }
 

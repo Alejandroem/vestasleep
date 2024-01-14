@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../application/cubit/onboarding_cubit.dart';
+import '../../../application/cubit/vesta_app_cubit.dart';
+import 'connect_health_kit.dart';
 import 'dashboard.dart';
 import 'getting_started.dart';
 
@@ -14,15 +15,17 @@ class VestaHome extends StatelessWidget {
       builder: (context, state) {
         Widget child = Container();
         switch (state.page) {
-          case CurrentPage.getStarted:
+          case VestaPages.getStarted:
             child = const GettingStarted();
             break;
-          case CurrentPage.connectToHealthKit:
-            child = const Text('Connect to HealthKit');
+          case VestaPages.connectToHealthKit:
+            child = const ConnectHealthKit();
             break;
-          case CurrentPage.dashboard:
+          case VestaPages.dashboard:
             child = const Dashboard();
             break;
+          case VestaPages.selectGender:
+          // TODO: Handle this case.
         }
         //animated child
         return AnimatedSwitcher(

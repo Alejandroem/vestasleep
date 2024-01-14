@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
+import '../../../application/cubit/health_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
+import '../common/vesta_back_white_button.dart';
 import '../common/vesta_outline_button.dart';
+import '../common/vesta_underlined_button.dart';
 
-class GettingStarted extends StatelessWidget {
-  const GettingStarted({super.key});
+class ConnectHealthKit extends StatelessWidget {
+  const ConnectHealthKit({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +42,10 @@ class GettingStarted extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.only(
-                    top: 100,
+                    top: MediaQuery.of(context).size.height * 0.1,
                     left: 20,
                     right: 20,
-                    bottom: MediaQuery.of(context).size.height * 0.2,
+                    bottom: MediaQuery.of(context).size.height * 0.15,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -48,7 +54,7 @@ class GettingStarted extends StatelessWidget {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Getting ',
+                              text: 'Health ',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -58,7 +64,7 @@ class GettingStarted extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'Started ',
+                              text: 'Kit',
                               style: TextStyle(
                                 color: Color(0xFF37A2E7),
                                 fontSize: 24,
@@ -70,13 +76,13 @@ class GettingStarted extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Text.rich(
+                      Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(
-                              text: 'Let\'s get',
+                            const TextSpan(
+                              text: 'Please enable your ',
                               style: TextStyle(
-                                color: Color(0xFF37A2E7),
+                                color: Colors.white,
                                 fontSize: 17,
                                 fontFamily: 'SF Pro Text',
                                 fontWeight: FontWeight.w400,
@@ -84,10 +90,32 @@ class GettingStarted extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
+                              text: Platform.isIOS
+                                  ? 'Apple Health Kit'
+                                  : 'Google Fit',
+                              style: const TextStyle(
+                                color: Color(0xFF37A2E7),
+                                fontSize: 17,
+                                fontFamily: 'SF Pro Text',
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 0.85,
+                              ),
+                            ),
+                            const TextSpan(
                               text:
-                                  ' to know your sleeping habits, tell us a few things about yourself.',
+                                  ' to allow for more accurate data and get help ',
                               style: TextStyle(
                                 color: Colors.white,
+                                fontSize: 17,
+                                fontFamily: 'SF Pro Text',
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 0.85,
+                              ),
+                            ),
+                            const TextSpan(
+                              text: 'in case of emergency.',
+                              style: TextStyle(
+                                color: Color(0xFF37A2E7),
                                 fontSize: 17,
                                 fontFamily: 'SF Pro Text',
                                 fontWeight: FontWeight.w400,
@@ -98,17 +126,38 @@ class GettingStarted extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      SvgPicture.asset(
+                        Platform.isIOS
+                            ? 'assets/svg/apple_health_kit.svg'
+                            : 'assets/svg/google_fit.svg',
+                        width: 200,
+                        height: 200,
+                      ),
                       VestaOutlineButton(
+                        onPressed: () {
+                          context.read<HealthCubit>().checkPermissions();
+                        },
+                        buttonText: 'Give Permission to Vesta',
+                      ),
+                      VestaUnderlinedButton(
+                        color: const Color(0xff37A2E7),
                         onPressed: () {
                           context
                               .read<VestaAppCubit>()
-                              .setPage(VestaPages.connectToHealthKit);
+                              .setPage(VestaPages.selectGender);
                         },
-                        buttonText: 'Next',
-                      )
+                        text: 'Skip for Now',
+                      ),
                     ],
                   ),
                 ),
+                VestaWhiteBackButton(
+                  onPressed: () {
+                    context
+                        .read<VestaAppCubit>()
+                        .setPage(VestaPages.getStarted);
+                  },
+                )
               ],
             ),
           ),

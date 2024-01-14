@@ -1,4 +1,3 @@
 abstract class HealthService {
-  Future<bool> requestPermission();
-  
+  Future<bool> requestPermissions();
 }

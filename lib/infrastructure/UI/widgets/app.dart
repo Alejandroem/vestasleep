@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/authentication_cubit.dart';
-import '../../../application/cubit/onboarding_cubit.dart';
+import '../../../application/cubit/health_cubit.dart';
+import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/health_service.dart';
 import '../../../domain/services/usernames_service.dart';
@@ -46,7 +47,10 @@ class App extends StatelessWidget {
               ),
             ),
             BlocProvider<VestaAppCubit>(
-              create: (context) => VestaAppCubit(
+              create: (context) => VestaAppCubit(),
+            ),
+            BlocProvider<HealthCubit>(
+              create: (context) => HealthCubit(
                 context.read<HealthService>(),
               ),
             ),
