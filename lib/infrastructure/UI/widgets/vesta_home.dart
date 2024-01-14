@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/gender_cubit.dart';
+import '../../../application/cubit/setup_profile_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/users_service.dart';
@@ -38,7 +39,10 @@ class VestaHome extends StatelessWidget {
               child: const SelectGender(),
             );
           case VestaPages.settingUpProfile:
-            child = const SettingUpProfile();
+            child = BlocProvider<SetupProfileCubit>(
+              create: (context) => SetupProfileCubit(),
+              child: const SettingUpProfile(),
+            );
             break;
         }
         //animated child

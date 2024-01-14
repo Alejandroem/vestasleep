@@ -11,7 +11,6 @@ class GoogleAppleHealthService implements HealthService {
     HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
 
     await Permission.activityRecognition.request();
-    await Permission.location.request();
 
     final types = [
       HealthDataType.WEIGHT,
@@ -46,5 +45,11 @@ class GoogleAppleHealthService implements HealthService {
     }
 
     return authorized;
+  }
+
+  @override
+  Future<bool> requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.request();
+    return status.isGranted;
   }
 }
