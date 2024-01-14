@@ -45,11 +45,19 @@ android {
         applicationId "com.vestasleep.vestasleep"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 26
+        minSdkVersion 28
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+    }
+     signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
     }
 
     buildTypes {
