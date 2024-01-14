@@ -3,7 +3,9 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 enum VestaPages {
   getStarted,
   connectToHealthKit,
-  dashboard, selectGender,
+  dashboard,
+  selectGender,
+  settingUpProfile,
 }
 
 class VestaAppState {

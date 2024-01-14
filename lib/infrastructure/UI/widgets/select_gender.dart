@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wheel_chooser/wheel_chooser.dart';
 
+import '../../../application/cubit/gender_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../common/vesta_back_white_button.dart';
+import '../common/vesta_outline_button.dart';
 
 class SelectGender extends StatelessWidget {
   const SelectGender({super.key});
 
   @override
   Widget build(BuildContext context) {
+    const TextStyle selectedStyle = TextStyle(
+      color: Color(0xFF37A2E7),
+      fontSize: 24,
+      fontFamily: 'M PLUS 1',
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.24,
+    );
+
+    final TextStyle unselectedStyle = TextStyle(
+      color: const Color(0xFFCDCDCD).withOpacity(0.20),
+      fontSize: 22,
+      fontFamily: 'M PLUS 1',
+      fontWeight: FontWeight.w400,
+      letterSpacing: 1.10,
+    );
     return Scaffold(
       backgroundColor: const Color(0xff1B1464),
       body: PopScope(
@@ -34,117 +51,82 @@ class SelectGender extends StatelessWidget {
           ),
           child: SafeArea(
             child: Stack(
-              fit: StackFit.expand,
+              alignment: Alignment.center,
               children: [
-                const SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: 100,
-                      left: 20,
-                      right: 20,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                const Positioned(
+                  top: 100,
+                  child: Text.rich(
+                    TextSpan(
                       children: [
-                        Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Terms & ',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontFamily: 'M PLUS 1',
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.24,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Conditions',
-                                style: TextStyle(
-                                  color: Color(0xFF37A2E7),
-                                  fontSize: 24,
-                                  fontFamily: 'M PLUS 1',
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.24,
-                                ),
-                              ),
-                            ],
+                        TextSpan(
+                          text: 'What is your ',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontFamily: 'M PLUS 1',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.24,
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: 305,
-                          child: Text(
-                            'These statements have not been evaluated by the Food and Drug Administration. These products are not intended to diagnose, treat, cure, or prevent any disease.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontFamily: 'SF Pro Text',
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.85,
-                            ),
+                        TextSpan(
+                          text: 'Gender?',
+                          style: TextStyle(
+                            color: Color(0xFF37A2E7),
+                            fontSize: 24,
+                            fontFamily: 'M PLUS 1',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.24,
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: 311,
-                          child: Text(
-                            'Consult your physician before beginning any exercise or diet program.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontFamily: 'SF Pro Text',
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.85,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: 301,
-                          child: Text(
-                            'Prior to using these products or information, take them to your physician for approval.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontFamily: 'SF Pro Text',
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.85,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: 329,
-                          child: Text(
-                            'IN NO WAY SHOULD VESTA SLEEP WEB SITE AND Heart monitor BE CONSIDERED AS OFFERING MEDICAL ADVICE! THE CONTENT ON THE SITE IS PRESENTED IN SUMMARY FORM IS GENERAL IN NATURE IS PROVIDED FOR INFORMATIONAL PURPOSES ONLY. NEVER DISREGARD MEDICAL ADVICE OR DELAY IN SEEKING IT BECAUSE OF SOMETHING YOU HAVE READ ON THIS OR ANY OTHER SITE ON THE INTERNET!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontFamily: 'SF Pro Text',
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.85,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
                         ),
                       ],
                     ),
+                  ),
+                ),
+                WheelChooser.custom(
+                  startPosition: 1,
+                  onValueChanged: (a) =>
+                      context.read<GenderCubit>().setGender(a.toString()),
+                  children: <Widget>[
+                    Text(
+                      "Non Binary",
+                      style: context.select((GenderCubit c) =>
+                          c.state.gender == "Non Binary"
+                              ? selectedStyle
+                              : unselectedStyle),
+                    ),
+                    Text(
+                      "Rather Not Say",
+                      style: context.select((GenderCubit c) =>
+                          c.state.gender == "Rather Not Say"
+                              ? selectedStyle
+                              : unselectedStyle),
+                    ),
+                    Text(
+                      "Male",
+                      style: context.select((GenderCubit c) =>
+                          c.state.gender == "Male"
+                              ? selectedStyle
+                              : unselectedStyle),
+                    ),
+                    Text(
+                      "Female",
+                      style: context.select((GenderCubit c) =>
+                          c.state.gender == "Female"
+                              ? selectedStyle
+                              : unselectedStyle),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 100,
+                  child: VestaOutlineButton(
+                    onPressed: () {
+                      context.read<GenderCubit>().persistGender();
+                      context
+                          .read<VestaAppCubit>()
+                          .setPage(VestaPages.settingUpProfile);
+                    },
+                    buttonText: 'Next',
                   ),
                 ),
                 VestaWhiteBackButton(

@@ -8,6 +8,7 @@ class VestaUser implements Model {
   final String? password;
   final String photoURL;
   final bool isAnonymous;
+  final String? gender;
 
   VestaUser({
     this.id,
@@ -16,16 +17,18 @@ class VestaUser implements Model {
     this.password,
     required this.photoURL,
     required this.isAnonymous,
+    this.gender,
   });
 
   @override
-  Model copyWith({
+  VestaUser copyWith({
     String? id,
     String? username,
     String? email,
     String? password,
     String? photoURL,
     bool? isAnonymous,
+    String? gender,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class VestaUser implements Model {
       password: password ?? this.password,
       photoURL: photoURL ?? this.photoURL,
       isAnonymous: isAnonymous ?? this.isAnonymous,
+      gender: gender ?? this.gender,
     );
   }
 
@@ -46,6 +50,7 @@ class VestaUser implements Model {
       password: json['password'],
       photoURL: json['photoURL'],
       isAnonymous: json['isAnonymous'],
+      gender: json['gender'],
     );
   }
 
@@ -57,6 +62,7 @@ class VestaUser implements Model {
       password: json['password'],
       photoURL: json['photoURL'],
       isAnonymous: json['isAnonymous'],
+      gender: json['gender'],
     );
   }
 
@@ -69,6 +75,7 @@ class VestaUser implements Model {
       password: json[0]['password'],
       photoURL: json[0]['photoURL'],
       isAnonymous: json[0]['isAnonymous'],
+      gender: json[0]['gender'],
     );
   }
 
@@ -81,6 +88,7 @@ class VestaUser implements Model {
       'password': password,
       'photoURL': photoURL,
       'isAnonymous': isAnonymous,
+      'gender': gender,
     };
   }
 
@@ -93,6 +101,7 @@ class VestaUser implements Model {
         'password': password,
         'photoURL': photoURL,
         'isAnonymous': isAnonymous,
+        'gender': gender,
       }
     ];
   }

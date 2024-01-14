@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:health/health.dart';
+
+//TODO FIX THIS AS SOON AS THERE IS A NEW RELEASE
+
+// ignore: prefer_relative_imports
 import 'package:health_example/util.dart';
 import 'package:permission_handler/permission_handler.dart';
 

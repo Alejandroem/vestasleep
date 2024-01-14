@@ -29,7 +29,7 @@ class HealthState {
 class HealthCubit extends Cubit<HealthState> {
   final HealthService healthService;
 
-  HealthCubit(this.healthService) : super(HealthState()) {}
+  HealthCubit(this.healthService) : super(HealthState());
 
   Future<void> checkPermissions() async {
     final bool hasPermission = await healthService.requestPermissions();

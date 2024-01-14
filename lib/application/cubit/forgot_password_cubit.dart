@@ -8,6 +8,7 @@ class ForgotPasswordState {
   final String emailValid;
   final bool isSubmitting;
   final bool isSuccess;
+  
 
   ForgotPasswordState({
     required this.email,
