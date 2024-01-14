@@ -5,6 +5,7 @@ import 'package:wheel_chooser/wheel_chooser.dart';
 import '../../../application/cubit/setup_profile_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../common/vesta_back_white_button.dart';
+import '../common/vesta_outline_button.dart';
 
 class SettingUpProfile extends StatelessWidget {
   const SettingUpProfile({super.key});
@@ -12,7 +13,7 @@ class SettingUpProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const TextStyle selectedStyle = TextStyle(
-      color: Color(0xFF37A2E7),
+      color: Colors.white,
       fontSize: 24,
       fontFamily: 'M PLUS 1',
       fontWeight: FontWeight.w600,
@@ -32,7 +33,7 @@ class SettingUpProfile extends StatelessWidget {
         canPop: false,
         onPopInvoked: (bool isPop) {
           context.read<VestaAppCubit>().setPage(
-                VestaPages.connectToHealthKit,
+                VestaPages.selectGender,
               );
         },
         child: Container(
@@ -185,7 +186,9 @@ class SettingUpProfile extends StatelessWidget {
                                               (SetupProfileCubit c) =>
                                                   c.state.age) -
                                           18,
-                                      onValueChanged: (a) => 1,
+                                      onValueChanged: (a) => context
+                                          .read<SetupProfileCubit>()
+                                          .setAge(a + 18),
                                       children: [
                                         ...List.generate(
                                           80,
@@ -225,7 +228,9 @@ class SettingUpProfile extends StatelessWidget {
                                                 c.state.height * 12 - 48,
                                           )
                                           .toInt(),
-                                      onValueChanged: (a) => 1,
+                                      onValueChanged: (a) => context
+                                          .read<SetupProfileCubit>()
+                                          .setHeight((a + 48) / 12),
                                       children: [
                                         ...List.generate(
                                           37, // This will generate heights from 4'0'' to 7'0''
@@ -272,12 +277,15 @@ class SettingUpProfile extends StatelessWidget {
                                   Expanded(
                                     child: WheelChooser.custom(
                                       startPosition: context
-                                          .select(
-                                            (SetupProfileCubit c) =>
-                                                c.state.weight,
-                                          )
-                                          .toInt(),
-                                      onValueChanged: (a) => 1,
+                                              .select(
+                                                (SetupProfileCubit c) =>
+                                                    c.state.weight,
+                                              )
+                                              .toInt() -
+                                          100,
+                                      onValueChanged: (a) => context
+                                          .read<SetupProfileCubit>()
+                                          .setWeight((a + 100).toDouble()),
                                       children: [
                                         ...List.generate(
                                           151, // This will generate weights from 100 to 250 kg
@@ -292,7 +300,7 @@ class SettingUpProfile extends StatelessWidget {
                                                                 c.state.weight,
                                                           )
                                                           .toInt() ==
-                                                      index
+                                                      weight
                                                   ? selectedStyle
                                                   : unselectedStyle,
                                             );
@@ -306,7 +314,19 @@ class SettingUpProfile extends StatelessWidget {
                             ),
                           ],
                         ),
-                      )
+                      ),
+                      VestaOutlineButton(
+                        onPressed: () {
+                          context.read<SetupProfileCubit>().persistGender();
+                          context
+                              .read<VestaAppCubit>()
+                              .setPage(VestaPages.editAddress);
+                        },
+                        buttonText: 'Next',
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
                     ],
                   ),
                 ),

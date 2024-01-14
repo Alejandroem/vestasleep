@@ -9,6 +9,9 @@ class VestaUser implements Model {
   final String photoURL;
   final bool isAnonymous;
   final String? gender;
+  final int? age;
+  final double? weight;
+  final double? height;
 
   VestaUser({
     this.id,
@@ -18,6 +21,9 @@ class VestaUser implements Model {
     required this.photoURL,
     required this.isAnonymous,
     this.gender,
+    this.age,
+    this.weight,
+    this.height,
   });
 
   @override
@@ -29,6 +35,9 @@ class VestaUser implements Model {
     String? photoURL,
     bool? isAnonymous,
     String? gender,
+    int? age,
+    double? weight,
+    double? height,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -38,6 +47,9 @@ class VestaUser implements Model {
       photoURL: photoURL ?? this.photoURL,
       isAnonymous: isAnonymous ?? this.isAnonymous,
       gender: gender ?? this.gender,
+      age: age ?? this.age,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
     );
   }
 
@@ -51,6 +63,9 @@ class VestaUser implements Model {
       photoURL: json['photoURL'],
       isAnonymous: json['isAnonymous'],
       gender: json['gender'],
+      age: json['age'],
+      weight: json['weight'],
+      height: json['height'],
     );
   }
 
@@ -63,6 +78,9 @@ class VestaUser implements Model {
       photoURL: json['photoURL'],
       isAnonymous: json['isAnonymous'],
       gender: json['gender'],
+      age: json['age'],
+      weight: json['weight'],
+      height: json['height'],
     );
   }
 
@@ -76,6 +94,9 @@ class VestaUser implements Model {
       photoURL: json[0]['photoURL'],
       isAnonymous: json[0]['isAnonymous'],
       gender: json[0]['gender'],
+      age: json[0]['age'],
+      weight: json[0]['weight'],
+      height: json[0]['height'],
     );
   }
 
@@ -89,6 +110,9 @@ class VestaUser implements Model {
       'photoURL': photoURL,
       'isAnonymous': isAnonymous,
       'gender': gender,
+      'age': age,
+      'weight': weight,
+      'height': height,
     };
   }
 
@@ -102,6 +126,9 @@ class VestaUser implements Model {
         'photoURL': photoURL,
         'isAnonymous': isAnonymous,
         'gender': gender,
+        'age': age,
+        'weight': weight,
+        'height': height,
       }
     ];
   }

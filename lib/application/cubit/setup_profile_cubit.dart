@@ -1,5 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/models/vesta_user.dart';
+import '../../domain/services/authentication_service.dart';
+import '../../domain/services/users_service.dart';
+
 class SetupProfileState {
   final int age;
   final double weight;
@@ -25,8 +29,12 @@ class SetupProfileState {
 }
 
 class SetupProfileCubit extends Cubit<SetupProfileState> {
-  SetupProfileCubit()
-      : super(
+  final AuthenticationService authenticationService;
+  final UsersService usersService;
+  SetupProfileCubit(
+    this.authenticationService,
+    this.usersService,
+  ) : super(
           SetupProfileState(
             age: 25,
             weight: 125,
@@ -44,5 +52,19 @@ class SetupProfileCubit extends Cubit<SetupProfileState> {
 
   void setHeight(double height) {
     emit(state.copyWith(height: height));
+  }
+
+  void persistGender() async {
+    VestaUser? user = await authenticationService.getCurrentUserOrNull();
+    if (user == null) {
+      await authenticationService.signOut();
+    } else {
+      user = user.copyWith(
+        age: state.age,
+        weight: state.weight,
+        height: state.height,
+      );
+      await usersService.update(user);
+    }
   }
 }
