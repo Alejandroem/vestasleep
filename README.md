@@ -1,16 +1,9 @@
 # vestasleep
 
-A new Flutter project.
+## New envionment setup
 
-## Getting Started
+Get the SHA1 of the key and follow the next guide 
 
-This project is a starting point for a Flutter application.
+https://developers.google.com/fit/android/get-api-key?hl=es-419
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

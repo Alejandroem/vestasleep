@@ -1,25 +1,31 @@
 import 'dart:developer';
 
 import 'package:health/health.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../domain/services/health_service.dart';
 
 class GoogleAppleHealthService implements HealthService {
-  HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
-
   @override
   Future<bool> requestPermissions() async {
-    //Request permissions for
-    //   HealthDataType.BLOOD_GLUCOSE,
-    //   HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
-    //   HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
+    HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
 
-    List<HealthDataType> types = [
+    await Permission.activityRecognition.request();
+    await Permission.location.request();
+
+    final types = [
+      HealthDataType.WEIGHT,
+      HealthDataType.STEPS,
+      HealthDataType.HEIGHT,
       HealthDataType.BLOOD_GLUCOSE,
-      HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
+      HealthDataType.WORKOUT,
       HealthDataType.BLOOD_PRESSURE_DIASTOLIC,
+      HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
+      // Uncomment these lines on iOS - only available on iOS
+      //   // HealthDataType.AUDIOGRAM
     ];
-    final permissions = types.map((e) => HealthDataAccess.READ).toList();
+
+    final permissions = types.map((e) => HealthDataAccess.READ_WRITE).toList();
 
     // Check if we have permission
     bool? hasPermissions =
@@ -33,10 +39,9 @@ class GoogleAppleHealthService implements HealthService {
     if (!hasPermissions) {
       // requesting access to the data types before reading them
       try {
-        authorized =
-            await health.requestAuthorization(types, permissions: permissions);
+        authorized = await health.requestAuthorization(types);
       } catch (error) {
-        log("Exception in healthservice authorize: $error");
+        log("Exception in authorize: $error");
       }
     }
 

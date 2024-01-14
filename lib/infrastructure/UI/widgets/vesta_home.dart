@@ -5,6 +5,7 @@ import '../../../application/cubit/vesta_app_cubit.dart';
 import 'connect_health_kit.dart';
 import 'dashboard.dart';
 import 'getting_started.dart';
+import 'select_gender.dart';
 
 class VestaHome extends StatelessWidget {
   const VestaHome({super.key});
@@ -25,7 +26,7 @@ class VestaHome extends StatelessWidget {
             child = const Dashboard();
             break;
           case VestaPages.selectGender:
-          // TODO: Handle this case.
+            child = const SelectGender();
         }
         //animated child
         return AnimatedSwitcher(
