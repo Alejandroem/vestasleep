@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../common/vesta_back_white_button.dart';
@@ -35,9 +36,9 @@ class EmergencyContacts extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                const SingleChildScrollView(
+                SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       top: 100,
                       left: 20,
                       right: 20,
@@ -45,7 +46,7 @@ class EmergencyContacts extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text.rich(
+                        const Text.rich(
                           TextSpan(
                             children: [
                               TextSpan(
@@ -71,8 +72,150 @@ class EmergencyContacts extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
+                        ),
+                        SvgPicture.asset(
+                          'assets/svg/contacts.svg',
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 21,
+                              height: 216,
+                              child: Text(
+                                '1.\n\n\n2.\n\n\n\n3.',
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  color: Color(0xFF37A2E7),
+                                  fontSize: 17,
+                                  fontFamily: 'SF Pro Text',
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.85,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 292,
+                              child: Text(
+                                'Let\'s set up your emergency contacts\n\nPlease make sure you provide a contact that has texting capabilities\n\nIn the event of an emergency, your emergency contact will be alerted first, before contacting first responders.\n',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontFamily: 'SF Pro Text',
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 0.85,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 200,
+                          child: ListView.builder(
+                            itemCount: 3,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Column(
+                                children: [
+                                  Opacity(
+                                    opacity: 0.20,
+                                    child: Container(
+                                      width: 398,
+                                      decoration: ShapeDecoration(
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                            width: 1,
+                                            strokeAlign:
+                                                BorderSide.strokeAlignCenter,
+                                            color: Color(0xFFCDCDCD),
+                                          ),
+                                        ),
+                                        shadows: [
+                                          BoxShadow(
+                                            color: Color(0xFF00FFFF),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                            spreadRadius: 0,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: SvgPicture.asset(
+                                            'assets/svg/contact_person.svg',
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 4,
+                                          child: Text(
+                                            'Contact Name',
+                                            style: TextStyle(
+                                              color: Color(0xFF37A2E7),
+                                              fontSize: 17,
+                                              fontFamily: 'M PLUS 1',
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 0.85,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: SvgPicture.asset(
+                                            'assets/svg/arrow_right.svg',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Opacity(
+                                    opacity: 0.20,
+                                    child: Container(
+                                      width: 398,
+                                      decoration: ShapeDecoration(
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                            width: 1,
+                                            strokeAlign:
+                                                BorderSide.strokeAlignCenter,
+                                            color: Color(0xFFCDCDCD),
+                                          ),
+                                        ),
+                                        shadows: [
+                                          BoxShadow(
+                                            color: Color(0xFF00FFFF),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                            spreadRadius: 0,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
