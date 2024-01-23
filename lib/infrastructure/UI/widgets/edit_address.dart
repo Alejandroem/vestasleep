@@ -74,7 +74,7 @@ class EditAddress extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(
-                          height: 100,
+                          height: 40,
                         ),
                         Container(
                           width: 311,
@@ -96,6 +96,12 @@ class EditAddress extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: TextEditingController(
+                                text: context
+                                    .read<EditAddressCubit>()
+                                    .state
+                                    .address,
+                              ),
                               decoration: InputDecoration(
                                 suffixIcon: BlocBuilder<EditAddressCubit,
                                     EditAddressState>(
@@ -164,6 +170,12 @@ class EditAddress extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: TextEditingController(
+                                text: context
+                                    .read<EditAddressCubit>()
+                                    .state
+                                    .unitNumber,
+                              ),
                               decoration: InputDecoration(
                                 suffixIcon: BlocBuilder<EditAddressCubit,
                                     EditAddressState>(
@@ -232,6 +244,10 @@ class EditAddress extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: TextEditingController(
+                                text:
+                                    context.read<EditAddressCubit>().state.city,
+                              ),
                               decoration: InputDecoration(
                                 suffixIcon: BlocBuilder<EditAddressCubit,
                                     EditAddressState>(
@@ -298,6 +314,12 @@ class EditAddress extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: TextEditingController(
+                                text: context
+                                    .read<EditAddressCubit>()
+                                    .state
+                                    .state,
+                              ),
                               decoration: InputDecoration(
                                 suffixIcon: BlocBuilder<EditAddressCubit,
                                     EditAddressState>(
@@ -366,6 +388,12 @@ class EditAddress extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: TextEditingController(
+                                text: context
+                                    .read<EditAddressCubit>()
+                                    .state
+                                    .zipCode,
+                              ),
                               decoration: InputDecoration(
                                 suffixIcon: BlocBuilder<EditAddressCubit,
                                     EditAddressState>(
@@ -414,7 +442,7 @@ class EditAddress extends StatelessWidget {
                         const SizedBox(
                           height: 20,
                         ),
-                        Text(
+                        const Text(
                           'Your personal information will only be used in case of emergency services. ',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -425,7 +453,58 @@ class EditAddress extends StatelessWidget {
                             letterSpacing: 0.85,
                           ),
                         ),
-                        //TODO add a button to go to the next page
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        BlocBuilder<EditAddressCubit, EditAddressState>(
+                            builder: (context, state) {
+                          return Container(
+                            width: 311,
+                            height: 55,
+                            decoration: ShapeDecoration(
+                              color: state.validForm()
+                                  ? const Color(0xFF37A2E7)
+                                  : const Color(0x4D37A2E7),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x33000000),
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1),
+                                  spreadRadius: 0,
+                                )
+                              ],
+                            ),
+                            child: TextButton(
+                              onPressed: state.validForm() && !state.isLoading
+                                  ? () {
+                                      context.read<EditAddressCubit>().submit();
+                                      context.read<VestaAppCubit>().setPage(
+                                            VestaPages.editContacts,
+                                          );
+                                    }
+                                  : null,
+                              child: state.isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(
+                                      'Save',
+                                      // ignore: unnecessary_const
+                                      style: TextStyle(
+                                        color: state.validForm()
+                                            ? Colors.white
+                                            : const Color(0x4DFFFFFF),
+                                        fontSize: 17,
+                                        fontFamily: 'SF Pro Text',
+                                        fontWeight: FontWeight.w700,
+                                        height: 0.07,
+                                        letterSpacing: 0.85,
+                                      ),
+                                    ),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                   ),

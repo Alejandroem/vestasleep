@@ -1,5 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/models/address.dart';
+import '../../domain/models/vesta_user.dart';
+import '../../domain/services/authentication_service.dart';
+import '../../domain/services/users_service.dart';
+
 class EditAddressState {
   final String address;
   final String validAddress;
@@ -21,6 +26,8 @@ class EditAddressState {
   final String validZipCode;
   final bool zipCodeTouched;
 
+  final bool isLoading;
+
   EditAddressState({
     required this.address,
     required this.validAddress,
@@ -37,6 +44,7 @@ class EditAddressState {
     required this.zipCode,
     required this.validZipCode,
     required this.zipCodeTouched,
+    required this.isLoading,
   });
 
   //copyWith
@@ -56,6 +64,7 @@ class EditAddressState {
     String? zipCode,
     String? validZipCode,
     bool? zipCodeTouched,
+    bool? isLoading,
   }) {
     return EditAddressState(
       address: address ?? this.address,
@@ -73,13 +82,32 @@ class EditAddressState {
       zipCode: zipCode ?? this.zipCode,
       validZipCode: validZipCode ?? this.validZipCode,
       zipCodeTouched: zipCodeTouched ?? this.zipCodeTouched,
+      isLoading: isLoading ?? this.isLoading,
     );
+  }
+
+  bool validForm() {
+    //Validate if the form is valid by checking errors and touched
+    return validAddress.isEmpty &&
+        addresTouched &&
+        validUnitNumber.isEmpty &&
+        unitNumberTouched &&
+        validCity.isEmpty &&
+        cityTouched &&
+        validState.isEmpty &&
+        stateTouched &&
+        validZipCode.isEmpty &&
+        zipCodeTouched;
   }
 }
 
 class EditAddressCubit extends Cubit<EditAddressState> {
-  EditAddressCubit()
-      : super(
+  final AuthenticationService authenticationService;
+  final UsersService usersService;
+  EditAddressCubit(
+    this.authenticationService,
+    this.usersService,
+  ) : super(
           EditAddressState(
             address: "",
             validAddress: "",
@@ -96,6 +124,7 @@ class EditAddressCubit extends Cubit<EditAddressState> {
             zipCode: "",
             validZipCode: "",
             zipCodeTouched: false,
+            isLoading: false,
           ),
         );
 
@@ -177,5 +206,28 @@ class EditAddressCubit extends Cubit<EditAddressState> {
         validZipCode: validZipCode,
       ),
     );
+  }
+
+  void submit() async {
+    //set loading
+    emit(state.copyWith(isLoading: true));
+    VestaUser? user = await authenticationService.getCurrentUserOrNull();
+
+    if (user == null) {
+      await authenticationService.signOut();
+    } else {
+      user = user.copyWith(
+        address: Address(
+          address: state.address,
+          unitNumber: state.unitNumber,
+          city: state.city,
+          state: state.state,
+          zipcode: state.zipCode,
+        ),
+      );
+      await usersService.update(user);
+    }
+    //set loading
+    emit(state.copyWith(isLoading: false));
   }
 }

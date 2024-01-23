@@ -8,7 +8,7 @@
             "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK
             "args": [
                 "-d",
-                "SM A528B"
+                "SM A536E"
             ]
         },
         {
@@ -17,7 +17,7 @@
             "type": "dart",
             "args": [
                 "-d",
-                "SM A528B"
+                "SM A536E"
             ]
         },
         {

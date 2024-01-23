@@ -262,6 +262,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.1.3"
+  flutter_contacts:
+    dependency: "direct main"
+    description:
+      name: flutter_contacts
+      sha256: "4fb4910fbe401ff234bc672304ef37f90319144920e940d1349b96fe089c6da7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.7+1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -270,6 +278,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  flutter_native_contact_picker:
+    dependency: "direct main"
+    description:
+      name: flutter_native_contact_picker
+      sha256: b34aac5c3640904b513628c7bcb326c25f213ba36482a30b3013a4e69285f006
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   flutter_native_splash:
     dependency: "direct main"
     description:

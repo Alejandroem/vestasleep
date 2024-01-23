@@ -4,6 +4,8 @@ alyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
+  exclude:
+    - "health/**"
 
 linter:
   rules:

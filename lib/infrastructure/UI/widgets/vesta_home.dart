@@ -10,6 +10,7 @@ import '../../../domain/services/users_service.dart';
 import 'connect_health_kit.dart';
 import 'dashboard.dart';
 import 'edit_address.dart';
+import 'emergency_contacts.dart';
 import 'getting_started.dart';
 import 'select_gender.dart';
 import 'settting_up_profile.dart';
@@ -19,58 +20,66 @@ class VestaHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<VestaAppCubit, VestaAppState>(
-      builder: (context, state) {
-        Widget child = Container();
-        switch (state.page) {
-          case VestaPages.getStarted:
-            child = const GettingStarted();
-            break;
-          case VestaPages.connectToHealthKit:
-            child = const ConnectHealthKit();
-            break;
-          case VestaPages.dashboard:
-            child = const Dashboard();
-            break;
-          case VestaPages.selectGender:
-            child = BlocProvider<GenderCubit>(
-              create: (context) => GenderCubit(
-                context.read<AuthenticationService>(),
-                context.read<UsersService>(),
-              ),
-              child: const SelectGender(),
-            );
-          case VestaPages.settingUpProfile:
-            child = BlocProvider<SetupProfileCubit>(
-              create: (context) => SetupProfileCubit(
-                context.read<AuthenticationService>(),
-                context.read<UsersService>(),
-              ),
-              child: const SettingUpProfile(),
-            );
-            break;
-          case VestaPages.editAddress:
-            child = BlocProvider(
-              create: (context) => EditAddressCubit(
-                  //context.read<AuthenticationService>(),
-                  //context.read<UsersService>(),
-                  ),
-              child: const EditAddress(),
-            );
-            break;
-        }
-        //animated child
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<GenderCubit>(
+          create: (context) => GenderCubit(
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
+          ),
+        ),
+        BlocProvider<SetupProfileCubit>(
+          create: (context) => SetupProfileCubit(
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => EditAddressCubit(
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
+          ),
+        )
+      ],
+      child: BlocBuilder<VestaAppCubit, VestaAppState>(
+        builder: (context, state) {
+          Widget child = Container();
+          switch (state.page) {
+            case VestaPages.getStarted:
+              child = const GettingStarted();
+              break;
+            case VestaPages.connectToHealthKit:
+              child = const ConnectHealthKit();
+              break;
+            case VestaPages.dashboard:
+              child = const Dashboard();
+              break;
+            case VestaPages.selectGender:
+              child = const SelectGender();
+              break;
+            case VestaPages.settingUpProfile:
+              child = const SettingUpProfile();
+              break;
+            case VestaPages.editAddress:
+              child = const EditAddress();
+              break;
+            case VestaPages.editContacts:
+              child = const EmergencyContacts();
+              break;
+          }
+          //animated child
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: child,
+          );
+        },
+      ),
     );
   }
 }

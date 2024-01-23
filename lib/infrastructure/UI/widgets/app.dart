@@ -5,6 +5,7 @@ import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/health_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/contacts_service.dart';
 import '../../../domain/services/health_service.dart';
 import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
@@ -12,6 +13,7 @@ import '../../services/firebase_authentication_service.dart';
 import '../../services/firebase_vestausernames_service.dart';
 import '../../services/firebase_vestausers_service.dart';
 import '../../services/google_apple_health_service.dart';
+import '../../services/ios_android_contacts_service.dart';
 import 'home.dart';
 
 class App extends StatelessWidget {
@@ -37,6 +39,9 @@ class App extends StatelessWidget {
           ),
           RepositoryProvider<HealthService>(
             create: (context) => GoogleAppleHealthService(),
+          ),
+          RepositoryProvider<ContactsService>(
+            create: (context) => IosAndroidContactsService(),
           ),
         ],
         child: MultiBlocProvider(

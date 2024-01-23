@@ -1,3 +1,4 @@
+import 'address.dart';
 import 'model.dart';
 
 class VestaUser implements Model {
@@ -12,6 +13,7 @@ class VestaUser implements Model {
   final int? age;
   final double? weight;
   final double? height;
+  final Address? address;
 
   VestaUser({
     this.id,
@@ -24,6 +26,7 @@ class VestaUser implements Model {
     this.age,
     this.weight,
     this.height,
+    this.address,
   });
 
   @override
@@ -38,6 +41,7 @@ class VestaUser implements Model {
     int? age,
     double? weight,
     double? height,
+    Address? address,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -50,6 +54,7 @@ class VestaUser implements Model {
       age: age ?? this.age,
       weight: weight ?? this.weight,
       height: height ?? this.height,
+      address: address ?? this.address,
     );
   }
 
@@ -66,6 +71,7 @@ class VestaUser implements Model {
       age: json['age'],
       weight: json['weight'],
       height: json['height'],
+      address: Address.fromJSON(json['address']),
     );
   }
 
@@ -81,6 +87,7 @@ class VestaUser implements Model {
       age: json['age'],
       weight: json['weight'],
       height: json['height'],
+      address: Address.fromJSON(json['address']),
     );
   }
 
@@ -97,6 +104,7 @@ class VestaUser implements Model {
       age: json[0]['age'],
       weight: json[0]['weight'],
       height: json[0]['height'],
+      address: Address.fromJSON(json[0]['address']),
     );
   }
 
@@ -113,6 +121,7 @@ class VestaUser implements Model {
       'age': age,
       'weight': weight,
       'height': height,
+      'address': address?.toJSON(),
     };
   }
 
@@ -129,6 +138,7 @@ class VestaUser implements Model {
         'age': age,
         'weight': weight,
         'height': height,
+        'address': address?.toJSON(),
       }
     ];
   }
