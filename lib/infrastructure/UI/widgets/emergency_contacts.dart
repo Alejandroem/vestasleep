@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../application/cubit/contacts_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../common/vesta_back_white_button.dart';
+import '../common/vesta_outline_button.dart';
 
 class EmergencyContacts extends StatelessWidget {
   const EmergencyContacts({super.key});
@@ -39,7 +41,7 @@ class EmergencyContacts extends StatelessWidget {
                 SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.only(
-                      top: 100,
+                      top: 70,
                       left: 20,
                       right: 20,
                     ),
@@ -73,7 +75,7 @@ class EmergencyContacts extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 10,
                         ),
                         SvgPicture.asset(
                           'assets/svg/contacts.svg',
@@ -93,7 +95,7 @@ class EmergencyContacts extends StatelessWidget {
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(
                                   color: Color(0xFF37A2E7),
-                                  fontSize: 17,
+                                  fontSize: 15,
                                   fontFamily: 'SF Pro Text',
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 0.85,
@@ -106,7 +108,7 @@ class EmergencyContacts extends StatelessWidget {
                                 'Let\'s set up your emergency contacts\n\nPlease make sure you provide a contact that has texting capabilities\n\nIn the event of an emergency, your emergency contact will be alerted first, before contacting first responders.\n',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 17,
+                                  fontSize: 15,
                                   fontFamily: 'SF Pro Text',
                                   fontWeight: FontWeight.w400,
                                   letterSpacing: 0.85,
@@ -116,106 +118,125 @@ class EmergencyContacts extends StatelessWidget {
                           ],
                         ),
                         SizedBox(
-                          height: 200,
-                          child: ListView.builder(
-                            itemCount: 3,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Column(
-                                children: [
-                                  Opacity(
-                                    opacity: 0.20,
-                                    child: Container(
-                                      width: 398,
-                                      decoration: ShapeDecoration(
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            width: 1,
-                                            strokeAlign:
-                                                BorderSide.strokeAlignCenter,
-                                            color: Color(0xFFCDCDCD),
-                                          ),
-                                        ),
-                                        shadows: [
-                                          BoxShadow(
-                                            color: Color(0xFF00FFFF),
-                                            blurRadius: 4,
-                                            offset: Offset(0, 2),
-                                            spreadRadius: 0,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: SvgPicture.asset(
-                                            'assets/svg/contact_person.svg',
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Text(
-                                            'Contact Name',
-                                            style: TextStyle(
-                                              color: Color(0xFF37A2E7),
-                                              fontSize: 17,
-                                              fontFamily: 'M PLUS 1',
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 0.85,
+                          height: 180,
+                          child: BlocBuilder<ContactsCubit, ContactsCubitState>(
+                              builder: (context, state) {
+                            return ListView.builder(
+                              itemCount: 3,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    //PICK CONTACT
+                                    context.read<ContactsCubit>().pickContact();
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Opacity(
+                                        opacity: 0.20,
+                                        child: Container(
+                                          width: 398,
+                                          decoration: const ShapeDecoration(
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                width: 1,
+                                                strokeAlign: BorderSide
+                                                    .strokeAlignCenter,
+                                                color: Color(0xFFCDCDCD),
+                                              ),
                                             ),
+                                            shadows: [
+                                              BoxShadow(
+                                                color: Color(0xFF00FFFF),
+                                                blurRadius: 4,
+                                                offset: Offset(0, 2),
+                                                spreadRadius: 0,
+                                              )
+                                            ],
                                           ),
                                         ),
-                                        Expanded(
-                                          child: SvgPicture.asset(
-                                            'assets/svg/arrow_right.svg',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Opacity(
-                                    opacity: 0.20,
-                                    child: Container(
-                                      width: 398,
-                                      decoration: ShapeDecoration(
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            width: 1,
-                                            strokeAlign:
-                                                BorderSide.strokeAlignCenter,
-                                            color: Color(0xFFCDCDCD),
-                                          ),
-                                        ),
-                                        shadows: [
-                                          BoxShadow(
-                                            color: Color(0xFF00FFFF),
-                                            blurRadius: 4,
-                                            offset: Offset(0, 2),
-                                            spreadRadius: 0,
-                                          )
-                                        ],
                                       ),
-                                    ),
-                                  )
-                                ],
-                              );
-                            },
-                          ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: SvgPicture.asset(
+                                                'assets/svg/contact_person.svg',
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Text(
+                                                state.contacts[index].name,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF37A2E7),
+                                                  fontSize: 17,
+                                                  fontFamily: 'M PLUS 1',
+                                                  fontWeight: FontWeight.w700,
+                                                   letterSpacing: 0.85,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: SvgPicture.asset(
+                                                'assets/svg/arrow_right.svg',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Opacity(
+                                        opacity: 0.20,
+                                        child: Container(
+                                          width: 398,
+                                          decoration: const ShapeDecoration(
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                width: 1,
+                                                strokeAlign: BorderSide
+                                                    .strokeAlignCenter,
+                                                color: Color(0xFFCDCDCD),
+                                              ),
+                                            ),
+                                            shadows: [
+                                              BoxShadow(
+                                                color: Color(0xFF00FFFF),
+                                                blurRadius: 4,
+                                                offset: Offset(0, 2),
+                                                spreadRadius: 0,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
+                        ),
+                        VestaOutlineButton(
+                          onPressed: () {
+                            //GO TO ADD EMERGENCY CONTACTS
+                            // context.read<VestaAppCubit>().setPage(
+                            //       VestaPages.addEmergencyContacts,
+                            //     );
+                          },
+                          buttonText: 'Next',
                         ),
                       ],
                     ),
