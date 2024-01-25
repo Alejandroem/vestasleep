@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 class VestaOutlineButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String buttonText;
+  final bool enabled;
 
-  const VestaOutlineButton({super.key, required this.onPressed, required this.buttonText});
+  const VestaOutlineButton(
+      {super.key,
+      required this.onPressed,
+      required this.buttonText,
+      this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +18,10 @@ class VestaOutlineButton extends StatelessWidget {
       height: 55,
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 2, color: Colors.white),
+          side: BorderSide(
+            width: 2,
+            color: enabled ? Colors.white : Colors.white.withOpacity(0.5),
+          ),
           borderRadius: BorderRadius.circular(100),
         ),
         shadows: const [
@@ -26,11 +34,11 @@ class VestaOutlineButton extends StatelessWidget {
         ],
       ),
       child: TextButton(
-        onPressed: onPressed,
+        onPressed: enabled ? onPressed : null,
         child: Text(
           buttonText,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: enabled ? Colors.white : Colors.white.withOpacity(0.5),
             fontSize: 17,
             fontFamily: 'SF Pro Text',
             fontWeight: FontWeight.w400,

@@ -5,11 +5,13 @@ import '../../../application/cubit/contacts_cubit.dart';
 import '../../../application/cubit/edit_address_cubit.dart';
 import '../../../application/cubit/emergency_response_cubit.dart';
 import '../../../application/cubit/gender_cubit.dart';
+import '../../../application/cubit/personal_safety_cubit.dart';
 import '../../../application/cubit/setup_profile_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/contacts_service.dart';
 import '../../../domain/services/users_service.dart';
+import 'all_done.dart';
 import 'connect_health_kit.dart';
 import 'dashboard.dart';
 import 'edit_address.dart';
@@ -58,6 +60,9 @@ class VestaHome extends StatelessWidget {
             context.read<UsersService>(),
           ),
         ),
+        BlocProvider(
+          create: (context) => PersonalSafetyCubit(),
+        ),
       ],
       child: BlocBuilder<VestaAppCubit, VestaAppState>(
         builder: (context, state) {
@@ -89,6 +94,9 @@ class VestaHome extends StatelessWidget {
               break;
             case VestaPages.personalSafety:
               child = const PersonalSafety();
+              break;
+            case VestaPages.done:
+              child = const AllDone();
               break;
           }
           //animated child
