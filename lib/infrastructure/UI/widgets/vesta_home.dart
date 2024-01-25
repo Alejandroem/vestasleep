@@ -52,7 +52,10 @@ class VestaHome extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) => EmergencyResponseCubit(),
+          create: (context) => EmergencyResponseCubit(
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
+          ),
         ),
       ],
       child: BlocBuilder<VestaAppCubit, VestaAppState>(

@@ -16,6 +16,7 @@ class VestaUser implements Model {
   final double? height;
   final Address? address;
   final List<VestaContact>? contacts;
+  final bool? emergencyResponseEnabled;
 
   VestaUser({
     this.id,
@@ -30,6 +31,7 @@ class VestaUser implements Model {
     this.height,
     this.address,
     this.contacts,
+    this.emergencyResponseEnabled,
   });
 
   @override
@@ -46,6 +48,7 @@ class VestaUser implements Model {
     double? height,
     Address? address,
     List<VestaContact>? contacts,
+    bool? emergencyResponseEnabled,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -60,6 +63,8 @@ class VestaUser implements Model {
       height: height ?? this.height,
       address: address ?? this.address,
       contacts: contacts ?? this.contacts,
+      emergencyResponseEnabled:
+          emergencyResponseEnabled ?? this.emergencyResponseEnabled,
     );
   }
 
