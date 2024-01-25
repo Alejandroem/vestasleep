@@ -16,6 +16,7 @@ import 'edit_address.dart';
 import 'emergency_contacts.dart';
 import 'emergency_response.dart';
 import 'getting_started.dart';
+import 'personal_safety.dart';
 import 'select_gender.dart';
 import 'settting_up_profile.dart';
 
@@ -85,6 +86,9 @@ class VestaHome extends StatelessWidget {
               break;
             case VestaPages.enableEmergencyResponse:
               child = const EmergencyResponse();
+              break;
+            case VestaPages.personalSafety:
+              child = const PersonalSafety();
               break;
           }
           //animated child

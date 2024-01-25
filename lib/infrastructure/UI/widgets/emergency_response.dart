@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -130,14 +129,22 @@ class EmergencyResponse extends StatelessWidget {
                           height: 20,
                         ),
                         VestaOutlineButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<VestaAppCubit>().setPage(
+                                  VestaPages.personalSafety,
+                                );
+                          },
                           buttonText: 'Save and Continue',
                         ),
                         const SizedBox(
                           height: 20,
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<VestaAppCubit>().setPage(
+                                  VestaPages.personalSafety,
+                                );
+                          },
                           child: const Text(
                             'Cancel',
                             style: TextStyle(

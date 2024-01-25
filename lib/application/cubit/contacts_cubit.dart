@@ -41,6 +41,9 @@ class ContactsCubitState {
         other.isLoading == isLoading &&
         other.error == error;
   }
+
+  @override
+  int get hashCode => contacts.hashCode ^ isLoading.hashCode ^ error.hashCode;
 }
 
 class ContactsCubit extends Cubit<ContactsCubitState> {
