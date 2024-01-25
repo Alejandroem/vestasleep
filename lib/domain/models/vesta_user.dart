@@ -1,4 +1,5 @@
 import 'address.dart';
+import 'contact.dart';
 import 'model.dart';
 
 class VestaUser implements Model {
@@ -14,6 +15,7 @@ class VestaUser implements Model {
   final double? weight;
   final double? height;
   final Address? address;
+  final List<VestaContact>? contacts;
 
   VestaUser({
     this.id,
@@ -27,6 +29,7 @@ class VestaUser implements Model {
     this.weight,
     this.height,
     this.address,
+    this.contacts,
   });
 
   @override
@@ -42,6 +45,7 @@ class VestaUser implements Model {
     double? weight,
     double? height,
     Address? address,
+    List<VestaContact>? contacts,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -55,6 +59,7 @@ class VestaUser implements Model {
       weight: weight ?? this.weight,
       height: height ?? this.height,
       address: address ?? this.address,
+      contacts: contacts ?? this.contacts,
     );
   }
 
@@ -72,6 +77,11 @@ class VestaUser implements Model {
       weight: json['weight'],
       height: json['height'],
       address: Address.fromJSON(json['address']),
+      contacts: json['contacts'] != null
+          ? (json['contacts'] as List)
+              .map((contact) => VestaContact.fromJson(contact))
+              .toList()
+          : null,
     );
   }
 
@@ -88,6 +98,11 @@ class VestaUser implements Model {
       weight: json['weight'],
       height: json['height'],
       address: Address.fromJSON(json['address']),
+      contacts: json['contacts'] != null
+          ? (json['contacts'] as List)
+              .map((contact) => VestaContact.fromJson(contact))
+              .toList()
+          : null,
     );
   }
 
@@ -105,6 +120,11 @@ class VestaUser implements Model {
       weight: json[0]['weight'],
       height: json[0]['height'],
       address: Address.fromJSON(json[0]['address']),
+      contacts: json[0]['contacts'] != null
+          ? (json[0]['contacts'] as List)
+              .map((contact) => VestaContact.fromJson(contact))
+              .toList()
+          : null,
     );
   }
 
@@ -122,6 +142,7 @@ class VestaUser implements Model {
       'weight': weight,
       'height': height,
       'address': address?.toJSON(),
+      'contacts': contacts?.map((contact) => contact.toJson()).toList(),
     };
   }
 
@@ -139,6 +160,7 @@ class VestaUser implements Model {
         'weight': weight,
         'height': height,
         'address': address?.toJSON(),
+        'contacts': contacts?.map((contact) => contact.toJson()).toList(),
       }
     ];
   }

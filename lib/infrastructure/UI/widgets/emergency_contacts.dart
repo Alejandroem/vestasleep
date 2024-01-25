@@ -126,8 +126,17 @@ class EmergencyContacts extends StatelessWidget {
                               itemBuilder: (BuildContext context, int index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    //PICK CONTACT
-                                    context.read<ContactsCubit>().pickContact();
+                                    if (state.contacts.length >= index + 1) {
+                                      context
+                                          .read<ContactsCubit>()
+                                          .updateContact(
+                                            state.contacts[index],
+                                          );
+                                    } else {
+                                      context
+                                          .read<ContactsCubit>()
+                                          .pickContact();
+                                    }
                                   },
                                   child: Column(
                                     children: [
@@ -177,13 +186,16 @@ class EmergencyContacts extends StatelessWidget {
                                             Expanded(
                                               flex: 4,
                                               child: Text(
-                                                state.contacts[index].name,
+                                                state.contacts.length >=
+                                                        index + 1
+                                                    ? state.contacts[index].name
+                                                    : 'Emergency Contact ${index + 1}',
                                                 style: const TextStyle(
                                                   color: Color(0xFF37A2E7),
                                                   fontSize: 17,
                                                   fontFamily: 'M PLUS 1',
                                                   fontWeight: FontWeight.w700,
-                                                   letterSpacing: 0.85,
+                                                  letterSpacing: 0.85,
                                                 ),
                                               ),
                                             ),
@@ -231,12 +243,14 @@ class EmergencyContacts extends StatelessWidget {
                         ),
                         VestaOutlineButton(
                           onPressed: () {
-                            //GO TO ADD EMERGENCY CONTACTS
-                            // context.read<VestaAppCubit>().setPage(
-                            //       VestaPages.addEmergencyContacts,
-                            //     );
+                            context
+                                .read<ContactsCubit>()
+                                .submit();
+                            context.read<VestaAppCubit>().setPage(
+                                  VestaPages.enableEmergencyResponse,
+                                );
                           },
-                          buttonText: 'Next',
+                          buttonText: 'Save and Continue',
                         ),
                       ],
                     ),

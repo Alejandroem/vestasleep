@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/contacts_cubit.dart';
 import '../../../application/cubit/edit_address_cubit.dart';
+import '../../../application/cubit/emergency_response_cubit.dart';
 import '../../../application/cubit/gender_cubit.dart';
 import '../../../application/cubit/setup_profile_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
@@ -13,6 +14,7 @@ import 'connect_health_kit.dart';
 import 'dashboard.dart';
 import 'edit_address.dart';
 import 'emergency_contacts.dart';
+import 'emergency_response.dart';
 import 'getting_started.dart';
 import 'select_gender.dart';
 import 'settting_up_profile.dart';
@@ -45,7 +47,12 @@ class VestaHome extends StatelessWidget {
         BlocProvider(
           create: (context) => ContactsCubit(
             context.read<ContactsService>(),
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
           ),
+        ),
+        BlocProvider(
+          create: (context) => EmergencyResponseCubit(),
         ),
       ],
       child: BlocBuilder<VestaAppCubit, VestaAppState>(
@@ -72,6 +79,9 @@ class VestaHome extends StatelessWidget {
               break;
             case VestaPages.editContacts:
               child = const EmergencyContacts();
+              break;
+            case VestaPages.enableEmergencyResponse:
+              child = const EmergencyResponse();
               break;
           }
           //animated child
