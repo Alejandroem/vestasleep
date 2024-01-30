@@ -5,4 +5,5 @@ abstract class HealthService {
   Future<bool> requestPermissions();
   Future<Stream<HeartRate>> getHeartRateStream();
   Future<Stream<HeartRate>> getRestingHeartRateStream();
+  Future<HeartRate> getCurrentRestingHeartRate();
 }

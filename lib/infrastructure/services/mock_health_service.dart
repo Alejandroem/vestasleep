@@ -112,4 +112,10 @@ class MockHealthService implements HealthService {
   Future<bool> requestPermissions() {
     return Future.value(true);
   }
+  
+  @override
+  Future<HeartRate> getCurrentRestingHeartRate() {
+    // TODO: implement getCurrentRestingHeartRate
+    throw UnimplementedError();
+  }
 }

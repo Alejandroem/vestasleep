@@ -65,4 +65,10 @@ class GoogleAppleHealthService implements HealthService {
     // TODO: implement getRestingHeartRateStream
     throw UnimplementedError();
   }
+  
+  @override
+  Future<HeartRate> getCurrentRestingHeartRate() {
+    // TODO: implement getCurrentRestingHeartRate
+    throw UnimplementedError();
+  }
 }
