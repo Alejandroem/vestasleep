@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../domain/models/heart_rate.dart';
 import '../../domain/services/health_service.dart';
 
 class GoogleAppleHealthService implements HealthService {
@@ -51,5 +52,17 @@ class GoogleAppleHealthService implements HealthService {
   Future<bool> requestLocationPermission() async {
     PermissionStatus status = await Permission.location.request();
     return status.isGranted;
+  }
+
+  @override
+  Future<Stream<HeartRate>> getHeartRateStream() {
+    // TODO: implement getHeartRateStream
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Stream<HeartRate>> getRestingHeartRateStream() {
+    // TODO: implement getRestingHeartRateStream
+    throw UnimplementedError();
   }
 }
