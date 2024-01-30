@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/models/contact.dart';
+import '../../domain/models/vesta_user.dart';
+import '../../domain/services/authentication_service.dart';
 import '../../domain/services/contacts_service.dart';
+import '../../domain/services/users_service.dart';
 
 class ContactsCubitState {
   final List<VestaContact> contacts;
@@ -26,13 +30,31 @@ class ContactsCubitState {
       error: error ?? this.error,
     );
   }
+
+  //override equality operator to check contact equality
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ContactsCubitState &&
+        listEquals(other.contacts, contacts) &&
+        other.isLoading == isLoading &&
+        other.error == error;
+  }
+
+  @override
+  int get hashCode => contacts.hashCode ^ isLoading.hashCode ^ error.hashCode;
 }
 
 class ContactsCubit extends Cubit<ContactsCubitState> {
   final ContactsService contactService;
+  final AuthenticationService authenticationService;
+  final UsersService usersService;
 
   ContactsCubit(
     this.contactService,
+    this.authenticationService,
+    this.usersService,
   ) : super(ContactsCubitState(
           contacts: [],
           isLoading: false,
@@ -58,23 +80,28 @@ class ContactsCubit extends Cubit<ContactsCubitState> {
     emit(
       state.copyWith(
         isLoading: false,
+        //TODO repeated validation
         contacts: [...state.contacts, contact],
       ),
     );
   }
 
-  void updateContact(VestaContact contact) async {
+  void updateContact(VestaContact oldContact) async {
     //set loading
     emit(state.copyWith(isLoading: true));
 
-    //pick new contact
     //pick contact
     VestaContact contact;
 
     try {
       contact = await contactService.pickContact();
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+        ),
+      );
       return;
     }
 
@@ -83,13 +110,37 @@ class ContactsCubit extends Cubit<ContactsCubitState> {
     emit(
       state.copyWith(
         isLoading: false,
+        //TODO repeated validation
         contacts: state.contacts.map((e) {
-          if (e.name == contact.name) {
+          if (e.name == oldContact.name) {
             return contact;
           }
           return e;
         }).toList(),
       ),
     );
+  }
+
+  void submit() async {
+    //get current user
+    VestaUser? user = await authenticationService.getCurrentUserOrNull();
+
+    if (user == null) {
+      await authenticationService.signOut();
+    } else {
+      //set loading
+      emit(state.copyWith(isLoading: true));
+
+      //update user
+      user = user.copyWith(contacts: state.contacts);
+      try {
+        await usersService.update(user);
+      } catch (e) {
+        emit(state.copyWith(isLoading: false, error: e.toString()));
+        return;
+      }
+      //set loading
+      emit(state.copyWith(isLoading: false));
+    }
   }
 }

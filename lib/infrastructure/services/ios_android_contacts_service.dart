@@ -22,8 +22,8 @@ class IosAndroidContactsService extends ContactsService {
 
   @override
   Future<VestaContact> pickContact() async {
-    final FlutterContactPicker _contactPicker = new FlutterContactPicker();
-    Contact? contact = await _contactPicker.selectContact();
+    final FlutterContactPicker contactPicker = FlutterContactPicker();
+    Contact? contact = await contactPicker.selectContact();
 
     if (contact == null) {
       throw Exception('No contact selected');

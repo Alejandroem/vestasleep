@@ -5,7 +5,7 @@ enum VestaPages {
   connectToHealthKit,
   dashboard,
   selectGender,
-  settingUpProfile, editAddress, editContacts,
+  settingUpProfile, editAddress, editContacts, enableEmergencyResponse, personalSafety, done,
 }
 
 class VestaAppState {
