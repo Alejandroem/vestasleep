@@ -33,6 +33,7 @@ dependencies:
   flutter_native_contact_picker: ^0.0.6
   equatable: ^2.0.5
   flutter_local_notifications: ^8.1.1+2
+  telephony: ^0.2.0
 
 dev_dependencies:
   flutter_test:

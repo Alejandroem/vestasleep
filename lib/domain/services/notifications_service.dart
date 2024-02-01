@@ -1,6 +1,7 @@
 import '../models/contact.dart';
 
 abstract class NotificationsService {
+  Future<bool> requestNotificationPermissions();
   Future<bool> sendLocalNotification(String title, String body);
   Future<bool> sendPushNotification(String title, String body);
   Future<bool> sendPhoneNotificationToContacts(

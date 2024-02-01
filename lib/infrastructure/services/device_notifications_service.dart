@@ -1,26 +1,40 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:telephony/telephony.dart';
 
 import '../../domain/models/contact.dart';
 import '../../domain/services/notifications_service.dart';
 
-class FlutterNotificationsService extends NotificationsService {
+class DeviceNotificationsService extends NotificationsService {
+  //LOCAL
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  final InitializationSettings initializationSettings =
+      const InitializationSettings(
+    android: AndroidInitializationSettings('app_icon'),
+  );
+
+  //SMS
+  final Telephony telephony = Telephony.instance;
+
+  //CALLS
   @override
-  Future<bool> sendLocalNotification(String title, String body) async {
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    flutterLocalNotificationsPlugin.initialize(
+  Future<bool> requestNotificationPermissions() async {
+    bool? notificationsIntialized =
+        await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
     );
 
+    bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+
+    return notificationsIntialized != null &&
+        permissionsGranted != null &&
+        notificationsIntialized &&
+        permissionsGranted;
+  }
+
+  @override
+  Future<bool> sendLocalNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'local_notifications',
@@ -46,9 +60,18 @@ class FlutterNotificationsService extends NotificationsService {
 
   @override
   Future<bool> sendEmergencyResponseNotification(
-      String title, String body, List<VestaContact> contacts) {
-    // TODO: implement sendEmergencyResponseNotification
-    throw UnimplementedError();
+      String title, String body, List<VestaContact> contacts) async {
+    try {
+      for (VestaContact contact in contacts) {
+        await telephony.sendSms(
+          to: contact.phone,
+          message: body,
+        );
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
