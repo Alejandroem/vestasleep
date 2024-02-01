@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/bloc/alarm/alarm_bloc.dart';
+import '../../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/health_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
@@ -44,23 +46,35 @@ class App extends StatelessWidget {
             create: (context) => IosAndroidContactsService(),
           ),
         ],
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider<AuthenticationCubit>(
-              create: (context) => AuthenticationCubit(
-                context.read<AuthenticationService>(),
+        child: BlocProvider<AlarmBloc>(
+          create: (context) => AlarmBloc(
+            context.read<AuthenticationService>(),
+            context.read<UsersService>(),
+          ),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<AuthenticationCubit>(
+                create: (context) => AuthenticationCubit(
+                  context.read<AuthenticationService>(),
+                ),
               ),
-            ),
-            BlocProvider<VestaAppCubit>(
-              create: (context) => VestaAppCubit(),
-            ),
-            BlocProvider<HealthCubit>(
-              create: (context) => HealthCubit(
-                context.read<HealthService>(),
+              BlocProvider<VestaAppCubit>(
+                create: (context) => VestaAppCubit(),
               ),
-            ),
-          ],
-          child: const Home(),
+              BlocProvider<HealthCubit>(
+                create: (context) => HealthCubit(
+                  context.read<HealthService>(),
+                ),
+              ),
+              BlocProvider<HeartRateBloc>(
+                create: (context) => HeartRateBloc(
+                  context.read<AlarmBloc>(),
+                  context.read<HealthService>(),
+                ),
+              )
+            ],
+            child: const Home(),
+          ),
         ),
       ),
     );

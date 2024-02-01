@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:health/health.dart';
@@ -8,6 +9,9 @@ import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
 class GoogleAppleHealthService implements HealthService {
+  Timer? _heartRateTimer;
+  StreamController<HeartRate>? heartRateStreamController;
+
   @override
   Future<bool> requestPermissions() async {
     HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
@@ -56,9 +60,45 @@ class GoogleAppleHealthService implements HealthService {
   }
 
   @override
-  Future<Stream<HeartRate>> getHeartRateStream() {
-    // TODO: implement getHeartRateStream
-    throw UnimplementedError();
+  Future<Stream<HeartRate>> getHeartRateStream(Duration delta) async {
+    HealthFactory health = HealthFactory();
+
+    heartRateStreamController ??= StreamController<HeartRate>();
+
+    if (_heartRateTimer != null) {
+      _heartRateTimer!.cancel();
+    }
+
+    _heartRateTimer =
+        Timer.periodic(delta, (timer) async {
+      try {
+        List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+          DateTime.now().subtract(delta),
+          DateTime.now(),
+          [
+            HealthDataType.HEART_RATE,
+          ],
+        );
+
+        if (healthData.isNotEmpty) {
+          int averageHeartRate = healthData
+                  .map((e) => e.value as int)
+                  .reduce((value, element) => value + element) ~/
+              healthData.length;
+          heartRateStreamController!.add(
+            HeartRate(
+              averageHeartRate,
+              healthData.first.dateFrom,
+              healthData.last.dateTo,
+            ),
+          );
+        }
+      } catch (error) {
+        log("Exception in getHeartRateStream: $error");
+      }
+    });
+
+    return heartRateStreamController!.stream;
   }
 
   @override

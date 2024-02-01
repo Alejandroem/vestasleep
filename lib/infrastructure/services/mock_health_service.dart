@@ -61,11 +61,11 @@ class MockHealthService implements HealthService {
   }
 
   @override
-  Future<Stream<HeartRate>> getHeartRateStream() {
+  Future<Stream<HeartRate>> getHeartRateStream(Duration delta) {
     //Switch between the three and return them forever
     return Future.value(
       Stream.periodic(
-        const Duration(seconds: 1),
+        delta,
         (index) {
           if (index % 3 == 0) {
             return getHeartRateWithLowProblem(

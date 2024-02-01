@@ -31,3 +31,12 @@ class NewHeartRateProblem extends HeartRateEvent {
   @override
   List<Object> get props => [heartRate];
 }
+
+class NewUrgentHeartRateProblem extends HeartRateEvent {
+  final HeartRate heartRate;
+
+  const NewUrgentHeartRateProblem(this.heartRate);
+
+  @override
+  List<Object> get props => [heartRate];
+}
