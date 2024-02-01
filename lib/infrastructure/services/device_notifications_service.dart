@@ -12,7 +12,7 @@ class DeviceNotificationsService extends NotificationsService {
   final InitializationSettings initializationSettings =
       const InitializationSettings(
     android: AndroidInitializationSettings(
-      'app_icon',
+      'splash',
     ),
   );
 
@@ -22,20 +22,17 @@ class DeviceNotificationsService extends NotificationsService {
   //CALLS
   @override
   Future<bool> requestNotificationPermissions() async {
-    // bool? notificationsIntialized =
-    //     await flutterLocalNotificationsPlugin.initialize(
-    //   initializationSettings,
-    // );
-
-    bool? permissionsGranted = true;
-
     bool? notificationsIntialized =
-        await telephony.requestPhoneAndSmsPermissions;
+        await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    bool? smsPermissionGranted = await telephony.requestPhoneAndSmsPermissions;
 
     return notificationsIntialized != null &&
-        permissionsGranted != null &&
+        smsPermissionGranted != null &&
         notificationsIntialized &&
-        permissionsGranted;
+        smsPermissionGranted;
   }
 
   @override
@@ -44,7 +41,6 @@ class DeviceNotificationsService extends NotificationsService {
         AndroidNotificationDetails(
       'local_notifications',
       'VestaSleep Notifications',
-      'VestaSleep alarm notifications',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: false,

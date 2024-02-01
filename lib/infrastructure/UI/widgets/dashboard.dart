@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,6 +25,23 @@ class Dashboard extends StatelessWidget {
                 context
                     .read<NotificationsService>()
                     .requestNotificationPermissions();
+              },
+            ),
+            ElevatedButton(
+              child: Text("Send local notification"),
+              onPressed: () {
+                //set a timer
+                context
+                    .read<NotificationsService>()
+                    .sendLocalNotification("Test", "This is a test");
+                Timer t = Timer(
+                  const Duration(seconds: 5),
+                  () {
+                    context
+                        .read<NotificationsService>()
+                        .sendLocalNotification("Test", "This is a test");
+                  },
+                );
               },
             ),
             ElevatedButton(
