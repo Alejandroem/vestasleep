@@ -1,5 +1,5 @@
 import '../../../domain/models/heart_rate.dart';
-import '../bloc/heart_rate/heart_rate_bloc.dart';
+import '../../domain/models/user_state.dart';
 
 bool hasHeartRateProblem(HeartRate current, UserState state) {
   int averageHeartRate = current.averageHeartRate;

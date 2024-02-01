@@ -1,5 +1,5 @@
-import '../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../models/heart_rate.dart';
+import '../models/user_state.dart';
 
 abstract class HealthService {
   Future<bool> requestLocationPermission();

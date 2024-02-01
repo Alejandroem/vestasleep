@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -40,7 +39,7 @@ class AllDone extends StatelessWidget {
               children: [
                 SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       top: 100,
                       left: 20,
                       right: 20,
@@ -48,7 +47,7 @@ class AllDone extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text.rich(
+                        const Text.rich(
                           TextSpan(
                             children: [
                               TextSpan(
@@ -74,13 +73,13 @@ class AllDone extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 100,
                         ),
                         SvgPicture.asset(
                           'assets/svg/done.svg',
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 100,
                         ),
                         VestaOutlineButton(

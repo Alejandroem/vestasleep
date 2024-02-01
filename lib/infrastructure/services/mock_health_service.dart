@@ -1,5 +1,5 @@
-import '../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../domain/models/heart_rate.dart';
+import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
 class MockHealthService implements HealthService {
@@ -65,7 +65,7 @@ class MockHealthService implements HealthService {
     //Switch between the three and return them forever
     return Future.value(
       Stream.periodic(
-        Duration(seconds: 1),
+        const Duration(seconds: 1),
         (index) {
           if (index % 3 == 0) {
             return getHeartRateWithLowProblem(
@@ -93,7 +93,7 @@ class MockHealthService implements HealthService {
     //return the resting heart rate forever
     return Future.value(
       Stream.periodic(
-        Duration(seconds: 1),
+        const Duration(seconds: 1),
         (index) {
           return getRestingHeartRate(
             DateTime.now(),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/models/contact.dart';
 import '../../../domain/models/heart_rate.dart';
+import '../../../domain/models/user_state.dart';
 import '../../../domain/services/health_service.dart';
 import '../../use_cases/heart_rate_functions.dart';
 

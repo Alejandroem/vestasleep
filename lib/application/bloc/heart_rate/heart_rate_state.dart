@@ -1,11 +1,5 @@
 part of 'heart_rate_bloc.dart';
 
-enum UserState {
-  normal,
-  sleeping,
-  excercising,
-}
-
 enum HeartRateAssessment {
   aboveRestingThreshold,
   belowRestingThreshold,

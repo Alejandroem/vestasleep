@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../domain/models/heart_rate.dart';
+import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
 class GoogleAppleHealthService implements HealthService {
