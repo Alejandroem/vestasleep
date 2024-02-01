@@ -11,7 +11,9 @@ class DeviceNotificationsService extends NotificationsService {
 
   final InitializationSettings initializationSettings =
       const InitializationSettings(
-    android: AndroidInitializationSettings('app_icon'),
+    android: AndroidInitializationSettings(
+      'app_icon',
+    ),
   );
 
   //SMS
@@ -20,12 +22,15 @@ class DeviceNotificationsService extends NotificationsService {
   //CALLS
   @override
   Future<bool> requestNotificationPermissions() async {
-    bool? notificationsIntialized =
-        await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-    );
+    // bool? notificationsIntialized =
+    //     await flutterLocalNotificationsPlugin.initialize(
+    //   initializationSettings,
+    // );
 
-    bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+    bool? permissionsGranted = true;
+
+    bool? notificationsIntialized =
+        await telephony.requestPhoneAndSmsPermissions;
 
     return notificationsIntialized != null &&
         permissionsGranted != null &&
@@ -61,6 +66,14 @@ class DeviceNotificationsService extends NotificationsService {
   @override
   Future<bool> sendEmergencyResponseNotification(
       String title, String body, List<VestaContact> contacts) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> sendPhoneNotificationToContacts(
+      String title, String body, List<VestaContact> contacts) async {
+    // TODO: implement sendPhoneNotificationToContacts
+
     try {
       for (VestaContact contact in contacts) {
         await telephony.sendSms(
@@ -72,13 +85,6 @@ class DeviceNotificationsService extends NotificationsService {
     } catch (e) {
       return false;
     }
-  }
-
-  @override
-  Future<bool> sendPhoneNotificationToContacts(
-      String title, String body, List<VestaContact> contacts) {
-    // TODO: implement sendPhoneNotificationToContacts
-    throw UnimplementedError();
   }
 
   @override

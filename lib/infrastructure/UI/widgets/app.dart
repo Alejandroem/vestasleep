@@ -9,8 +9,10 @@ import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/contacts_service.dart';
 import '../../../domain/services/health_service.dart';
+import '../../../domain/services/notifications_service.dart';
 import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
+import '../../services/device_notifications_service.dart';
 import '../../services/firebase_authentication_service.dart';
 import '../../services/firebase_vestausernames_service.dart';
 import '../../services/firebase_vestausers_service.dart';
@@ -44,6 +46,9 @@ class App extends StatelessWidget {
           ),
           RepositoryProvider<ContactsService>(
             create: (context) => IosAndroidContactsService(),
+          ),
+          RepositoryProvider<NotificationsService>(
+            create: (context) => DeviceNotificationsService(),
           ),
         ],
         child: BlocProvider<AlarmBloc>(

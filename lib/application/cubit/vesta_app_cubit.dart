@@ -5,7 +5,12 @@ enum VestaPages {
   connectToHealthKit,
   dashboard,
   selectGender,
-  settingUpProfile, editAddress, editContacts, enableEmergencyResponse, personalSafety, done,
+  settingUpProfile,
+  editAddress,
+  editContacts,
+  enableEmergencyResponse,
+  personalSafety,
+  done,
 }
 
 class VestaAppState {
@@ -29,7 +34,7 @@ class VestaAppState {
   }
 }
 
-class VestaAppCubit extends HydratedCubit<VestaAppState> {
+class VestaAppCubit extends Cubit<VestaAppState> {
   VestaAppCubit() : super(VestaAppState());
 
   void setHasFinishedOnboarding(bool hasFinishedOnboarding) {
