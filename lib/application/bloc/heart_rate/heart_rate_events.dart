@@ -14,19 +14,19 @@ class StopMonitoringHeartRate extends HeartRateEvent {
   List<Object> get props => [];
 }
 
-class NewHeartRateEvent extends HeartRateEvent {
+class NewHeartRateLecture extends HeartRateEvent {
   final HeartRate heartRate;
 
-  const NewHeartRateEvent(this.heartRate);
+  const NewHeartRateLecture(this.heartRate);
 
   @override
   List<Object> get props => [heartRate];
 }
 
-class DetectedHeartRateProblem extends HeartRateEvent {
+class NewHeartRateProblem extends HeartRateEvent {
   final HeartRate heartRate;
 
-  const DetectedHeartRateProblem(this.heartRate);
+  const NewHeartRateProblem(this.heartRate);
 
   @override
   List<Object> get props => [heartRate];

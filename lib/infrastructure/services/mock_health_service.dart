@@ -1,3 +1,4 @@
+import '../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../domain/models/heart_rate.dart';
 import '../../domain/services/health_service.dart';
 
@@ -112,10 +113,25 @@ class MockHealthService implements HealthService {
   Future<bool> requestPermissions() {
     return Future.value(true);
   }
-  
+
   @override
   Future<HeartRate> getCurrentRestingHeartRate() {
     // TODO: implement getCurrentRestingHeartRate
     throw UnimplementedError();
+  }
+
+  int _index = 0;
+
+  @override
+  Future<UserState> getUserState() {
+    //use index to return different user states
+    _index++;
+    if (_index % 3 == 0) {
+      return Future.value(UserState.normal);
+    } else if (_index % 3 == 1) {
+      return Future.value(UserState.sleeping);
+    } else {
+      return Future.value(UserState.excercising);
+    }
   }
 }
