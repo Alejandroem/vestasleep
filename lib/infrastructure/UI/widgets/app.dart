@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../application/bloc/alarm/alarm_bloc.dart';
 import '../../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../../application/cubit/authentication_cubit.dart';
+import '../../../application/cubit/bottom_navigation_cubit.dart';
 import '../../../application/cubit/health_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
@@ -82,7 +83,10 @@ class App extends StatelessWidget {
                   context.read<AlarmBloc>(),
                   context.read<HealthService>(),
                 ),
-              )
+              ),
+              BlocProvider<BottomNavigationCubit>(
+                create: (context) => BottomNavigationCubit(),
+              ),
             ],
             child: const Home(),
           ),

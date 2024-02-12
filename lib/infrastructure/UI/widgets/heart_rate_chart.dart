@@ -67,9 +67,20 @@ class HeartRateChart extends StatelessWidget {
                       ),
                       minY: 0,
                       maxY: 160,
-                      lineTouchData: const LineTouchData(
+                      lineTouchData: LineTouchData(
                         touchTooltipData: LineTouchTooltipData(
                           tooltipBgColor: Colors.white,
+                          getTooltipItems: (touchedSpots) {
+                            return touchedSpots.map((LineBarSpot touchedSpot) {
+                              return LineTooltipItem(
+                                touchedSpot.y.toString(),
+                                const TextStyle(
+                                  color: Color(0xff1B1464),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }).toList();
+                          },
                         ),
                         handleBuiltInTouches: true,
                       ),

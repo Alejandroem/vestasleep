@@ -23,9 +23,7 @@ class AlarmFlow extends StatelessWidget {
           widget = emergencyResponseTriggered(context);
         }
         return AnimatedSwitcher(
-          key: UniqueKey(),
           duration: const Duration(seconds: 1),
-          reverseDuration: const Duration(seconds: 1),
           transitionBuilder: (Widget child, Animation<double> animation) {
             return FadeTransition(
               opacity: animation,
@@ -40,7 +38,6 @@ class AlarmFlow extends StatelessWidget {
 
   Column emergencyResponseTriggered(BuildContext context) {
     return Column(
-      key: UniqueKey(),
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -112,7 +109,6 @@ class AlarmFlow extends StatelessWidget {
   Column waitingToTriggerEmergencyResponse(
       WaitingToNotifyEmergencyServices state, BuildContext context) {
     return Column(
-      key: UniqueKey(),
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -181,7 +177,6 @@ class AlarmFlow extends StatelessWidget {
   Column waitingToNotifyContacts(
       WaitingToNotifyContacts state, BuildContext context) {
     return Column(
-      key: UniqueKey(),
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

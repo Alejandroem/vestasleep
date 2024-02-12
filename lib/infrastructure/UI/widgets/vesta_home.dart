@@ -13,7 +13,7 @@ import '../../../domain/services/contacts_service.dart';
 import '../../../domain/services/users_service.dart';
 import 'all_done.dart';
 import 'connect_health_kit.dart';
-import 'dashboard.dart';
+import 'authenticated_home.dart';
 import 'edit_address.dart';
 import 'emergency_contacts.dart';
 import 'emergency_response.dart';
@@ -75,7 +75,7 @@ class VestaHome extends StatelessWidget {
               child = const ConnectHealthKit();
               break;
             case VestaPages.dashboard:
-              child = const Dashboard();
+              child = const AuthenticatedHome();
               break;
             case VestaPages.selectGender:
               child = const SelectGender();
@@ -102,7 +102,6 @@ class VestaHome extends StatelessWidget {
           //animated child
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            
             transitionBuilder: (Widget child, Animation<double> animation) {
               return FadeTransition(
                 opacity: animation,
