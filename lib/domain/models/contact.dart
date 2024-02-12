@@ -26,4 +26,10 @@ class VestaContact {
       'phone': phone,
     };
   }
+
+  //tostring
+  @override
+  String toString() {
+    return 'VestaContact{name: $name, email: $email, phone: $phone}';
+  }
 }

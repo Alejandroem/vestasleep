@@ -43,11 +43,11 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   ) : super(AuthenticationState()) {
     //We won't subscribe if we are already subscribed
     authStateChangesSubscription ??=
-        authenticationService.authStateChanges.listen((user) {
-      if (user == null) {
-        emit(state.copyWith(status: Status.justLanded));
-      } else {
+        authenticationService.authStateChanges.listen((authenticated) {
+      if (authenticated) {
         emit(state.copyWith(status: Status.authenticated));
+      } else {
+        emit(state.copyWith(status: Status.justLanded));
       }
     });
   }

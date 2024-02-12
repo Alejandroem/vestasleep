@@ -9,22 +9,26 @@ class AlarmDisarmed extends AlarmState {
   List<Object> get props => [];
 }
 
-class AwaitingUserResponse extends AlarmState {
+class WaitingToNotifyContacts extends AlarmState {
+  final int timeLeft;
+  const WaitingToNotifyContacts(this.timeLeft);
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        timeLeft,
+      ];
 }
 
-class AwaitResponderResponse extends AlarmState {
-  final List<VestaContact> contact;
+class WaitingToNotifyEmergencyServices extends AlarmState {
+  final int timeLeft;
 
-  const AwaitResponderResponse(this.contact);
+  const WaitingToNotifyEmergencyServices(this.timeLeft);
 
   @override
-  List<Object> get props => [contact];
+  List<Object> get props => [timeLeft];
 }
 
-class EmergencyResponse extends AlarmState {
-  const EmergencyResponse();
+class EmergencyResponseTriggered extends AlarmState {
+  const EmergencyResponseTriggered();
 
   @override
   List<Object> get props => [];

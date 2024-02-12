@@ -1,7 +1,7 @@
 import '../models/vesta_user.dart';
 
 abstract class AuthenticationService {
-  Stream<VestaUser?> get authStateChanges;
+  Stream<bool> get authStateChanges;
   Future<VestaUser?> getCurrentUserOrNull();
   Future<VestaUser> signInWithEmailAndPassword(String email, String password);
   Future<VestaUser> signInWithApple();

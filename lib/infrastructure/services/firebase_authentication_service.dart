@@ -7,46 +7,19 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../domain/models/vesta_exception.dart';
 import '../../domain/models/vesta_user.dart';
-import '../../domain/models/vesta_usernames.dart';
 import '../../domain/services/authentication_service.dart';
-import 'firebase_vestausernames_service.dart';
 import 'firebase_vestausers_service.dart';
 
 class FirebaseAuthenticationService extends AuthenticationService {
   //stream to listen to auth changes
   @override
-  Stream<VestaUser?> get authStateChanges =>
+  Stream<bool> get authStateChanges =>
       FirebaseAuth.instance.authStateChanges().map(
         (user) {
           if (user == null) {
-            return null;
+            return false;
           }
-          FirebaseVestaUsersService usersService = FirebaseVestaUsersService();
-          VestaUser vestaUser = VestaUser(
-            id: user.uid,
-            username: user.displayName ?? '',
-            email: user.email ?? '',
-            photoURL: user.photoURL ?? '',
-            isAnonymous: user.isAnonymous,
-          );
-          usersService.updateOrCreate(vestaUser).then((value) {
-            log("User updated or created successfully.");
-          }).catchError((error) {
-            log("Failed to update or create user: $error");
-          });
-
-          FirebaseVestaUserNamesService userNamesService =
-              FirebaseVestaUserNamesService();
-          VestaUserName username = VestaUserName(
-            username: user.displayName ?? 'Guest',
-          );
-          userNamesService.updateOrCreate(username).then((value) {
-            log("User name updated or created successfully.");
-          }).catchError((error) {
-            log("Failed to update or create user name: $error");
-          });
-
-          return vestaUser;
+          return true;
         },
       );
 
@@ -84,13 +57,24 @@ class FirebaseAuthenticationService extends AuthenticationService {
     if (user == null) {
       return null;
     }
-    log(user.toString());
+
+    //do a call to firestore to get the user data form the vesta_users collection
+    FirebaseVestaUsersService usersService = FirebaseVestaUsersService();
+    VestaUser? vestaUser = await usersService.read(user.uid);
+    log("User data from firestore: $vestaUser.toString()");
     return VestaUser(
       id: user.uid,
-      username: user.displayName ?? 'Guest',
+      username: user.displayName ?? '',
       email: user.email ?? '',
       photoURL: user.photoURL ?? '',
       isAnonymous: user.isAnonymous,
+      gender: vestaUser?.gender,
+      age: vestaUser?.age,
+      weight: vestaUser?.weight,
+      height: vestaUser?.height,
+      address: vestaUser?.address,
+      contacts: vestaUser?.contacts,
+      emergencyResponseEnabled: vestaUser?.emergencyResponseEnabled,
     );
   }
 

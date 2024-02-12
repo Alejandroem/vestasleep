@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/bloc/heart_rate/heart_rate_bloc.dart';
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/create_account_cubit.dart';
 import '../../../application/cubit/forgot_password_cubit.dart';
@@ -21,7 +22,14 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
+    return BlocConsumer<AuthenticationCubit, AuthenticationState>(
+      listener: (context, state) {
+        if (state.status == Status.authenticated) {
+          context.read<HeartRateBloc>().add(
+                StartMonitoringHeartRate(),
+              );
+        }
+      },
       builder: (context, state) {
         Widget child = Container();
         switch (state.status) {

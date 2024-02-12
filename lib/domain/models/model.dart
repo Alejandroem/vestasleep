@@ -5,4 +5,5 @@ abstract class Model {
   Map<String, dynamic> toJson();
   List<Map<String, dynamic>> toJsonList();
   Model copyWith();
+  Model merge(old);
 }

@@ -1,14 +1,17 @@
+import 'dart:developer';
+
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
 class MockHealthService implements HealthService {
-  List<HeartRate> getRestingHeartRate(DateTime baseTime, int baseHeartRate) {
+  List<HeartRate> getListOfHeartRate(
+      DateTime baseTime, int heartRate, int length) {
     return List<HeartRate>.generate(
-      60,
+      length,
       (index) {
         return HeartRate(
-          baseHeartRate,
+          heartRate,
           baseTime.add(Duration(seconds: index)),
           baseTime.add(Duration(seconds: index + 1)),
         );
@@ -16,76 +19,29 @@ class MockHealthService implements HealthService {
     );
   }
 
-  List<HeartRate> getHeartRateWithLowProblem(
-      DateTime baseTime, int baseHeartRate) {
-    return List<HeartRate>.generate(
-      60,
-      (index) {
-        if (index < 30 || index >= 40) {
-          return HeartRate(
-            baseHeartRate,
-            baseTime.add(Duration(seconds: index)),
-            baseTime.add(Duration(seconds: index + 1)),
-          );
-        } else {
-          return HeartRate(
-            baseHeartRate - 60, // Assuming baseHeartRate is 80
-            baseTime.add(Duration(seconds: index)),
-            baseTime.add(Duration(seconds: index + 1)),
-          );
-        }
-      },
-    );
-  }
-
-  List<HeartRate> getHeartRateWithHighProblem(
-      DateTime baseTime, int baseHeartRate) {
-    return List<HeartRate>.generate(
-      60,
-      (index) {
-        if (index < 30 || index >= 40) {
-          return HeartRate(
-            baseHeartRate,
-            baseTime.add(Duration(seconds: index)),
-            baseTime.add(Duration(seconds: index + 1)),
-          );
-        } else {
-          return HeartRate(
-            baseHeartRate + 120, // Assuming baseHeartRate is 80
-            baseTime.add(Duration(seconds: index)),
-            baseTime.add(Duration(seconds: index + 1)),
-          );
-        }
-      },
-    );
-  }
-
   @override
-  Future<Stream<HeartRate>> getHeartRateStream(Duration delta) {
+  Future<Stream<HeartRate>> getHeartRateStream(Duration delta) async {
     //Switch between the three and return them forever
-    return Future.value(
-      Stream.periodic(
-        delta,
-        (index) {
-          if (index % 3 == 0) {
-            return getHeartRateWithLowProblem(
-              DateTime.now(),
-              80,
-            );
-          } else if (index % 3 == 1) {
-            return getHeartRateWithHighProblem(
-              DateTime.now(),
-              80,
-            );
-          } else {
-            return getRestingHeartRate(
-              DateTime.now(),
-              80,
-            );
-          }
-        },
-      ).asyncExpand((element) => Stream.fromIterable(element)),
-    );
+    return Stream.periodic(
+      delta,
+      (index) {
+        if (index < 3) {
+          log('Normal');
+          return getListOfHeartRate(
+            DateTime.now(),
+            80,
+            10,
+          );
+        } else {
+          log('Low problem');
+          return getListOfHeartRate(
+            DateTime.now(),
+            30,
+            10,
+          );
+        }
+      },
+    ).asyncExpand((element) => Stream.fromIterable(element));
   }
 
   @override
@@ -95,9 +51,10 @@ class MockHealthService implements HealthService {
       Stream.periodic(
         const Duration(seconds: 1),
         (index) {
-          return getRestingHeartRate(
+          return getListOfHeartRate(
             DateTime.now(),
             80,
+            10,
           );
         },
       ).asyncExpand((element) => Stream.fromIterable(element)),

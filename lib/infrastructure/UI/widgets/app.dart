@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,6 +19,7 @@ import '../../services/firebase_vestausernames_service.dart';
 import '../../services/firebase_vestausers_service.dart';
 import '../../services/google_apple_health_service.dart';
 import '../../services/ios_android_contacts_service.dart';
+import '../../services/mock_health_service.dart';
 import 'home.dart';
 
 class App extends StatelessWidget {
@@ -42,7 +44,8 @@ class App extends StatelessWidget {
             create: (context) => FirebaseVestaUserNamesService(),
           ),
           RepositoryProvider<HealthService>(
-            create: (context) => GoogleAppleHealthService(),
+            create: (context) =>
+                kDebugMode ? MockHealthService() : GoogleAppleHealthService(),
           ),
           RepositoryProvider<ContactsService>(
             create: (context) => IosAndroidContactsService(),
@@ -55,6 +58,7 @@ class App extends StatelessWidget {
           create: (context) => AlarmBloc(
             context.read<AuthenticationService>(),
             context.read<UsersService>(),
+            context.read<NotificationsService>(),
           ),
           child: MultiBlocProvider(
             providers: [

@@ -54,4 +54,9 @@ class VestaUserName implements Model {
 
   @override
   String? get id => username;
+
+  @override
+  Model merge(old) {
+    return this;
+  }
 }

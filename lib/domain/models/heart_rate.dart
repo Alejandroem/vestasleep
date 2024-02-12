@@ -8,4 +8,9 @@ class HeartRate {
     this.dateFrom,
     this.dateTo,
   );
+
+  @override
+  String toString() {
+    return 'HeartRate{averageHeartRate: $averageHeartRate, dateFrom: $dateFrom, dateTo: $dateTo}';
+  }
 }

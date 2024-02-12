@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:telephony/telephony.dart';
 
@@ -5,6 +8,8 @@ import '../../domain/models/contact.dart';
 import '../../domain/services/notifications_service.dart';
 
 class DeviceNotificationsService extends NotificationsService {
+  //AUDIO
+  final audioPlayer = AudioPlayer();
   //LOCAL
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -37,6 +42,7 @@ class DeviceNotificationsService extends NotificationsService {
 
   @override
   Future<bool> sendLocalNotification(String title, String body) async {
+    log('Sending local notification with title: $title and body: $body');
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'local_notifications',
@@ -72,6 +78,7 @@ class DeviceNotificationsService extends NotificationsService {
 
     try {
       for (VestaContact contact in contacts) {
+        log('Sending SMS to ${contact.name}');
         await telephony.sendSms(
           to: contact.phone,
           message: body,
@@ -79,13 +86,46 @@ class DeviceNotificationsService extends NotificationsService {
       }
       return true;
     } catch (e) {
+      log('Error sending SMS: $e');
       return false;
     }
   }
 
   @override
-  Future<bool> sendPushNotification(String title, String body) {
-    // TODO: implement sendPushNotification
+  Future<bool> sendPushNotification(String title, String body) async {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> playAlarmSound() async {
+    try {
+      audioPlayer.setReleaseMode(ReleaseMode.loop);
+      await audioPlayer.play(
+        AssetSource(
+          'sounds/alert.wav',
+        ),
+      );
+      return true;
+    } catch (e) {
+      log('Error playing sound: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> stopAlarmSound() async {
+    try {
+      await audioPlayer.stop();
+      return true;
+    } catch (e) {
+      log('Error stopping audio player: $e');
+      try {
+        audioPlayer.release();
+        return true;
+      } catch (e) {
+        log('Error releasing audio player: $e');
+        return false;
+      }
+    }
   }
 }

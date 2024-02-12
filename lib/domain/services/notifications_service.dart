@@ -8,4 +8,6 @@ abstract class NotificationsService {
       String title, String body, List<VestaContact> contacts);
   Future<bool> sendEmergencyResponseNotification(
       String title, String body, List<VestaContact> contacts);
+  Future<bool> playAlarmSound();
+  Future<bool> stopAlarmSound();
 }

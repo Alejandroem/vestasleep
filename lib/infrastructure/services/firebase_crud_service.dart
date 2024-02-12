@@ -113,9 +113,13 @@ abstract class FirebaseCrudService<T> extends CrudService<T> {
       if ((entity as Model).id?.isEmpty ?? true) {
         return create(entity);
       }
-      if (await read((entity).id!) == null) {
+      
+      T old = await read((entity).id!) as T;
+      if (old == null) {
         return create(entity);
       }
+      //merge both
+      entity = (entity as Model).merge(old) as T;
       return update(entity);
     } catch (e) {
       log(e.toString());

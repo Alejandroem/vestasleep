@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,19 +14,19 @@ part 'heart_rate_state.dart';
 part 'heart_rate_events.dart';
 
 class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
-  final Duration lectureLength = Duration(seconds: 10);
+  final Duration tenSeconds = const Duration(seconds: 10);
   AlarmBloc alarmBloc;
   HealthService healthService;
   StreamSubscription<HeartRate>? heartRateSubscription;
-  Timer? _timerBeforeTriggeringAlarm;
-  Timer? _timerBeforeTriggeringEmergency;
+  Timer? _timerToAddressPotentialProblem;
+  Timer? _timerToAddressSevereProblem;
+  Timer? _recoveryTimer;
 
   HeartRateBloc(
     this.alarmBloc,
     this.healthService,
   ) : super(HeartRateNotMonitored()) {
     //We trigger the monitoring of the heart rate
-    add(StartMonitoringHeartRate());
 
     on<StartMonitoringHeartRate>(_onStartMonitoringHeartRate);
     on<StopMonitoringHeartRate>(_onStopMonitoringHeartRate);
@@ -54,11 +55,13 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
 
   FutureOr<void> _onStartMonitoringHeartRate(
       StartMonitoringHeartRate event, Emitter<HeartRateState> emit) async {
+    log('Monitoring heart rate');
     if (heartRateSubscription != null) {
-      heartRateSubscription!.cancel();
+      await heartRateSubscription!.cancel();
     }
     Stream<HeartRate> heartRateStream =
-        await healthService.getHeartRateStream(lectureLength);
+        await healthService.getHeartRateStream(tenSeconds);
+
     heartRateSubscription = heartRateStream.listen((heartRate) {
       add(NewHeartRateLecture(heartRate));
     });
@@ -74,40 +77,83 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
       NewHeartRateLecture event, Emitter<HeartRateState> emit) async {
     //TODO add try catch to this?
     UserState userState = await healthService.getUserState();
+    log('New heart rate lecture: ${event.heartRate}');
 
     //Start waiting for the next 60 seconds to check if the heart rate is still a problem
-    if (hasHeartRateProblem(event.heartRate, userState)) {
-      _timerBeforeTriggeringAlarm ??=
-          Timer.periodic(const Duration(seconds: 60), (timer) {
-        add(NewHeartRateProblem(
-          event.heartRate,
-        ));
+    if (hasHeartRateProblem(event.heartRate, userState) &&
+        alarmBloc.state is AlarmDisarmed) {
+      _timerToAddressPotentialProblem ??=
+          Timer.periodic(const Duration(seconds: 1), (timer) {
+        log('Heart rate problem detected. Timer tick: ${50 - timer.tick}');
+        //We wait for 50 seconds before triggering the alarm because
+        //the reading was from the last 10 seconds
+        //and we want to wait for the next 20 seconds to be sure
+        //Total time is 60 seconds
+        if (timer.tick == 50) {
+          log('Heart rate problem timer expired');
+          add(NewHeartRateProblem(
+            event.heartRate,
+          ));
+          _timerToAddressPotentialProblem?.cancel();
+          _timerToAddressPotentialProblem = null;
+        }
       });
     }
-    //If the heart it's urgent, we start waiting for the next 10 seconds to check if the heart rate is still a problem
-    else if (hasSevereHeartRateProblem(event.heartRate)) {
-      _timerBeforeTriggeringEmergency ??=
-          Timer.periodic(const Duration(seconds: 10), (timer) {
-        add(NewUrgentHeartRateProblem(event.heartRate));
+    if (hasSevereHeartRateProblem(event.heartRate) &&
+        alarmBloc.state is AlarmDisarmed) {
+      _timerToAddressSevereProblem ??=
+          Timer.periodic(const Duration(seconds: 1), (timer) {
+        log('Urgent heart rate problem detected. Timer tick: ${10 - timer.tick}');
+        //We wait for 10 seconds before triggering the emergency response because
+        //the reading was from the last 10 seconds
+        //and we want to wait for the next 10 seconds to be sure
+        //total time is 20 seconds
+        if (timer.tick == 10) {
+          log('Urgent heart rate problem timer expired');
+          add(NewUrgentHeartRateProblem(
+            event.heartRate,
+          ));
+
+          _timerToAddressSevereProblem?.cancel();
+          _timerToAddressSevereProblem = null;
+        }
       });
     }
-    //If the heart rate is normal after the next lecture we cancel the timers
-    //The lectures are determined by the lecture paramter
+    //We only start a recovery timer if the heart rate is normal
+    if (heartRateNormal(event.heartRate, userState) &&
+        alarmBloc.state is! AlarmDisarmed) {
+      _recoveryTimer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+        log('Heart rate recovery detected. Timer tick: ${110 - timer.tick}');
+        //We wait for 110 seconds before disarming the timers because
+        //We want to be sure the heart rate has recovered
+        //Total time is 120 seconds
+        if (timer.tick == 110) {
+          log('Heart rate recovery timer expired');
+          _timerToAddressPotentialProblem?.cancel();
+          _timerToAddressSevereProblem?.cancel();
+          _recoveryTimer?.cancel();
+        }
+      });
+    }
+    //We cancel the recovery timer if the heart rate is not normal
     else {
-      _timerBeforeTriggeringAlarm?.cancel();
-      _timerBeforeTriggeringAlarm = null;
-      _timerBeforeTriggeringEmergency?.cancel();
-      _timerBeforeTriggeringEmergency = null;
+      _recoveryTimer?.cancel();
     }
   }
 
   FutureOr<void> _onNewHeartRateProblem(
       NewHeartRateProblem event, Emitter<HeartRateState> emit) {
-    alarmBloc.add(TriggerAlarm());
+    log('Heart rate problem detected');
+    _timerToAddressPotentialProblem?.cancel();
+    _timerToAddressPotentialProblem = null;
+    alarmBloc.add(TriggerPotentialProblemAlarm());
   }
 
   FutureOr<void> _onNewUrgentHeartRateProblem(
       NewUrgentHeartRateProblem event, Emitter<HeartRateState> emit) {
-    alarmBloc.add(TriggerEmergencyResponse());
+    log('Urgent heart rate problem detected');
+    _timerToAddressPotentialProblem?.cancel();
+    _timerToAddressPotentialProblem = null;
+    alarmBloc.add(const TriggerContactsResponse());
   }
 }

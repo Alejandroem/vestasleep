@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/bloc/alarm/alarm_bloc.dart';
 import '../../../application/cubit/authentication_cubit.dart';
 import '../../../domain/models/contact.dart';
 import '../../../domain/services/notifications_service.dart';
@@ -19,33 +18,53 @@ class Dashboard extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            ElevatedButton(
-              child: Text("Request permissions"),
-              onPressed: () {
-                context
-                    .read<NotificationsService>()
-                    .requestNotificationPermissions();
+            BlocBuilder<AlarmBloc, AlarmState>(
+              builder: (context, state) {
+                if (state is WaitingToNotifyContacts) {
+                  //Show alert with icon and a button to disarm the alarm
+                  return Column(
+                    children: [
+                      Text('Time left: ${state.timeLeft}'),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AlarmBloc>().add(DisarmAlarm());
+                        },
+                        child: const Text(
+                            'Disarm Alarm or we will notify your contacts'),
+                      ),
+                    ],
+                  );
+                }
+                if (state is WaitingToNotifyEmergencyServices) {
+                  //Show alert with icon and a button to disarm the alarm
+                  return Column(
+                    children: [
+                      Text('Time left: ${state.timeLeft}'),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AlarmBloc>().add(DisarmAlarm());
+                        },
+                        child: const Text(
+                            'Disarm Alarm or we will call emergency services'),
+                      ),
+                    ],
+                  );
+                }
+                
+                return const SizedBox.shrink();
               },
             ),
             ElevatedButton(
-              child: Text("Send local notification"),
+              child: const Text("Send local notification"),
               onPressed: () {
                 //set a timer
                 context
                     .read<NotificationsService>()
                     .sendLocalNotification("Test", "This is a test");
-                Timer t = Timer(
-                  const Duration(seconds: 5),
-                  () {
-                    context
-                        .read<NotificationsService>()
-                        .sendLocalNotification("Test", "This is a test");
-                  },
-                );
               },
             ),
             ElevatedButton(
-              child: Text("Send message to test alex"),
+              child: const Text("Send message to test alex"),
               onPressed: () {
                 context
                     .read<NotificationsService>()
@@ -54,7 +73,7 @@ class Dashboard extends StatelessWidget {
                   VestaContact(
                     name: "Alex",
                     email: "Alexalejadroem@gmail.com",
-                    phone: "+595971722855",
+                    phone: "+595971307111",
                   ),
                 ]);
               },

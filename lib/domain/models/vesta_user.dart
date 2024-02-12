@@ -102,7 +102,9 @@ class VestaUser implements Model {
       age: json['age'],
       weight: json['weight'],
       height: json['height'],
-      address: Address.fromJSON(json['address']),
+      address: json.keys.contains('address') && json['address'] != null
+          ? Address.fromJSON(json['address'])
+          : null,
       contacts: json['contacts'] != null
           ? (json['contacts'] as List)
               .map((contact) => VestaContact.fromJson(contact))
@@ -168,5 +170,23 @@ class VestaUser implements Model {
         'contacts': contacts?.map((contact) => contact.toJson()).toList(),
       }
     ];
+  }
+
+  @override
+  VestaUser merge(old) {
+    return VestaUser(
+      id: id ?? old.id,
+      username: username.isEmpty ? old.username : username,
+      email: email.isEmpty ? old.email : email,
+      password: password ?? old.password,
+      photoURL: photoURL.isEmpty ? old.photoURL : photoURL,
+      isAnonymous: isAnonymous,
+    );
+  }
+
+  //tostring
+  @override
+  String toString() {
+    return 'VestaUser{id: $id, username: $username, email: $email, password: $password, photoURL: $photoURL, isAnonymous: $isAnonymous, contacts: $contacts, emergencyResponseEnabled: $emergencyResponseEnabled}';
   }
 }
