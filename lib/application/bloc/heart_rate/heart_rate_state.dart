@@ -1,12 +1,8 @@
 part of 'heart_rate_bloc.dart';
 
 enum HeartRateAssessment {
-  aboveRestingThreshold,
-  belowRestingThreshold,
-  aboveSleepingThreshold,
-  belowSleepingThreshold,
-  aboveExcerciseThreshold,
-  belowExcerciseThreshold,
+  potentialProblem,
+  inminentProblem,
   normal,
   calibrating,
 }
@@ -21,10 +17,16 @@ class HeartRateNotMonitored extends HeartRateState {
 }
 
 class MonitoringHeartRate extends HeartRateState {
+  final HeartRate? heartRate;
+  final List<HeartRate>? heartRateList;
   final HeartRateAssessment assessment;
 
-  const MonitoringHeartRate(this.assessment);
+  const MonitoringHeartRate(
+      this.heartRate, this.heartRateList, this.assessment);
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        heartRate ?? 0,
+        heartRateList ?? [],
+        assessment,
+      ];
 }
-

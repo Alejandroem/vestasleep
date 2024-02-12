@@ -102,6 +102,7 @@ class VestaHome extends StatelessWidget {
           //animated child
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
+            
             transitionBuilder: (Widget child, Animation<double> animation) {
               return FadeTransition(
                 opacity: animation,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'alarm_flow.dart';
+import 'heart_rate_chart.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -27,7 +28,7 @@ class Dashboard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
                     Padding(
                       padding: EdgeInsets.all(20),
@@ -45,6 +46,7 @@ class Dashboard extends StatelessWidget {
                   ],
                 ),
                 AlarmFlow(),
+                HeartRateChart(),
               ],
             ),
           ),

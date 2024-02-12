@@ -68,6 +68,8 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
 
     emit(
       const MonitoringHeartRate(
+        null,
+        [],
         HeartRateAssessment.calibrating,
       ),
     ); //We assume the heart rate is normal
@@ -77,11 +79,13 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
       NewHeartRateLecture event, Emitter<HeartRateState> emit) async {
     //TODO add try catch to this?
     UserState userState = await healthService.getUserState();
+    HeartRateAssessment? assessment = HeartRateAssessment.normal;
     log('New heart rate lecture: ${event.heartRate}');
 
     //Start waiting for the next 60 seconds to check if the heart rate is still a problem
     if (hasHeartRateProblem(event.heartRate, userState) &&
         alarmBloc.state is AlarmDisarmed) {
+      assessment = HeartRateAssessment.potentialProblem;
       _timerToAddressPotentialProblem ??=
           Timer.periodic(const Duration(seconds: 1), (timer) {
         log('Heart rate problem detected. Timer tick: ${50 - timer.tick}');
@@ -101,6 +105,7 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
     }
     if (hasSevereHeartRateProblem(event.heartRate) &&
         alarmBloc.state is AlarmDisarmed) {
+      assessment = HeartRateAssessment.inminentProblem;
       _timerToAddressSevereProblem ??=
           Timer.periodic(const Duration(seconds: 1), (timer) {
         log('Urgent heart rate problem detected. Timer tick: ${10 - timer.tick}');
@@ -122,6 +127,7 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
     //We only start a recovery timer if the heart rate is normal
     if (heartRateNormal(event.heartRate, userState) &&
         alarmBloc.state is! AlarmDisarmed) {
+      assessment = HeartRateAssessment.normal;
       _recoveryTimer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
         log('Heart rate recovery detected. Timer tick: ${110 - timer.tick}');
         //We wait for 110 seconds before disarming the timers because
@@ -139,6 +145,21 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
     else {
       _recoveryTimer?.cancel();
     }
+    List<HeartRate>? heartRateList =
+        List.from(((state as MonitoringHeartRate).heartRateList ?? []));
+    heartRateList.add(event.heartRate);
+    //trim down list to 6 only
+    if (heartRateList.length > 10) {
+      heartRateList.removeAt(0);
+    }
+    log('Heart rate list: $heartRateList');
+    emit(
+      MonitoringHeartRate(
+        event.heartRate,
+        heartRateList,
+        assessment,
+      ),
+    );
   }
 
   FutureOr<void> _onNewHeartRateProblem(

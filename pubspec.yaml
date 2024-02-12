@@ -36,6 +36,7 @@ dependencies:
   telephony: ^0.2.0
   audioplayers: ^5.2.1
   flutter_launcher_icons: ^0.13.1
+  fl_chart: ^0.66.2
 
 dev_dependencies:
   flutter_test:

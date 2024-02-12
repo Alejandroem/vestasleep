@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math';
 
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/user_state.dart';
@@ -25,21 +26,11 @@ class MockHealthService implements HealthService {
     return Stream.periodic(
       delta,
       (index) {
-        if (index < 3) {
-          log('Normal');
-          return getListOfHeartRate(
-            DateTime.now(),
-            80,
-            10,
-          );
-        } else {
-          log('Low problem');
-          return getListOfHeartRate(
-            DateTime.now(),
-            80,
-            10,
-          );
-        }
+        return getListOfHeartRate(
+          DateTime.now(),
+          Random().nextInt(49) + 50,
+          1,
+        );
       },
     ).asyncExpand((element) => Stream.fromIterable(element));
   }
@@ -81,6 +72,7 @@ class MockHealthService implements HealthService {
 
   @override
   Future<UserState> getUserState() {
+    return Future.value(UserState.normal);
     //use index to return different user states
     _index++;
     if (_index % 3 == 0) {
