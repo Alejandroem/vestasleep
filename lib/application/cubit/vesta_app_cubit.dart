@@ -1,5 +1,8 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
+import '../../domain/models/vesta_user.dart';
+import '../../domain/services/authentication_service.dart';
+
 enum VestaPages {
   getStarted,
   connectToHealthKit,
@@ -36,7 +39,12 @@ class VestaAppState {
 
 //TODO BREAKING CHANGE Here we have to figure out if the user already did the onboarding
 class VestaAppCubit extends HydratedCubit<VestaAppState> {
-  VestaAppCubit() : super(VestaAppState());
+  AuthenticationService authenticationService;
+  VestaAppCubit(
+    this.authenticationService,
+  ) : super(VestaAppState()) {
+    checkOnboarding();
+  }
 
   void setHasFinishedOnboarding(bool hasFinishedOnboarding) {
     emit(state.copyWith(hasFinishedOnboarding: hasFinishedOnboarding));
@@ -60,5 +68,18 @@ class VestaAppCubit extends HydratedCubit<VestaAppState> {
       "hasFinishedOnboarding": state.hasFinishedOnboarding,
       "page": state.page.index,
     };
+  }
+
+  void checkOnboarding() async {
+    VestaUser? vestaUser = await authenticationService.getCurrentUserOrNull();
+    if (vestaUser == null) {
+      setPage(VestaPages.getStarted);
+    } else if (vestaUser.hasFinishedOnboarding ?? false) {
+      setHasFinishedOnboarding(true);
+      setPage(VestaPages.dashboard);
+    } else {
+      setHasFinishedOnboarding(false);
+      setPage(VestaPages.getStarted);
+    }
   }
 }

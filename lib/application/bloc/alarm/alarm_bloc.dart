@@ -137,6 +137,7 @@ class AlarmBloc extends Bloc<AlarmEvent, AlarmState> {
       _timerToContactEmergencyResponse = null;
       //Call 911
       log('Calling 911.');
+      emit(const EmergencyResponseTriggered());
     }
   }
 

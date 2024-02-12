@@ -36,7 +36,7 @@ class MockHealthService implements HealthService {
           log('Low problem');
           return getListOfHeartRate(
             DateTime.now(),
-            30,
+            80,
             10,
           );
         }

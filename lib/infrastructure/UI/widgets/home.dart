@@ -7,6 +7,8 @@ import '../../../application/cubit/create_account_cubit.dart';
 import '../../../application/cubit/forgot_password_cubit.dart';
 import '../../../application/cubit/login_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
+import '../../../domain/services/health_service.dart';
+import '../../../domain/services/notifications_service.dart';
 import '../../../domain/services/usernames_service.dart';
 import '../../../domain/services/users_service.dart';
 import 'choose_auth_method.dart';
@@ -28,6 +30,12 @@ class Home extends StatelessWidget {
           context.read<HeartRateBloc>().add(
                 StartMonitoringHeartRate(),
               );
+
+          //request permissions for health data
+          context.read<HealthService>().requestPermissions();
+
+          //request permissions for notifications
+          context.read<NotificationsService>().requestNotificationPermissions();
         }
       },
       builder: (context, state) {

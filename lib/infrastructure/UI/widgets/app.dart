@@ -68,7 +68,9 @@ class App extends StatelessWidget {
                 ),
               ),
               BlocProvider<VestaAppCubit>(
-                create: (context) => VestaAppCubit(),
+                create: (context) => VestaAppCubit(
+                  context.read<AuthenticationService>(),
+                ),
               ),
               BlocProvider<HealthCubit>(
                 create: (context) => HealthCubit(

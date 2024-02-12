@@ -100,11 +100,14 @@ class DeviceNotificationsService extends NotificationsService {
   Future<bool> playAlarmSound() async {
     try {
       audioPlayer.setReleaseMode(ReleaseMode.loop);
-      await audioPlayer.play(
-        AssetSource(
-          'sounds/alert.wav',
-        ),
-      );
+      //if not playing already
+      if (audioPlayer.state != PlayerState.playing) {
+        await audioPlayer.play(
+          AssetSource(
+            'sounds/alert.wav',
+          ),
+        );
+      }
       return true;
     } catch (e) {
       log('Error playing sound: $e');

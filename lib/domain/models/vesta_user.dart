@@ -17,6 +17,7 @@ class VestaUser implements Model {
   final Address? address;
   final List<VestaContact>? contacts;
   final bool? emergencyResponseEnabled;
+  final bool? hasFinishedOnboarding;
 
   VestaUser({
     this.id,
@@ -32,6 +33,7 @@ class VestaUser implements Model {
     this.address,
     this.contacts,
     this.emergencyResponseEnabled,
+    this.hasFinishedOnboarding,
   });
 
   @override
@@ -49,6 +51,7 @@ class VestaUser implements Model {
     Address? address,
     List<VestaContact>? contacts,
     bool? emergencyResponseEnabled,
+    bool? hasFinishedOnboarding,
   }) {
     return VestaUser(
       id: id ?? this.id,
@@ -65,6 +68,8 @@ class VestaUser implements Model {
       contacts: contacts ?? this.contacts,
       emergencyResponseEnabled:
           emergencyResponseEnabled ?? this.emergencyResponseEnabled,
+      hasFinishedOnboarding:
+          hasFinishedOnboarding ?? this.hasFinishedOnboarding,
     );
   }
 
@@ -87,6 +92,8 @@ class VestaUser implements Model {
               .map((contact) => VestaContact.fromJson(contact))
               .toList()
           : null,
+      emergencyResponseEnabled: json['emergencyResponseEnabled'],
+      hasFinishedOnboarding: json['hasFinishedOnboarding'],
     );
   }
 
@@ -110,6 +117,8 @@ class VestaUser implements Model {
               .map((contact) => VestaContact.fromJson(contact))
               .toList()
           : null,
+      emergencyResponseEnabled: json['emergencyResponseEnabled'],
+      hasFinishedOnboarding: json['hasFinishedOnboarding'],
     );
   }
 
@@ -132,6 +141,8 @@ class VestaUser implements Model {
               .map((contact) => VestaContact.fromJson(contact))
               .toList()
           : null,
+      emergencyResponseEnabled: json[0]['emergencyResponseEnabled'],
+      hasFinishedOnboarding: json[0]['hasFinishedOnboarding'],
     );
   }
 
@@ -150,6 +161,8 @@ class VestaUser implements Model {
       'height': height,
       'address': address?.toJSON(),
       'contacts': contacts?.map((contact) => contact.toJson()).toList(),
+      'emergencyResponseEnabled': emergencyResponseEnabled,
+      'hasFinishedOnboarding': hasFinishedOnboarding,
     };
   }
 
@@ -168,6 +181,8 @@ class VestaUser implements Model {
         'height': height,
         'address': address?.toJSON(),
         'contacts': contacts?.map((contact) => contact.toJson()).toList(),
+        'emergencyResponseEnabled': emergencyResponseEnabled,
+        'hasFinishedOnboarding': hasFinishedOnboarding,
       }
     ];
   }
