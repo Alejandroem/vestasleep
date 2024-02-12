@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:telephony/telephony.dart';
 
@@ -27,6 +28,11 @@ class DeviceNotificationsService extends NotificationsService {
   //CALLS
   @override
   Future<bool> requestNotificationPermissions() async {
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+
     bool? notificationsIntialized =
         await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -79,10 +85,14 @@ class DeviceNotificationsService extends NotificationsService {
     try {
       for (VestaContact contact in contacts) {
         log('Sending SMS to ${contact.name}');
-        await telephony.sendSms(
-          to: contact.phone,
-          message: body,
-        );
+        if (kDebugMode) {
+          log('Sending SMS to ${contact.name} with body: $body');
+        } else {
+          await telephony.sendSms(
+            to: contact.phone,
+            message: body,
+          );
+        }
       }
       return true;
     } catch (e) {
