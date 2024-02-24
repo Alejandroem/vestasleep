@@ -13,8 +13,11 @@ class Settings extends StatelessWidget {
         future: context.read<AuthenticationService>().getCurrentUserOrNull(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
           if (snapshot.hasError || snapshot.data == null) {
