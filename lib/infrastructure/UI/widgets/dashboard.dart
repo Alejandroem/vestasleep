@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'heart_rate_chart.dart';
+import 'sleep_chart.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -27,6 +28,7 @@ class Dashboard extends StatelessWidget {
             ),
           ],
         ),
+        SleepChart(),
         HeartRateChart(),
       ],
     );

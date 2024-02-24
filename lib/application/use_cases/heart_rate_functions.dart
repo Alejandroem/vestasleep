@@ -9,7 +9,7 @@ bool hasHeartRateProblem(HeartRate current, UserState state) {
     case UserState.normal:
       return averageHeartRate <= 60 || averageHeartRate >= 100;
     case UserState.sleeping:
-      return averageHeartRate <= 40 || averageHeartRate >= 80;
+      return averageHeartRate <= 40 || averageHeartRate >= 120;
     case UserState.excercising:
       return averageHeartRate <= 100 || averageHeartRate >= 150;
   }
@@ -17,7 +17,7 @@ bool hasHeartRateProblem(HeartRate current, UserState state) {
 
 bool hasSevereHeartRateProblem(HeartRate current) {
   int averageHeartRate = current.averageHeartRate;
-  return averageHeartRate < 35 || averageHeartRate > 160;
+  return averageHeartRate < 35 || averageHeartRate > 140;
 }
 
 bool heartRateNormal(HeartRate current, UserState state) {

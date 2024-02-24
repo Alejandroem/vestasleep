@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:math';
 
 import '../../domain/models/heart_rate.dart';
+import '../../domain/models/sleep_data_point.dart';
 import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
@@ -28,7 +29,7 @@ class MockHealthService implements HealthService {
       (index) {
         return getListOfHeartRate(
           DateTime.now(),
-          Random().nextInt(49) + 50,
+          Random().nextInt(16) + 85,
           1,
         );
       },
@@ -82,5 +83,27 @@ class MockHealthService implements HealthService {
     } else {
       return Future.value(UserState.excercising);
     }
+  }
+
+  @override
+  Future<List<SleepDataPoint>> getSleepData(
+      DateTime start, DateTime end) async {
+    return generateSleepData(start);
+  }
+
+  List<SleepDataPoint> generateSleepData(DateTime start) {
+    var rng = Random();
+    List<SleepDataPoint> sleepData = [];
+    List<SleepStage> stages = SleepStage.values;
+    DateTime current = start;
+
+    while (current.isBefore(start.add(Duration(hours: 24)))) {
+      SleepStage randomStage = stages[rng.nextInt(stages.length)];
+      DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
+      sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));
+      current = end;
+    }
+
+    return sleepData;
   }
 }
