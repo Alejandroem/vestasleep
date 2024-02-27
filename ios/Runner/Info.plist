@@ -23,7 +23,7 @@
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
-		<true/>
+		<true />
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>
@@ -42,14 +42,16 @@
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-		<true/>
+		<true />
 		<key>UIApplicationSupportsIndirectInputEvents</key>
-		<true/>
+		<true />
 		<key>UIStatusBarHidden</key>
-		<false/>
+		<false />
 		<key>NSHealthShareUsageDescription</key>
 		<string>We will sync your data with the Apple Health app to give you better insights</string>
 		<key>NSHealthUpdateUsageDescription</key>
 		<string>We will sync your data with the Apple Health app to give you better insights</string>
+		<key>NSContactsUsageDescription </key>
+		<string>We use contacts to record the users that will be notified when an alarm goes on</string>
 	</dict>
 </plist>
