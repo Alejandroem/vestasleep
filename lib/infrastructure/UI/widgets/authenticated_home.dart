@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/bottom_navigation_cubit.dart';
+import '../../../domain/models/contact.dart';
+import '../../../domain/services/notifications_service.dart';
+import '../../services/device_notifications_service.dart';
 import 'alarm_flow.dart';
 import 'dashboard.dart';
 import 'settings.dart';
@@ -16,6 +19,27 @@ class AuthenticatedHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          NotificationsService notificationsService =
+              context.read<NotificationsService>();
+          notificationsService.playAlarmSound();
+          Future.delayed(const Duration(seconds: 3), () {
+            notificationsService.stopAlarmSound();
+          });
+          notificationsService.sendLocalNotification(
+              "Test notification", "Test bodyas dfkasjdf ñads ");
+          notificationsService.sendPhoneNotificationToContacts("test", "test", [
+            VestaContact(
+                name: "timi", email: "timi@timi.com", phone: "+595971307111")
+          ]);
+        },
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+        backgroundColor: const Color(0xff37A2E7),
+      ),
       bottomNavigationBar: BlocBuilder<BottomNavigationCubit, SelectedTab>(
           builder: (context, state) {
         return BottomNavigationBar(

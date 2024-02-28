@@ -97,8 +97,9 @@ class DeviceNotificationsService extends NotificationsService {
       String result = await sendSMS(
         message: body,
         recipients: contacts.map((e) => e.phone).toList(),
+        sendDirect: true,
       );
-      log(result);
+      log('SMS sent with result: $result');
       return true;
     } catch (e) {
       log('Error sending SMS: $e');
