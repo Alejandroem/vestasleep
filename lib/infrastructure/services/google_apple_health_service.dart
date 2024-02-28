@@ -72,15 +72,19 @@ class GoogleAppleHealthService implements HealthService {
 
     _heartRateTimer = Timer.periodic(delta, (timer) async {
       try {
+        DateTime startTime = DateTime.now().subtract(delta);
+        DateTime endTime = DateTime.now();
+        log("Getting heart rate data from health kit from $startTime to $endTime");
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          DateTime.now().subtract(delta),
-          DateTime.now(),
+          startTime,
+          endTime,
           [
             HealthDataType.HEART_RATE,
           ],
         );
-
+        log("Health data: $healthData");
         if (healthData.isNotEmpty) {
+          log("Health data: $healthData");
           int averageHeartRate = healthData
                   .map((e) => e.value as int)
                   .reduce((value, element) => value + element) ~/
@@ -114,9 +118,12 @@ class GoogleAppleHealthService implements HealthService {
   }
 
   @override
-  Future<UserState> getUserState() {
-    // TODO: implement getUserState
-    throw UnimplementedError();
+  Future<UserState> getUserState() async {
+    //use google healthkit to read the state of the user
+    //   normal,
+    // sleeping,
+    // excercising,
+    return UserState.normal;
   }
 
   @override

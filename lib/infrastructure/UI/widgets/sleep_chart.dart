@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/models/sleep_data_point.dart';
@@ -152,7 +151,7 @@ class SleepChart extends StatelessWidget {
                                         "REM",
                                         "Awake",
                                       ][value.toInt()],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFB2AFAF),
                                         fontSize: 13,
                                         fontFamily: 'M PLUS 1',

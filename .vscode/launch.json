@@ -5,20 +5,17 @@
             "name": "vestasleep fvm",
             "request": "launch",
             "type": "dart",
-            "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK
-            "args": [
-                "-d",
-                "SM A536E"
-            ]
+            "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK            
+        },
+        {
+            "name":"Attach ios",
+            "request": "attach",
+            "type": "dart",
         },
         {
             "name": "vestasleep",
             "request": "launch",
-            "type": "dart",
-            "args": [
-                "-d",
-                "SM A536E"
-            ]
+            "type": "dart",            
         },
         {
             "name": "vestasleep (profile mode)",

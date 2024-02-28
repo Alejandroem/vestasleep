@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math';
 
 import '../../domain/models/heart_rate.dart';
@@ -97,7 +96,7 @@ class MockHealthService implements HealthService {
     List<SleepStage> stages = SleepStage.values;
     DateTime current = start;
 
-    while (current.isBefore(start.add(Duration(hours: 24)))) {
+    while (current.isBefore(start.add(const Duration(hours: 24)))) {
       SleepStage randomStage = stages[rng.nextInt(stages.length)];
       DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
       sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));

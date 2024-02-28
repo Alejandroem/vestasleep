@@ -13,7 +13,7 @@ class Settings extends StatelessWidget {
         future: context.read<AuthenticationService>().getCurrentUserOrNull(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
+            return SizedBox(
               height: MediaQuery.of(context).size.height,
               child: const Center(
                 child: CircularProgressIndicator(),
@@ -27,7 +27,7 @@ class Settings extends StatelessWidget {
           }
           return Column(
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 40,
@@ -49,7 +49,7 @@ class Settings extends StatelessWidget {
               Text(
                 snapshot.data!.username,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontFamily: 'M PLUS 1',
@@ -63,7 +63,7 @@ class Settings extends StatelessWidget {
               Text(
                 snapshot.data!.email,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontFamily: 'SF Pro Text',

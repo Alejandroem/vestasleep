@@ -11,6 +11,9 @@ class HeartRateChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HeartRateBloc, HeartRateState>(
         builder: (context, state) {
+      if (state is HeartRateNotMonitored) {
+        return const SizedBox.shrink();
+      }
       return Container(
         height: 300,
         padding: const EdgeInsets.all(20),

@@ -1,9 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:telephony/telephony.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../domain/models/contact.dart';
 import '../../domain/services/notifications_service.dart';
@@ -20,30 +21,42 @@ class DeviceNotificationsService extends NotificationsService {
     android: AndroidInitializationSettings(
       'splash',
     ),
+    iOS: DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    ),
   );
-
-  //SMS
-  final Telephony telephony = Telephony.instance;
 
   //CALLS
   @override
   Future<bool> requestNotificationPermissions() async {
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-
+    if (Platform.isAndroid) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    }
+    if (Platform.isIOS) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
     bool? notificationsIntialized =
         await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
     );
 
-    bool? smsPermissionGranted = await telephony.requestPhoneAndSmsPermissions;
+    PermissionStatus smsPermissionGranted = await Permission.sms.request();
 
     return notificationsIntialized != null &&
-        smsPermissionGranted != null &&
         notificationsIntialized &&
-        smsPermissionGranted;
+        smsPermissionGranted == PermissionStatus.granted;
   }
 
   @override
@@ -80,20 +93,12 @@ class DeviceNotificationsService extends NotificationsService {
   @override
   Future<bool> sendPhoneNotificationToContacts(
       String title, String body, List<VestaContact> contacts) async {
-    // TODO: implement sendPhoneNotificationToContacts
-
     try {
-      for (VestaContact contact in contacts) {
-        log('Sending SMS to ${contact.name}');
-        if (kDebugMode) {
-          log('Sending SMS to ${contact.name} with body: $body');
-        } else {
-          await telephony.sendSms(
-            to: contact.phone,
-            message: body,
-          );
-        }
-      }
+      String result = await sendSMS(
+        message: body,
+        recipients: contacts.map((e) => e.phone).toList(),
+      );
+      log(result);
       return true;
     } catch (e) {
       log('Error sending SMS: $e');

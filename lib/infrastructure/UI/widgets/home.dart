@@ -24,6 +24,8 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //logout
+    //context.read<AuthenticationService>().signOut();
     return BlocConsumer<AuthenticationCubit, AuthenticationState>(
       listener: (context, state) {
         if (state.status == Status.authenticated) {

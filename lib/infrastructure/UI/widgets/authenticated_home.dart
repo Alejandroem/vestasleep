@@ -74,7 +74,7 @@ class AuthenticatedHome extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AlarmFlow(),
+                const AlarmFlow(),
                 BlocBuilder<BottomNavigationCubit, SelectedTab>(
                   builder: (context, state) {
                     if (state == SelectedTab.home) {

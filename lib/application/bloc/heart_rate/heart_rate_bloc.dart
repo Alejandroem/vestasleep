@@ -14,7 +14,7 @@ part 'heart_rate_state.dart';
 part 'heart_rate_events.dart';
 
 class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
-  final Duration tenSeconds = const Duration(seconds: 10);
+  final Duration heartRateDelta = const Duration(minutes: 5);
   AlarmBloc alarmBloc;
   HealthService healthService;
   StreamSubscription<HeartRate>? heartRateSubscription;
@@ -60,7 +60,7 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
       await heartRateSubscription!.cancel();
     }
     Stream<HeartRate> heartRateStream =
-        await healthService.getHeartRateStream(tenSeconds);
+        await healthService.getHeartRateStream(heartRateDelta);
 
     heartRateSubscription = heartRateStream.listen((heartRate) {
       add(NewHeartRateLecture(heartRate));
@@ -77,7 +77,6 @@ class HeartRateBloc extends Bloc<HeartRateEvent, HeartRateState> {
 
   FutureOr<void> _onNewHeartRateEvent(
       NewHeartRateLecture event, Emitter<HeartRateState> emit) async {
-    //TODO add try catch to this?
     UserState userState = await healthService.getUserState();
     HeartRateAssessment? assessment = HeartRateAssessment.normal;
     log('New heart rate lecture: ${event.heartRate}');
