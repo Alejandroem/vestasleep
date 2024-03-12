@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../application/cubit/bottom_navigation_cubit.dart';
-import '../../../domain/models/contact.dart';
-import '../../../domain/services/notifications_service.dart';
 import 'alarm_flow.dart';
 import 'dashboard.dart';
 import 'settings.dart';
+import 'sleep_dashboard.dart';
 
 class AuthenticatedHome extends StatelessWidget {
   const AuthenticatedHome({super.key});
@@ -18,27 +17,6 @@ class AuthenticatedHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          NotificationsService notificationsService =
-              context.read<NotificationsService>();
-          notificationsService.playAlarmSound();
-          Future.delayed(const Duration(seconds: 3), () {
-            notificationsService.stopAlarmSound();
-          });
-          notificationsService.sendLocalNotification(
-              "Test notification", "Test bodyas dfkasjdf ñads ");
-          notificationsService.sendPhoneNotificationToContacts("test", "test", [
-            VestaContact(
-                name: "timi", email: "timi@timi.com", phone: "+595971307111")
-          ]);
-        },
-        backgroundColor: const Color(0xff37A2E7),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
       bottomNavigationBar: BlocBuilder<BottomNavigationCubit, SelectedTab>(
           builder: (context, state) {
         return BottomNavigationBar(
@@ -46,6 +24,10 @@ class AuthenticatedHome extends StatelessWidget {
             if (index == 0) {
               context.read<BottomNavigationCubit>().updateSelectedTab(
                     SelectedTab.home,
+                  );
+            } else if (index == 1) {
+              context.read<BottomNavigationCubit>().updateSelectedTab(
+                    SelectedTab.graphs,
                   );
             } else {
               context.read<BottomNavigationCubit>().updateSelectedTab(
@@ -59,6 +41,16 @@ class AuthenticatedHome extends StatelessWidget {
                 'assets/svg/home_icon.svg',
                 colorFilter: ColorFilter.mode(
                   state == SelectedTab.home ? selectedColor : unselectedColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+              label: ' ',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                'assets/svg/graph_icon.svg',
+                colorFilter: ColorFilter.mode(
+                  state == SelectedTab.graphs ? selectedColor : unselectedColor,
                   BlendMode.srcIn,
                 ),
               ),
@@ -94,23 +86,23 @@ class AuthenticatedHome extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const AlarmFlow(),
-                BlocBuilder<BottomNavigationCubit, SelectedTab>(
-                  builder: (context, state) {
-                    if (state == SelectedTab.home) {
-                      return const Dashboard();
-                    }
-                    if (state == SelectedTab.settings) {
-                      return const Settings();
-                    }
-                    return const Placeholder();
-                  },
-                ),
-              ],
-            ),
+          child: Stack(
+            children: [
+              const AlarmFlow(),
+              BlocBuilder<BottomNavigationCubit, SelectedTab>(
+                builder: (context, state) {
+                  if (state == SelectedTab.home) {
+                    return const SleepDashboard();
+                  } else if (state == SelectedTab.graphs) {
+                    return const Dashboard();
+                  }
+                  if (state == SelectedTab.settings) {
+                    return const Settings();
+                  }
+                  return const Placeholder();
+                },
+              ),
+            ],
           ),
         ),
       ),

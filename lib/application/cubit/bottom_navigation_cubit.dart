@@ -2,7 +2,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 enum SelectedTab {
   home,
-  settings,
+  settings, graphs,
 }
 
 class BottomNavigationCubit extends HydratedCubit<SelectedTab> {

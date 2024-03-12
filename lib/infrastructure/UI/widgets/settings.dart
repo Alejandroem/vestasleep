@@ -25,59 +25,65 @@ class Settings extends StatelessWidget {
               child: Text('An error occurred'),
             );
           }
-          return Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 40,
-                ),
-                child: Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'M PLUS 1',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 24,
-                    letterSpacing: 0.24,
+          return SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 40,
+                    ),
+                    child: Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'M PLUS 1',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 24,
+                        letterSpacing: 0.24,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    snapshot.data!.username,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontFamily: 'M PLUS 1',
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.85,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    snapshot.data!.email,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontFamily: 'SF Pro Text',
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.85,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Image.asset(
+                    'assets/images/card_background.png',
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                snapshot.data!.username,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontFamily: 'M PLUS 1',
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.85,
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                snapshot.data!.email,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontFamily: 'SF Pro Text',
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.85,
-                ),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              Image.asset(
-                'assets/images/card_background.png',
-              ),
-            ],
+            ),
           );
         });
   }
