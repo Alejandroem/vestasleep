@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import '../../../application/cubit/bottom_navigation_cubit.dart';
 import '../../../domain/models/contact.dart';
 import '../../../domain/services/notifications_service.dart';
-import '../../services/device_notifications_service.dart';
 import 'alarm_flow.dart';
 import 'dashboard.dart';
 import 'settings.dart';
@@ -34,11 +33,11 @@ class AuthenticatedHome extends StatelessWidget {
                 name: "timi", email: "timi@timi.com", phone: "+595971307111")
           ]);
         },
-        child: Icon(
+        backgroundColor: const Color(0xff37A2E7),
+        child: const Icon(
           Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: const Color(0xff37A2E7),
       ),
       bottomNavigationBar: BlocBuilder<BottomNavigationCubit, SelectedTab>(
           builder: (context, state) {

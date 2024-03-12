@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_sms/flutter_sms.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:telephony/telephony.dart';
 
 import '../../domain/models/contact.dart';
 import '../../domain/services/notifications_service.dart';
@@ -93,18 +93,25 @@ class DeviceNotificationsService extends NotificationsService {
   @override
   Future<bool> sendPhoneNotificationToContacts(
       String title, String body, List<VestaContact> contacts) async {
-    try {
-      String result = await sendSMS(
-        message: body,
-        recipients: contacts.map((e) => e.phone).toList(),
-        sendDirect: true,
-      );
-      log('SMS sent with result: $result');
-      return true;
-    } catch (e) {
-      log('Error sending SMS: $e');
+    if (Platform.isAndroid) {
+      try {
+        final Telephony telephony = Telephony.instance;
+        for (VestaContact contact in contacts) {
+          await telephony.sendSms(
+            to: contact.phone,
+            message: body,
+          );
+        }
+        return true;
+      } catch (e) {
+        log('Error sending SMS: $e');
+      }
       return false;
     }
+    if (Platform.isIOS) {
+      throw UnimplementedError();
+    }
+    return false;
   }
 
   @override

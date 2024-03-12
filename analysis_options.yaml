@@ -6,6 +6,7 @@ alyzer:
     implicit-dynamic: false
   exclude:
     - "health/**"
+    - "health"
 
 linter:
   rules:

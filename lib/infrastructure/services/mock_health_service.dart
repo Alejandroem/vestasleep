@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'dart:math';
 
 import '../../domain/models/heart_rate.dart';
