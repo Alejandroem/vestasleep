@@ -89,7 +89,23 @@ class MockHealthService implements HealthService {
   @override
   Future<List<SleepDataPoint>> getSleepData(
       DateTime start, DateTime end) async {
-    return generateSleepData(start);
+    return generateSleepDataForNight(start);
+  }
+
+  List<SleepDataPoint> generateSleepDataForNight(DateTime start) {
+    var rng = Random();
+    List<SleepDataPoint> sleepData = [];
+    List<SleepStage> stages = SleepStage.values;
+    DateTime current = start;
+
+    while (current.isBefore(start.add(const Duration(hours: 24)))) {
+      SleepStage randomStage = stages[rng.nextInt(stages.length)];
+      DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
+      sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));
+      current = end;
+    }
+
+    return sleepData;
   }
 
   List<SleepDataPoint> generateSleepData(DateTime start) {
