@@ -28,6 +28,24 @@ class SleepScoreState {
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );
   }
+
+  String weeklyScore() {
+    int score = 0;
+    for (SleepScore sleepScore in scores) {
+      score += sleepScore.getOverallScoreValue();
+    }
+    return "${score ~/ scores.length}";
+  }
+
+  String averageSessionTime() {
+    int minutes = 0;
+    int hours = 0;
+    for (SleepScore sleepScore in scores) {
+      minutes += sleepScore.sessionTotalMins();
+    }
+    hours = minutes ~/ scores.length ~/ 60;
+    return "$hours hr ${minutes ~/ scores.length % 60} min";
+  }
 }
 
 class SleepScoreCubit extends Cubit<SleepScoreState> {

@@ -52,8 +52,19 @@ class SleepDashboard extends StatelessWidget {
                       letterSpacing: 0.85,
                     ),
                   ),
-                  getSleepGraph(),
-                  getThisWeekTile(),
+                  BlocBuilder<SleepScoreCubit, SleepScoreState>(
+                      builder: (context, state) {
+                    return getSleepGraph(state);
+                  }),
+                  BlocBuilder<SleepScoreCubit, SleepScoreState>(
+                      builder: (context, state) {
+                    if (state.loading) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return getThisWeekTile(state);
+                  }),
                   const SizedBox(height: 20),
                   Expanded(
                     child: BlocBuilder<SleepScoreCubit, SleepScoreState>(
@@ -81,59 +92,12 @@ class SleepDashboard extends StatelessWidget {
     );
   }
 
-  Container getThisWeekTile() {
+  Container getThisWeekTile(SleepScoreState state) {
     return Container(
       width: 349,
       height: 102.50,
       child: Stack(
         children: [
-          Positioned(
-            left: 17.61,
-            top: 0,
-            child: Container(
-              width: 148.39,
-              height: 12,
-              child: const Stack(
-                children: [
-                  Positioned(
-                    left: 135.58,
-                    top: 0,
-                    child: SizedBox(
-                      width: 12.81,
-                      child: Text(
-                        '􀋚',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 10,
-                          fontFamily: 'SF Pro Text',
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: SizedBox(
-                      width: 16.01,
-                      child: Text(
-                        '􀙪',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 10,
-                          fontFamily: 'SF Pro Text',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           Positioned(
             left: 0,
             top: 31.50,
@@ -166,7 +130,7 @@ class SleepDashboard extends StatelessWidget {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 153,
             top: 37.50,
             child: SizedBox(
@@ -174,9 +138,9 @@ class SleepDashboard extends StatelessWidget {
               child: Opacity(
                 opacity: 0.60,
                 child: Text(
-                  '70 Sleep Score\n6 hr 3 min',
+                  '${state.weeklyScore()} Sleep Score\n ${state.averageSessionTime()}',
                   textAlign: TextAlign.right,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 17,
                     fontFamily: 'M PLUS 1',
@@ -192,7 +156,15 @@ class SleepDashboard extends StatelessWidget {
     );
   }
 
-  SizedBox getSleepGraph() {
+  SizedBox getSleepGraph(state) {
+    if (state.loading) {
+      return const SizedBox(
+        height: 250,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return SizedBox(
       height: 250,
       child: BarChart(
@@ -276,15 +248,24 @@ class SleepDashboard extends StatelessWidget {
           borderData: FlBorderData(
             show: false,
           ),
-          barGroups: [
-            ...generateSevenDaysData(),
-          ],
+          barGroups: state.scores.isEmpty
+              ? []
+              : generateSevenDaysData(
+                  state.scores,
+                ),
         ),
       ),
     );
   }
 
-  List<BarChartGroupData> generateSevenDaysData() {
+  List<BarChartGroupData> generateSevenDaysData(List<SleepScore> scores) {
+    if (scores.length < 7) {
+      return [];
+    }
+    List<SleepScore> last7days = scores.sublist(
+      scores.length - 7,
+      scores.length,
+    );
     return List.generate(7, (index) {
       return BarChartGroupData(
         x: index,
@@ -292,8 +273,7 @@ class SleepDashboard extends StatelessWidget {
           BarChartRodData(
             width: 16,
             fromY: 0,
-            toY: (index + 1) *
-                10, // Just an example, replace with your actual data
+            toY: last7days[index].getOverallScoreValue().toDouble(),
             color: Colors.lightBlueAccent,
           )
         ],

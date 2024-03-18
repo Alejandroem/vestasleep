@@ -16,7 +16,7 @@ class SleepScore {
     required this.sleepDataPoints,
   });
 
-  int _sessionMins() {
+  int sessionTotalMins() {
     int minutes = 0;
     for (var point in sleepDataPoints) {
       minutes += point.to.difference(point.from).inMinutes;
@@ -57,7 +57,7 @@ class SleepScore {
   }
 
   String getAsleepAwakeScore() {
-    return "${((_timeAsleep() / _sessionMins()) * 50).toInt()} / 50";
+    return "${((_timeAsleep() / sessionTotalMins()) * 50).toInt()} / 50";
   }
 
   int _getTotalDeepSleep() {
@@ -93,7 +93,7 @@ class SleepScore {
   }
 
   String getDeepReemScore() {
-    return "${((_getTotalRemSleep() / _sessionMins()) * 25).toInt()} / 25";
+    return "${((_getTotalRemSleep() / sessionTotalMins()) * 25).toInt()} / 25";
   }
 
   bool restingHeartHeartRate(int averageHeartRate) {
@@ -122,20 +122,20 @@ class SleepScore {
 
   String getBellowRestingString() {
     //percentage
-    return "${_getMinutesBellowRestingHeartRate()} / ${_sessionMins()} %";
+    return "${_getMinutesBellowRestingHeartRate()} / ${sessionTotalMins()} %";
   }
 
   String getRestLessPercentage() {
     //percentage
-    return "${_minsAboveRestingHR()} / ${_sessionMins()} %";
+    return "${_minsAboveRestingHR()} / ${sessionTotalMins()} %";
   }
 
   String getRestorationScore() {
-    return "${((_minsAboveRestingHR() / _sessionMins()) * 25).toInt()} / 25}";
+    return "${((_minsAboveRestingHR() / sessionTotalMins()) * 25).toInt()} / 25}";
   }
 
-  int _getOverallScore() {
-    int sessionMins = _sessionMins();
+  int getOverallScoreValue() {
+    int sessionMins = sessionTotalMins();
     double asleepScore = ((_timeAsleep() / sessionMins) * 50);
     double remSleepScore = ((_getTotalRemSleep() / sessionMins) * 25);
     double restorationScore = ((_minsAboveRestingHR() / sessionMins) * 25);
@@ -144,11 +144,11 @@ class SleepScore {
   }
 
   String getOverallScore() {
-    return "${_getOverallScore()}";
+    return "${getOverallScoreValue()}";
   }
 
   String getSleepQuality() {
-    int overallScore = _getOverallScore();
+    int overallScore = getOverallScoreValue();
     if (overallScore < 60) {
       return "Poor";
     } else if (overallScore < 80) {
@@ -187,8 +187,8 @@ class SleepScore {
   }
 
   String sessionDuration() {
-    int hours = _sessionMins() ~/ 60;
-    int minutes = _sessionMins() % 60;
+    int hours = sessionTotalMins() ~/ 60;
+    int minutes = sessionTotalMins() % 60;
     return "$hours h $minutes m";
   }
 }
