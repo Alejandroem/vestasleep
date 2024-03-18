@@ -1,16 +1,16 @@
 class HeartRate {
   final int averageHeartRate;
-  final DateTime dateFrom;
-  final DateTime dateTo;
+  final DateTime from;
+  final DateTime to;
 
   HeartRate(
     this.averageHeartRate,
-    this.dateFrom,
-    this.dateTo,
+    this.from,
+    this.to,
   );
 
   @override
   String toString() {
-    return 'HeartRate{averageHeartRate: $averageHeartRate, dateFrom: $dateFrom, dateTo: $dateTo}';
+    return 'HeartRate{averageHeartRate: $averageHeartRate, dateFrom: $from, dateTo: $to}';
   }
 }
