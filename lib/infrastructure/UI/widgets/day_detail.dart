@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/models/sleep_score.dart';
+
 class DayDetail extends StatelessWidget {
-  const DayDetail({super.key});
+  final SleepScore score;
+  const DayDetail(this.score, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +29,9 @@ class DayDetail extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Wednesday',
-                style: TextStyle(
+              Text(
+                score.getHumanDay(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                   fontFamily: 'M PLUS 1',
@@ -36,15 +39,15 @@ class DayDetail extends StatelessWidget {
                   letterSpacing: 0.85,
                 ),
               ),
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: 100,
                   ),
                   Text(
-                    '45',
-                    style: TextStyle(
+                    score.getOverallScore(),
+                    style: const TextStyle(
                       color: Color(0xFF00FFFF),
                       fontSize: 38,
                       fontFamily: 'M PLUS 1',
@@ -55,7 +58,7 @@ class DayDetail extends StatelessWidget {
                   SizedBox(
                     width: 100,
                     child: Text(
-                      'Good',
+                      score.getSleepQuality(),
                       style: TextStyle(
                         color: Color(0xFF00FFFF),
                         fontSize: 22,
@@ -72,34 +75,34 @@ class DayDetail extends StatelessWidget {
               getScoreCard(
                 context,
                 "Time Asleep",
-                "7h 51 min",
-                "1h 16 min",
+                score.getAsleepString(),
+                score.getAwakeString(),
                 "Asleep",
                 "Awake",
-                "40",
-                "50",
+                score.getAsleepAwakeScore(),
+                50,
               ),
               const SizedBox(height: 20),
               getScoreCard(
                 context,
                 "Deep and REM",
-                "1h 27 min",
-                "18%  ",
+                score.getDeepSleepString(),
+                score.getRemSleepString(),
                 "Deep",
                 "REM",
-                "22",
-                "25",
+                score.getDeepReemScore(),
+                25,
               ),
               const SizedBox(height: 20),
               getScoreCard(
                 context,
                 "Restoration",
-                "78% below resting",
-                "11%",
+                "${score.getBellowRestingString()} below resting",
+                score.getRestLessPercentage(),
                 "Sleep heart rate",
                 "Restless",
-                "19",
-                "25",
+                19,
+                25,
               ),
             ],
           ),
@@ -115,59 +118,13 @@ class DayDetail extends StatelessWidget {
       String avgSecond,
       String metricFirst,
       String metricSecond,
-      String score,
-      String total) {
+      int score,
+      int total) {
     return Container(
       width: 340,
       height: 153,
       child: Stack(
         children: [
-          Positioned(
-            left: 17.16,
-            top: 50.50,
-            child: Container(
-              width: 144.56,
-              height: 12,
-              child: const Stack(
-                children: [
-                  Positioned(
-                    left: 132.08,
-                    top: 0,
-                    child: SizedBox(
-                      width: 12.48,
-                      child: Text(
-                        '􀋚',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 10,
-                          fontFamily: 'SF Pro Text',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: SizedBox(
-                      width: 15.60,
-                      child: Text(
-                        '􀙪',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFFCDCDCD),
-                          fontSize: 10,
-                          fontFamily: 'SF Pro Text',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           Positioned(
             left: 0,
             top: 0,
@@ -188,7 +145,7 @@ class DayDetail extends StatelessWidget {
             left: 19,
             top: 89,
             child: Text(
-              '${avgFirst}      ${avgSecond}',
+              '$avgFirst      $avgSecond',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -201,7 +158,7 @@ class DayDetail extends StatelessWidget {
             left: 19,
             top: 109,
             child: Text(
-              '${metricFirst}               ${metricSecond}',
+              '$metricFirst               $metricSecond',
               style: const TextStyle(
                 color: Color(0xFFB2AFAF),
                 fontSize: 14,
@@ -239,6 +196,20 @@ class DayDetail extends StatelessWidget {
             ),
           ),
           Positioned(
+            left: 17,
+            top: 56,
+            child: Container(
+              width: 309 * (score / total),
+              height: 6,
+              decoration: ShapeDecoration(
+                color: const Color(0xFF37A2E7),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
             left: 19,
             top: 23,
             child: Text(
@@ -261,7 +232,7 @@ class DayDetail extends StatelessWidget {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: '${score}',
+                      text: '$score',
                       style: const TextStyle(
                         color: Color(0xFF00FFFF),
                         fontSize: 17,
@@ -271,7 +242,7 @@ class DayDetail extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: '/${total}',
+                      text: '/$total',
                       style: const TextStyle(
                         color: Color(0xFFCDCDCD),
                         fontSize: 17,

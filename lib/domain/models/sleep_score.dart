@@ -56,8 +56,8 @@ class SleepScore {
     return "$hours h $minutes m";
   }
 
-  String getAsleepAwakeScore() {
-    return "${((_timeAsleep() / sessionTotalMins()) * 50).toInt()} / 50";
+  int getAsleepAwakeScore() {
+    return ((_timeAsleep() / sessionTotalMins()) * 50).toInt();
   }
 
   int _getTotalDeepSleep() {
@@ -92,8 +92,8 @@ class SleepScore {
     return "$hours h $minutes m";
   }
 
-  String getDeepReemScore() {
-    return "${((_getTotalRemSleep() / sessionTotalMins()) * 25).toInt()} / 25";
+  int getDeepReemScore() {
+    return ((_getTotalRemSleep() / sessionTotalMins()) * 25).toInt();
   }
 
   bool restingHeartHeartRate(int averageHeartRate) {
@@ -121,13 +121,11 @@ class SleepScore {
   }
 
   String getBellowRestingString() {
-    //percentage
-    return "${_getMinutesBellowRestingHeartRate()} / ${sessionTotalMins()} %";
+    return "${_getMinutesBellowRestingHeartRate() ~/ sessionTotalMins()} %";
   }
 
   String getRestLessPercentage() {
-    //percentage
-    return "${_minsAboveRestingHR()} / ${sessionTotalMins()} %";
+    return "${_minsAboveRestingHR() ~/ sessionTotalMins()} %";
   }
 
   String getRestorationScore() {

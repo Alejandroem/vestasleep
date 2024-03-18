@@ -286,11 +286,11 @@ class SleepDashboard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const DayDetail(),
+            builder: (context) => DayDetail(score),
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         height: 106,
         child: Stack(
           children: [
