@@ -21,6 +21,8 @@ dependencies:
   sign_in_with_apple: ^5.0.0
   http: ^1.1.2
   flutter_native_splash: ^2.3.9
+  intl: ^0.18.1
+
   #health: ^8.1.0
   health:
     path: ./health

@@ -198,4 +198,52 @@ class GoogleAppleHealthService implements HealthService {
       return [];
     }
   }
+
+  @override
+  Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
+    HealthFactory health = HealthFactory();
+    List<HealthDataType> types = [
+      HealthDataType.HEART_RATE,
+    ];
+
+    final permissions = types.map((e) => HealthDataAccess.READ).toList();
+
+    // Check if we have permission
+    bool? hasPermissions =
+        await health.hasPermissions(types, permissions: permissions);
+
+    // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
+    // Hence, we have to request with WRITE as well.
+    hasPermissions = false;
+
+    bool authorized = false;
+    if (!hasPermissions) {
+      // requesting access to the data types before reading them
+      try {
+        authorized = await health.requestAuthorization(types);
+      } catch (error) {
+        log("Exception in authorize: $error");
+      }
+    }
+
+    if (authorized) {
+      List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+        start,
+        end,
+        types,
+      );
+
+      List<HeartRate> heartRates = healthData.map((dataPoint) {
+        return HeartRate(
+          dataPoint.value as int,
+          dataPoint.dateFrom,
+          dataPoint.dateTo,
+        );
+      }).toList();
+
+      return heartRates;
+    } else {
+      return [];
+    }
+  }
 }

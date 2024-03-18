@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,6 +7,7 @@ import '../../../application/cubit/authentication_cubit.dart';
 import '../../../application/cubit/bottom_navigation_cubit.dart';
 import '../../../application/cubit/health_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
+import '../../../constants.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/contacts_service.dart';
 import '../../../domain/services/health_service.dart';
@@ -31,7 +29,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Vesta',      
+      title: 'Vesta',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -47,9 +45,9 @@ class App extends StatelessWidget {
             create: (context) => FirebaseVestaUserNamesService(),
           ),
           RepositoryProvider<HealthService>(
-            create: (context) =>
-                kDebugMode && Platform.isAndroid?
-                MockHealthService() : GoogleAppleHealthService(),
+            create: (context) => USE_MOCK_HEALTH_DATA
+                ? MockHealthService()
+                : GoogleAppleHealthService(),
           ),
           RepositoryProvider<ContactsService>(
             create: (context) => IosAndroidContactsService(),

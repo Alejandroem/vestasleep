@@ -1,6 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../application/cubit/sleep_score_cubit.dart';
+import '../../../domain/models/sleep_score.dart';
 import 'day_detail.dart';
 
 class SleepDashboard extends StatelessWidget {
@@ -8,6 +11,7 @@ class SleepDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<SleepScoreCubit>().fetchSleepScores();
     return Scaffold(
       backgroundColor: const Color(0xff1B1464),
       body: PopScope(
@@ -52,16 +56,20 @@ class SleepDashboard extends StatelessWidget {
                   getThisWeekTile(),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: ListView(
-                      children: [
-                        getSleepTile(context),
-                        getSleepTile(context),
-                        getSleepTile(context),
-                        getSleepTile(context),
-                        getSleepTile(context),
-                        getSleepTile(context),
-                        getSleepTile(context),
-                      ],
+                    child: BlocBuilder<SleepScoreCubit, SleepScoreState>(
+                      builder: (context, state) {
+                        if (state.loading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return ListView.builder(
+                          itemCount: state.scores.length,
+                          itemBuilder: (context, index) {
+                            return getSleepTile(context, state.scores[index]);
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -293,7 +301,7 @@ class SleepDashboard extends StatelessWidget {
     });
   }
 
-  Widget getSleepTile(BuildContext context) {
+  Widget getSleepTile(BuildContext context, SleepScore score) {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
@@ -333,11 +341,11 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               top: 46,
               child: Text(
-                '5 hr 22 min',
-                style: TextStyle(
+                score.sessionDuration(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontFamily: 'M PLUS 1',
@@ -376,12 +384,12 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 290,
               top: 18,
               child: Text(
-                '63',
-                style: TextStyle(
+                score.getOverallScore(),
+                style: const TextStyle(
                   color: Color(0xFF00FFFF),
                   fontSize: 22,
                   fontFamily: 'M PLUS 1',
@@ -390,7 +398,7 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               top: 10,
               child: SizedBox(
                 width: 262,
@@ -398,8 +406,8 @@ class SleepDashboard extends StatelessWidget {
                   TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Today',
-                        style: TextStyle(
+                        text: score.getHumanDay(),
+                        style: const TextStyle(
                           color: Color(0xFF37A2E7),
                           fontSize: 14,
                           fontFamily: 'M PLUS 1',
@@ -408,8 +416,9 @@ class SleepDashboard extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: '   5:23 AM - 12:04 PM',
-                        style: TextStyle(
+                        text:
+                            '   ${score.sessionStart()} - ${score.sessionEnd()}',
+                        style: const TextStyle(
                           color: Color(0xFF37A2E7),
                           fontSize: 14,
                           fontFamily: 'M PLUS 1',
@@ -422,15 +431,15 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 290,
               top: 80,
               child: SizedBox(
                 width: 40,
                 height: 26,
                 child: Text(
-                  'Fair',
-                  style: TextStyle(
+                  score.getSleepQuality(),
+                  style: const TextStyle(
                     color: Color(0xFF37A2E7),
                     fontSize: 14,
                     fontFamily: 'M PLUS 1',

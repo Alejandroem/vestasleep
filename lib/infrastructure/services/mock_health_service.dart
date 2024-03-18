@@ -89,16 +89,12 @@ class MockHealthService implements HealthService {
   @override
   Future<List<SleepDataPoint>> getSleepData(
       DateTime start, DateTime end) async {
-    return generateSleepDataForNight(start);
-  }
-
-  List<SleepDataPoint> generateSleepDataForNight(DateTime start) {
     var rng = Random();
     List<SleepDataPoint> sleepData = [];
     List<SleepStage> stages = SleepStage.values;
     DateTime current = start;
 
-    while (current.isBefore(start.add(const Duration(hours: 24)))) {
+    while (current.isBefore(end)) {
       SleepStage randomStage = stages[rng.nextInt(stages.length)];
       DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
       sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));
@@ -108,19 +104,19 @@ class MockHealthService implements HealthService {
     return sleepData;
   }
 
-  List<SleepDataPoint> generateSleepData(DateTime start) {
+  @override
+  Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
     var rng = Random();
-    List<SleepDataPoint> sleepData = [];
-    List<SleepStage> stages = SleepStage.values;
+    List<HeartRate> heartRates = [];
     DateTime current = start;
-
-    while (current.isBefore(start.add(const Duration(hours: 24)))) {
-      SleepStage randomStage = stages[rng.nextInt(stages.length)];
-      DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
-      sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));
-      current = end;
+    while (current.isBefore(end)) {
+      heartRates.add(HeartRate(
+        rng.nextInt(40) + 70,
+        current,
+        current.add(const Duration(minutes: 15)),
+      ));
+      current = current.add(const Duration(minutes: 15));
     }
-
-    return sleepData;
+    return heartRates;
   }
 }

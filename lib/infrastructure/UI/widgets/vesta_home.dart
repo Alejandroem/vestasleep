@@ -7,9 +7,11 @@ import '../../../application/cubit/emergency_response_cubit.dart';
 import '../../../application/cubit/gender_cubit.dart';
 import '../../../application/cubit/personal_safety_cubit.dart';
 import '../../../application/cubit/setup_profile_cubit.dart';
+import '../../../application/cubit/sleep_score_cubit.dart';
 import '../../../application/cubit/vesta_app_cubit.dart';
 import '../../../domain/services/authentication_service.dart';
 import '../../../domain/services/contacts_service.dart';
+import '../../../domain/services/health_service.dart';
 import '../../../domain/services/users_service.dart';
 import 'all_done.dart';
 import 'connect_health_kit.dart';
@@ -62,6 +64,11 @@ class VestaHome extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => PersonalSafetyCubit(),
+        ),
+        BlocProvider(
+          create: (context) => SleepScoreCubit(
+            context.read<HealthService>(),
+          ),
         ),
       ],
       child: BlocBuilder<VestaAppCubit, VestaAppState>(
