@@ -15,4 +15,9 @@ class SleepDataPoint {
     required this.to,
     required this.stage,
   });
+
+  @override
+  String toString() {
+    return 'SleepDataPoint{from: $from, to: $to, stage: $stage}';
+  }
 }
