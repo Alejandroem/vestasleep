@@ -27,7 +27,7 @@ class SleepScore {
   int _timeAsleep() {
     int minutes = 0;
     for (var point in sleepDataPoints) {
-      if (point.stage != SleepStage.awake) {
+      if (point.stage != SleepStage.asleep) {
         minutes += point.to.difference(point.from).inMinutes;
       }
     }

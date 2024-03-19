@@ -184,8 +184,8 @@ class GoogleAppleHealthService implements HealthService {
           case HealthDataType.SLEEP_REM:
             sleepType = SleepStage.rem;
             break;
-          case HealthDataType.SLEEP_LIGHT:
-            sleepType = SleepStage.light;
+          case HealthDataType.SLEEP_ASLEEP:
+            sleepType = SleepStage.asleep;
             break;
           case HealthDataType.SLEEP_DEEP:
             sleepType = SleepStage.deep;
@@ -235,12 +235,12 @@ class GoogleAppleHealthService implements HealthService {
       // requesting access to the data types before reading them
       try {
         log.info("Requesting authorization for $types");
-        authorized = await health.requestAuthorization(types);        
+        authorized = await health.requestAuthorization(types);
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
     }
-    
+
     if (authorized) {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
