@@ -65,15 +65,16 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
     emit(state.copyWith(loading: true));
     DateTime from;
     DateTime to;
-    List<SleepScore> scores = [];
+    List<SleepScore> newScores = [];
     log.info('fetchSleepScores: state.scores.isEmpty: ${state.scores.isEmpty}');
+    DateTime today;
     if (state.scores.isEmpty) {
-      from = DateTime.now().subtract(const Duration(days: 7));
-      to = DateTime.now();
+      today = DateTime.now();
     } else {
-      from = state.scores.first.from.subtract(const Duration(days: 7));
-      to = state.scores.first.from;
+      today = state.scores.first.from;
     }
+    from = DateTime(today.year, today.month, today.day - 7);
+    to = DateTime(today.year, today.month, today.day, 23, 59, 59);
     log.info('fetchSleepScores: from: $from, to: $to');
     List<SleepDataPoint> newSleepData =
         await healthService.getSleepData(from, to);
@@ -83,30 +84,45 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
 
     log.info('fetchSleepScores: mapping data to scores');
     for (int i = 0; i < 7; i++) {
-      DateTime from = DateTime.now().subtract(Duration(
-        days: i,
-      ));
-      DateTime to = from.add(const Duration(days: 1, hours: 12, minutes: 30));
+      DateTime scorefrom =
+          DateTime(from.year, from.month, from.day + i, 0, 0, 0, 0, 0);
+      DateTime scoreTo =
+          DateTime(from.year, from.month, from.day + i, 23, 59, 59, 0, 0);
 
-      log.info('fetchSleepScores: current score from: $from, to: $to');
+      log.info(
+          'fetchSleepScores: current score from: $scorefrom, to: $scoreTo');
       List<SleepDataPoint> sleepPoints = newSleepData.where((element) {
-        return element.from.day == from.day;
+        return element.from.day == scorefrom.day &&
+            element.from.month == scorefrom.month &&
+            element.from.year == scorefrom.year;
       }).toList();
       List<HeartRate> heartRatesPoints = newHeartRates.where((element) {
-        return element.from.day == from.day;
+        return element.from.day == scorefrom.day &&
+            element.from.month == scorefrom.month &&
+            element.from.year == scorefrom.year;
       }).toList();
+
+      //orderSleepPoints by hour minute second
+      sleepPoints.sort((a, b) => a.from.compareTo(b.from));
+      //orderHeartRates by hour minute second
+      heartRatesPoints.sort((a, b) => a.from.compareTo(b.from));
+
       log.info('fetchSleepScores: sleep: $sleepPoints');
       log.info('fetchSleepScores: heartRates: $heartRatesPoints');
-      scores.add(
+      newScores = [
         SleepScore(
-          from: from,
-          to: to,
+          from: scorefrom,
+          to: scoreTo,
           heartRatesDataPoints: heartRatesPoints,
           sleepDataPoints: sleepPoints,
         ),
-      );
+        ...newScores,
+      ];
     }
-    log.info('fetchSleepScores: scores: $scores');
+    log.info('fetchSleepScores: scores: $newScores');
+
+    List<SleepScore> scores = [...state.scores, ...newScores];
+    scores.sort((a, b) => a.from.compareTo(b.from));
     emit(state.copyWith(
       scores: scores,
       loading: false,

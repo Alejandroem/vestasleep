@@ -255,7 +255,7 @@ class GoogleAppleHealthService implements HealthService {
         return HeartRate(
           (dataPoint.value as NumericHealthValue).numericValue.toInt(),
           dataPoint.dateFrom,
-          dataPoint.dateTo,
+          dataPoint.dateFrom.add(const Duration(minutes: 4)),
         );
       }).toList();
       log.info("Heart rate data points: $heartRates");

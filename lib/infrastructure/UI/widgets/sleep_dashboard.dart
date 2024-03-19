@@ -54,7 +54,7 @@ class SleepDashboard extends StatelessWidget {
                   ),
                   BlocBuilder<SleepScoreCubit, SleepScoreState>(
                       builder: (context, state) {
-                    return getSleepGraph(state);
+                    return getSleepGraph(context, state);
                   }),
                   BlocBuilder<SleepScoreCubit, SleepScoreState>(
                       builder: (context, state) {
@@ -74,11 +74,19 @@ class SleepDashboard extends StatelessWidget {
                             child: CircularProgressIndicator(),
                           );
                         }
-                        return ListView.builder(
-                          itemCount: state.scores.length,
-                          itemBuilder: (context, index) {
-                            return getSleepTile(context, state.scores[index]);
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            context.read<SleepScoreCubit>().fetchSleepScores();
                           },
+                          child: ListView.builder(
+                            itemCount: state.scores.length,
+                            itemBuilder: (context, index) {
+                              return getSleepTile(
+                                  context,
+                                  state
+                                      .scores[state.scores.length - index - 1]);
+                            },
+                          ),
                         );
                       },
                     ),
@@ -156,7 +164,7 @@ class SleepDashboard extends StatelessWidget {
     );
   }
 
-  SizedBox getSleepGraph(state) {
+  Widget getSleepGraph(BuildContext context, SleepScoreState state) {
     if (state.loading) {
       return const SizedBox(
         height: 250,
@@ -165,96 +173,173 @@ class SleepDashboard extends StatelessWidget {
         ),
       );
     }
-    return SizedBox(
-      height: 250,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          minY: 0,
-          maxY: 100,
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            drawHorizontalLine: true,
-            horizontalInterval: 50,
-            getDrawingHorizontalLine: (value) {
-              return const FlLine(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFCDCDCD),
-                    Color(0xFF00FFFF),
-                  ],
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.only(
+            top: 25,
+          ),
+          height: 250,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '100',
+                style: const TextStyle(
+                  color: Color(0xFFCDCDCD),
+                  fontSize: 11,
+                  fontFamily: 'M PLUS 1',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.55,
                 ),
-                color: Colors.white,
-                strokeWidth: 1,
-              );
-            },
-          ),
-          barTouchData: BarTouchData(
-            enabled: false,
-          ),
-          titlesData: FlTitlesData(
-            show: true,
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: false,
-                reservedSize: 28,
               ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                reservedSize: 28,
-                showTitles: true,
-                interval: 50,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    '${value.toInt()}',
-                    style: const TextStyle(
-                      color: Color(0xFFCDCDCD),
-                      fontSize: 11,
-                      fontFamily: 'M PLUS 1',
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.55,
-                    ),
-                  );
-                },
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  List<String> days = [
-                    'Mo',
-                    'Tu',
-                    'We',
-                    'Th',
-                    'Fr',
-                    'Sa',
-                    'Su'
-                  ];
-                  return Text(
-                    days[value.toInt()],
-                    style: const TextStyle(
-                      color: Color(0xff7589a2),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: false,
-          ),
-          barGroups: state.scores.isEmpty
-              ? []
-              : generateSevenDaysData(
-                  state.scores,
+              Text(
+                '50',
+                style: const TextStyle(
+                  color: Color(0xFFCDCDCD),
+                  fontSize: 11,
+                  fontFamily: 'M PLUS 1',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.55,
                 ),
+              ),
+              Text(
+                '0',
+                style: const TextStyle(
+                  color: Color(0xFFCDCDCD),
+                  fontSize: 11,
+                  fontFamily: 'M PLUS 1',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.55,
+                ),
+              )
+            ],
+          ),
         ),
-      ),
+        SingleChildScrollView(
+          //controller: ScrollController()..jumpTo(double.infinity),
+          scrollDirection: Axis.horizontal,
+          child: RefreshIndicator(
+            onRefresh: () async {
+              context.read<SleepScoreCubit>().fetchSleepScores();
+            },
+            child: Container(
+              padding: const EdgeInsets.only(
+                left: 25,
+              ),
+              height: 300,
+              width: 400 * (state.scores.length / 7),
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  minY: 0,
+                  maxY: 100,
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    drawHorizontalLine: true,
+                    horizontalInterval: 50,
+                    getDrawingHorizontalLine: (value) {
+                      return const FlLine(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFCDCDCD),
+                            Color(0xFF00FFFF),
+                          ],
+                        ),
+                        color: Colors.white,
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
+                  barTouchData: BarTouchData(
+                    enabled: false,
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: false,
+                        reservedSize: 28,
+                      ),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: false,
+                        reservedSize: 28,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        reservedSize: 28,
+                        showTitles: false,
+                        interval: 50,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            '${value.toInt()}',
+                            style: const TextStyle(
+                              color: Color(0xFFCDCDCD),
+                              fontSize: 11,
+                              fontFamily: 'M PLUS 1',
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.55,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          SleepScore score = state.scores[value.toInt()];
+                          //if its beyond last seven days return dd/m
+                          if (DateTime.now().day - score.from.day > 7 ||
+                              DateTime.now().month != score.from.month) {
+                            return Text(
+                              '${score.from.day}/${score.from.month}',
+                              style: const TextStyle(
+                                color: Color(0xff7589a2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            );
+                          }
+                          List<String> days = [
+                            'Mo',
+                            'Tu',
+                            'We',
+                            'Th',
+                            'Fr',
+                            'Sa',
+                            'Su'
+                          ];
+                          return Text(
+                            days[score.from.weekday - 1],
+                            style: const TextStyle(
+                              color: Color(0xff7589a2),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  barGroups: state.scores.isEmpty
+                      ? []
+                      : generateSevenDaysData(
+                          state.scores,
+                        ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -262,23 +347,32 @@ class SleepDashboard extends StatelessWidget {
     if (scores.length < 7) {
       return [];
     }
-    List<SleepScore> last7days = scores.sublist(
-      scores.length - 7,
-      scores.length,
-    );
-    return List.generate(7, (index) {
+    return scores.map((SleepScore e) {
       return BarChartGroupData(
-        x: index,
+        x: scores.indexOf(e),
         barRods: [
           BarChartRodData(
             width: 16,
             fromY: 0,
-            toY: last7days[index].getOverallScoreValue().toDouble(),
+            toY: e.getOverallScoreValue().toDouble(),
             color: Colors.lightBlueAccent,
           )
         ],
       );
-    });
+    }).toList();
+    // return List.generate(7, (index) {
+    //   return BarChartGroupData(
+    //     x: index,
+    //     barRods: [
+    //       BarChartRodData(
+    //         width: 16,
+    //         fromY: 0,
+    //         toY: last7days[index].getOverallScoreValue().toDouble(),
+    //         color: Colors.lightBlueAccent,
+    //       )
+    //     ],
+    //   );
+    // });
   }
 
   Widget getSleepTile(BuildContext context, SleepScore score) {
@@ -293,6 +387,7 @@ class SleepDashboard extends StatelessWidget {
       child: SizedBox(
         height: 106,
         child: Stack(
+          alignment: Alignment.center,
           children: [
             Positioned(
               left: 0,
@@ -321,8 +416,8 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              top: 46,
+            Align(
+              alignment: Alignment.centerLeft,
               child: Text(
                 score.sessionDuration(),
                 style: const TextStyle(
@@ -334,53 +429,51 @@ class SleepDashboard extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: 274,
-              top: 2,
-              child: Container(
-                width: 62,
-                height: 62,
-                decoration: const ShapeDecoration(
-                  shape: OvalBorder(
-                    side: BorderSide(width: 1, color: Color(0xFF00FFFF)),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Container(
+                    width: 62,
+                    height: 62,
+                    decoration: const ShapeDecoration(
+                      shape: OvalBorder(
+                        side: BorderSide(width: 1, color: Color(0xFF00FFFF)),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        score.getOverallScore(),
+                        style: const TextStyle(
+                          color: Color(0xFF00FFFF),
+                          fontSize: 22,
+                          fontFamily: 'M PLUS 1',
+                          fontWeight: FontWeight.w800,
+                          height: 0,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    score.getSleepQuality(),
+                    style: const TextStyle(
+                      color: Color(0xFF37A2E7),
+                      fontSize: 14,
+                      fontFamily: 'M PLUS 1',
+                      fontWeight: FontWeight.w700,
+                      height: 0.09,
+                      letterSpacing: 0.70,
+                    ),
+                  )
+                ],
               ),
             ),
-            Positioned(
-              left: 250,
-              top: 28,
+            Align(
+              alignment: Alignment.topLeft,
               child: Container(
-                width: 22,
-                height: 22,
-                padding: const EdgeInsets.symmetric(vertical: 5.50),
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [],
-                ),
-              ),
-            ),
-            Positioned(
-              left: 290,
-              top: 18,
-              child: Text(
-                score.getOverallScore(),
-                style: const TextStyle(
-                  color: Color(0xFF00FFFF),
-                  fontSize: 22,
-                  fontFamily: 'M PLUS 1',
-                  fontWeight: FontWeight.w800,
-                  height: 0,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 10,
-              child: SizedBox(
+                padding: const EdgeInsets.only(top: 10),
                 width: 262,
                 child: Text.rich(
                   TextSpan(
@@ -407,25 +500,6 @@ class SleepDashboard extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 290,
-              top: 80,
-              child: SizedBox(
-                width: 40,
-                height: 26,
-                child: Text(
-                  score.getSleepQuality(),
-                  style: const TextStyle(
-                    color: Color(0xFF37A2E7),
-                    fontSize: 14,
-                    fontFamily: 'M PLUS 1',
-                    fontWeight: FontWeight.w700,
-                    height: 0.09,
-                    letterSpacing: 0.70,
                   ),
                 ),
               ),

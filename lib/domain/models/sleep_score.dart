@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 import 'heart_rate.dart';
@@ -57,6 +58,7 @@ class SleepScore {
   }
 
   int getAsleepAwakeScore() {
+    if (sessionTotalMins() == 0) return 0;
     return ((_timeAsleep() / sessionTotalMins()) * 50).toInt();
   }
 
@@ -93,6 +95,7 @@ class SleepScore {
   }
 
   int getDeepReemScore() {
+    if (sessionTotalMins() == 0) return 0;
     return ((_getTotalRemSleep() / sessionTotalMins()) * 25).toInt();
   }
 
@@ -121,10 +124,12 @@ class SleepScore {
   }
 
   String getBellowRestingString() {
+    if (sessionTotalMins() == 0) return "0 %";
     return "${_getMinutesBellowRestingHeartRate() ~/ sessionTotalMins()} %";
   }
 
   String getRestLessPercentage() {
+    if (sessionTotalMins() == 0) return "0 %";
     return "${_minsAboveRestingHR() ~/ sessionTotalMins()} %";
   }
 
@@ -134,6 +139,7 @@ class SleepScore {
 
   int getOverallScoreValue() {
     int sessionMins = sessionTotalMins();
+    if (sessionMins == 0) return 0;
     double asleepScore = ((_timeAsleep() / sessionMins) * 50);
     double remSleepScore = ((_getTotalRemSleep() / sessionMins) * 25);
     double restorationScore = ((_minsAboveRestingHR() / sessionMins) * 25);
@@ -170,18 +176,21 @@ class SleepScore {
       "Sunday"
     ];
     if (DateTime.now().day - from.day < 7) {
-      return days[from.weekday - 1];
+      return days[from.weekday - 1] +
+          (kDebugMode ? " ${from.day}/${from.month}" : "");
     } else {
       return "${from.day}/${from.month}";
     }
   }
 
   String sessionStart() {
-    return DateFormat.jm().format(from);
+    if (sleepDataPoints.isEmpty) return "";
+    return DateFormat.jm().format(sleepDataPoints.first.from);
   }
 
   String sessionEnd() {
-    return DateFormat.jm().format(to);
+    if (sleepDataPoints.isEmpty) return "";
+    return DateFormat.jm().format(sleepDataPoints.last.to);
   }
 
   String sessionDuration() {
