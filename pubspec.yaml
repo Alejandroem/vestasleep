@@ -1,7 +1,7 @@
 name: vestasleep
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.0.11+13
+version: 1.0.12+14
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -23,6 +23,10 @@ dependencies:
   flutter_native_splash: ^2.3.9
   intl: ^0.18.1
   sentry_flutter: ^7.18.0
+  sentry: ^7.18.0
+  sentry_logging: ^7.18.0
+  logging: ^1.0.2
+
 
 
   #health: ^8.1.0

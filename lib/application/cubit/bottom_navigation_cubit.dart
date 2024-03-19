@@ -1,14 +1,20 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:logging/logging.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 enum SelectedTab {
   home,
-  settings, graphs,
+  settings,
+  graphs,
 }
 
 class BottomNavigationCubit extends HydratedCubit<SelectedTab> {
+  final log = Logger('BottomNavigationCubit');
   BottomNavigationCubit() : super(SelectedTab.home);
 
-  void updateSelectedTab(SelectedTab selectedTab) => emit(selectedTab);
+  void updateSelectedTab(SelectedTab selectedTab) async {
+    emit(selectedTab);
+  }
 
   @override
   SelectedTab? fromJson(Map<String, dynamic> json) {

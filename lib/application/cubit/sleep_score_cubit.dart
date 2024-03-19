@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 import 'package:vestasleep/domain/models/sleep_data_point.dart';
 
 import '../../domain/models/heart_rate.dart';
@@ -49,6 +50,7 @@ class SleepScoreState {
 }
 
 class SleepScoreCubit extends Cubit<SleepScoreState> {
+  final log = Logger('SleepScoreCubit');
   final HealthService healthService;
   SleepScoreCubit(
     this.healthService,
@@ -59,10 +61,12 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         ));
 
   Future<void> fetchSleepScores() async {
+    log.info('fetchSleepScores');
     emit(state.copyWith(loading: true));
     DateTime from;
     DateTime to;
     List<SleepScore> scores = [];
+    log.info('fetchSleepScores: state.scores.isEmpty: ${state.scores.isEmpty}');
     if (state.scores.isEmpty) {
       from = DateTime.now().subtract(const Duration(days: 7));
       to = DateTime.now();
@@ -70,28 +74,39 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
       from = state.scores.first.from.subtract(const Duration(days: 7));
       to = state.scores.first.from;
     }
-    List<SleepDataPoint> newScores = await healthService.getSleepData(from, to);
-    List<HeartRate> heartRates = await healthService.getHeartRates(from, to);
+    log.info('fetchSleepScores: from: $from, to: $to');
+    List<SleepDataPoint> newSleepData =
+        await healthService.getSleepData(from, to);
+    log.info('fetchSleepScores: sleepData: $newSleepData');
+    List<HeartRate> newHeartRates = await healthService.getHeartRates(from, to);
+    log.info('fetchSleepScores: heartRates: $newHeartRates');
+
+    log.info('fetchSleepScores: mapping data to scores');
     for (int i = 0; i < 7; i++) {
       DateTime from = DateTime.now().subtract(Duration(
         days: i,
       ));
       DateTime to = from.add(const Duration(days: 1, hours: 12, minutes: 30));
-      List<SleepDataPoint> points = newScores.where((element) {
+
+      log.info('fetchSleepScores: current score from: $from, to: $to');
+      List<SleepDataPoint> sleepPoints = newSleepData.where((element) {
         return element.from.day == from.day;
       }).toList();
-      List<HeartRate> rates = heartRates.where((element) {
+      List<HeartRate> heartRatesPoints = newHeartRates.where((element) {
         return element.from.day == from.day;
       }).toList();
+      log.info('fetchSleepScores: sleep: $sleepPoints');
+      log.info('fetchSleepScores: heartRates: $heartRatesPoints');
       scores.add(
         SleepScore(
           from: from,
           to: to,
-          heartRatesDataPoints: rates,
-          sleepDataPoints: points,
+          heartRatesDataPoints: heartRatesPoints,
+          sleepDataPoints: sleepPoints,
         ),
       );
     }
+    log.info('fetchSleepScores: scores: $scores');
     emit(state.copyWith(
       scores: scores,
       loading: false,
