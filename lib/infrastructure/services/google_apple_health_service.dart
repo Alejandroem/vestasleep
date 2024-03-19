@@ -253,7 +253,7 @@ class GoogleAppleHealthService implements HealthService {
       List<HeartRate> heartRates = healthData.map((dataPoint) {
         log.info("MapingData: Data point: $dataPoint");
         return HeartRate(
-          dataPoint.value as int,
+          (dataPoint.value as NumericHealthValue).numericValue.toInt(),
           dataPoint.dateFrom,
           dataPoint.dateTo,
         );
