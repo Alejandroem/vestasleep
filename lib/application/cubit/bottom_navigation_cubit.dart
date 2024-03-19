@@ -1,6 +1,5 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 enum SelectedTab {
   home,
