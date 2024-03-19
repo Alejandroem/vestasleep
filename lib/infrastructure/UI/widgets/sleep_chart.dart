@@ -147,7 +147,7 @@ class SleepChart extends StatelessWidget {
                                     return Text(
                                       [
                                         "Deep",
-                                        "Light",
+                                        "Asleep",
                                         "REM",
                                         "Awake",
                                       ][value.toInt()],

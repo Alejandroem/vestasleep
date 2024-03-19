@@ -137,7 +137,7 @@ class GoogleAppleHealthService implements HealthService {
     List<HealthDataType> types = [
       HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_REM,
-      HealthDataType.SLEEP_LIGHT,
+      HealthDataType.SLEEP_ASLEEP,
       HealthDataType.SLEEP_DEEP,
     ];
 
