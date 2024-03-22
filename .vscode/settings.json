@@ -17,4 +17,5 @@
   ],
   //exclude heatlh folder from formatting
   "dart.flutterCreateIOSLanguage": "swift",
+  "yaml.schemaStore.enable": false,
 }

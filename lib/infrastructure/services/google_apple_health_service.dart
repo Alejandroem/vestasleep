@@ -22,18 +22,14 @@ class GoogleAppleHealthService implements HealthService {
     await Permission.activityRecognition.request();
 
     final types = [
-      HealthDataType.WEIGHT,
-      HealthDataType.STEPS,
-      HealthDataType.HEIGHT,
-      HealthDataType.BLOOD_GLUCOSE,
-      HealthDataType.WORKOUT,
-      HealthDataType.BLOOD_PRESSURE_DIASTOLIC,
-      HealthDataType.BLOOD_PRESSURE_SYSTOLIC,
-      // Uncomment these lines on iOS - only available on iOS
-      //   // HealthDataType.AUDIOGRAM
+      HealthDataType.HEART_RATE,
+      HealthDataType.SLEEP_AWAKE,
+      HealthDataType.SLEEP_REM,
+      HealthDataType.SLEEP_ASLEEP,
+      HealthDataType.SLEEP_DEEP,
     ];
 
-    final permissions = types.map((e) => HealthDataAccess.READ_WRITE).toList();
+    final permissions = types.map((e) => HealthDataAccess.READ).toList();
 
     // Check if we have permission
     bool? hasPermissions =
@@ -88,9 +84,9 @@ class GoogleAppleHealthService implements HealthService {
         log.info("Health data: $healthData");
         if (healthData.isNotEmpty) {
           log.info("Health data: $healthData");
-          int averageHeartRate = healthData
-                  .map((e) => e.value as int)
-                  .reduce((value, element) => value + element) ~/
+          int averageHeartRate = healthData.map((e) {
+                return (e.value as NumericHealthValue).numericValue.toInt();
+              }).reduce((value, element) => value + element) ~/
               healthData.length;
           heartRateStreamController!.add(
             HeartRate(
