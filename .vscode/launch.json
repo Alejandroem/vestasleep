@@ -4,7 +4,10 @@
         {
             "name": "vestasleep",
             "request": "launch",
-            "type": "dart"            
+            "type": "dart",
+            "args": [
+                "-v"
+            ]
         },
         {
             "name": "ios vestasleep attach",
