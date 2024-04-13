@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:health/health.dart';
 import 'package:logging/logging.dart';
@@ -6,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/sleep_data_point.dart';
+import '../../domain/models/sleep_session.dart';
 import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
@@ -256,6 +258,65 @@ class GoogleAppleHealthService implements HealthService {
       }).toList();
       log.info("Heart rate data points: $heartRates");
       return heartRates;
+    } else {
+      log.info("Not authorized to read health data returning empty list");
+      return [];
+    }
+  }
+
+  @override
+  Future<List<SleepSession>> getSleepSessions(
+      DateTime start, DateTime end) async {
+    HealthFactory health = HealthFactory();
+    List<HealthDataType> types = [HealthDataType.SLEEP_IN_BED];
+    if (Platform.isAndroid) {
+      types = [
+        HealthDataType.SLEEP_SESSION,
+      ];
+    }
+
+    final permissions = types.map((e) => HealthDataAccess.READ).toList();
+    log.info("Requesting permissions for $permissions");
+
+    // Check if we have permission
+    bool? hasPermissions =
+        await health.hasPermissions(types, permissions: permissions);
+
+    // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
+    // Hence, we have to request with WRITE as well.
+    hasPermissions = false;
+    log.info("Has permissions: $hasPermissions");
+    bool authorized = false;
+    if (!hasPermissions) {
+      log.info("Requesting authorization for $types");
+      // requesting access to the data types before reading them
+      try {
+        log.info("Requesting authorization for $types");
+        authorized = await health.requestAuthorization(types);
+      } catch (error, stackTrace) {
+        log.severe('Exception in authorize!', error, stackTrace);
+      }
+    }
+
+    if (authorized) {
+      log.info("Authorized to read health data");
+      log.info("Getting health data from $start to $end for $types");
+      List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+        start,
+        end,
+        types,
+      );
+
+      log.info("Health data for sleep session: $healthData");
+      List<SleepSession> sleepSessions = healthData.map((dataPoint) {
+        log.info("MapingData: Data point: $dataPoint");
+        return SleepSession(
+          from: dataPoint.dateFrom,
+          to: dataPoint.dateTo,
+        );
+      }).toList();
+      log.info("Sleep session data points: $sleepSessions");
+      return sleepSessions;
     } else {
       log.info("Not authorized to read health data returning empty list");
       return [];

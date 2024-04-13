@@ -2,6 +2,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "vestasleep",
+            "request": "launch",
+            "type": "dart"            
+        },
+        {
+            "name": "ios vestasleep attach",
+            "request": "attach",
+            "type": "dart"            
+        },
+        {
             "name": "vestasleep fvm",
             "request": "launch",
             "type": "dart",
@@ -15,6 +25,11 @@
             "name":"Attach ios",
             "request": "attach",
             "type": "dart",
+            //flutter: The Dart VM service is listening on http://127.0.0.1:62016/j8F4SGsMqOI=/
+            "args": [
+                "--host-vmservice-port",
+                "http://127.0.0.1:62016/j8F4SGsMqOI=/"
+            ]
         },
         {
             "name": "vestasleep",

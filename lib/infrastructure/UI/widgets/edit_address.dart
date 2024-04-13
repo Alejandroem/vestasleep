@@ -480,10 +480,16 @@ class EditAddress extends StatelessWidget {
                             child: TextButton(
                               onPressed: state.validForm() && !state.isLoading
                                   ? () {
-                                      context.read<EditAddressCubit>().submit();
-                                      context.read<VestaAppCubit>().setPage(
-                                            VestaPages.editContacts,
-                                          );
+                                      context
+                                          .read<EditAddressCubit>()
+                                          .submit()
+                                          .then(
+                                        (_) {
+                                          context.read<VestaAppCubit>().setPage(
+                                                VestaPages.editContacts,
+                                              );
+                                        },
+                                      );
                                     }
                                   : null,
                               child: state.isLoading

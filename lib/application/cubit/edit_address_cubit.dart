@@ -90,8 +90,6 @@ class EditAddressState {
     //Validate if the form is valid by checking errors and touched
     return validAddress.isEmpty &&
         addresTouched &&
-        validUnitNumber.isEmpty &&
-        unitNumberTouched &&
         validCity.isEmpty &&
         cityTouched &&
         validState.isEmpty &&
@@ -208,7 +206,7 @@ class EditAddressCubit extends Cubit<EditAddressState> {
     );
   }
 
-  void submit() async {
+  Future<void> submit() async {
     //set loading
     emit(state.copyWith(isLoading: true));
     VestaUser? user = await authenticationService.getCurrentUserOrNull();

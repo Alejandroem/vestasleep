@@ -4,6 +4,7 @@ import 'dart:math';
 
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/sleep_data_point.dart';
+import '../../domain/models/sleep_session.dart';
 import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
 
@@ -118,5 +119,10 @@ class MockHealthService implements HealthService {
       current = current.add(const Duration(minutes: 15));
     }
     return heartRates;
+  }
+
+  @override
+  Future<List<SleepSession>> getSleepSessions(DateTime start, DateTime end) async {
+    return [];
   }
 }

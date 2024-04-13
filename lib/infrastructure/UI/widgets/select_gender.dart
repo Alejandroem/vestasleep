@@ -88,20 +88,6 @@ class SelectGender extends StatelessWidget {
                       context.read<GenderCubit>().setGender(a.toString()),
                   children: <Widget>[
                     Text(
-                      "Non Binary",
-                      style: context.select((GenderCubit c) =>
-                          c.state.gender == "Non Binary"
-                              ? selectedStyle
-                              : unselectedStyle),
-                    ),
-                    Text(
-                      "Rather Not Say",
-                      style: context.select((GenderCubit c) =>
-                          c.state.gender == "Rather Not Say"
-                              ? selectedStyle
-                              : unselectedStyle),
-                    ),
-                    Text(
                       "Male",
                       style: context.select((GenderCubit c) =>
                           c.state.gender == "Male"

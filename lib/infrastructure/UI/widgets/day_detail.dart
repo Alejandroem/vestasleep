@@ -80,7 +80,7 @@ class DayDetail extends StatelessWidget {
                 "Asleep",
                 "Awake",
                 score.getAsleepAwakeScore(),
-                50,
+                25,
               ),
               const SizedBox(height: 20),
               getScoreCard(
@@ -91,7 +91,7 @@ class DayDetail extends StatelessWidget {
                 "Deep",
                 "REM",
                 score.getDeepReemScore(),
-                25,
+                50,
               ),
               const SizedBox(height: 20),
               getScoreCard(

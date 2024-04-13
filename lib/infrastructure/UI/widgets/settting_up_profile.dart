@@ -288,9 +288,9 @@ class SettingUpProfile extends StatelessWidget {
                                           .setWeight((a + 100).toDouble()),
                                       children: [
                                         ...List.generate(
-                                          151, // This will generate weights from 100 to 250 kg
+                                          600 - 220,
                                           (index) {
-                                            final weight = index + 100;
+                                            final weight = index + 220;
                                             return Text(
                                               "$weight",
                                               style: context

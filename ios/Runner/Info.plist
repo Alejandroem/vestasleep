@@ -55,5 +55,14 @@
 		<string>We will sync your data with the Apple Health app to give you better insights</string>
 		<key>NSContactsUsageDescription</key>
 		<string>We use contacts to record the users that will be notified when an alarm goes on</string>
+		<key>NSPrivacyAccessedAPITypes</key>
+		<array>
+			<dict>
+				<key>NSPrivacyAccessedAPICategory</key>
+				<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+				<key>NSPrivacyAccessedAPIReason</key>
+				<string>We use this data to store the alarms and the user data</string>
+			</dict>
+		</array>
 	</dict>
 </plist>

@@ -140,8 +140,8 @@ class SleepScore {
   int getOverallScoreValue() {
     int sessionMins = sessionTotalMins();
     if (sessionMins == 0) return 0;
-    double asleepScore = ((_timeAsleep() / sessionMins) * 50);
-    double remSleepScore = ((_getTotalRemSleep() / sessionMins) * 25);
+    double asleepScore = ((_timeAsleep() / sessionMins) * 25);
+    double remSleepScore = ((_getTotalRemSleep() / sessionMins) * 50);
     double restorationScore = ((_minsAboveRestingHR() / sessionMins) * 25);
     int overallScore = (asleepScore + remSleepScore + restorationScore).toInt();
     return overallScore;
