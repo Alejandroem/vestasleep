@@ -26,21 +26,15 @@ class GenderCubit extends Cubit<GenderState> {
   GenderCubit(
     this.authenticationService,
     this.usersService,
-  ) : super(GenderState(gender: 'Rather Not Say'));
+  ) : super(GenderState(gender: 'Male'));
 
   void setGender(String gender) {
     String genderString = "";
     switch (gender) {
       case "0":
-        genderString = "Non Binary";
-        break;
-      case "1":
-        genderString = "Rather Not Say";
-        break;
-      case "2":
         genderString = "Male";
         break;
-      case "3":
+      case "1":
         genderString = "Female";
         break;
     }

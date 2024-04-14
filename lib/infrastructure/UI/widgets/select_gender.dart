@@ -83,7 +83,7 @@ class SelectGender extends StatelessWidget {
                   ),
                 ),
                 WheelChooser.custom(
-                  startPosition: 1,
+                  startPosition: 0,
                   onValueChanged: (a) =>
                       context.read<GenderCubit>().setGender(a.toString()),
                   children: <Widget>[

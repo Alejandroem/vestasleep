@@ -282,10 +282,10 @@ class SettingUpProfile extends StatelessWidget {
                                                     c.state.weight,
                                               )
                                               .toInt() -
-                                          100,
+                                          220,
                                       onValueChanged: (a) => context
                                           .read<SetupProfileCubit>()
-                                          .setWeight((a + 100).toDouble()),
+                                          .setWeight((a + 220).toDouble()),
                                       children: [
                                         ...List.generate(
                                           600 - 220,

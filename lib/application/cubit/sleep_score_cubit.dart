@@ -4,6 +4,7 @@ import 'package:vestasleep/domain/models/sleep_data_point.dart';
 
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/sleep_score.dart';
+import '../../domain/models/sleep_session.dart';
 import '../../domain/services/health_service.dart';
 
 class SleepScoreState {
@@ -76,6 +77,10 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
     from = DateTime(today.year, today.month, today.day - 7);
     to = DateTime(today.year, today.month, today.day, 23, 59, 59);
     log.info('fetchSleepScores: from: $from, to: $to');
+
+    List<SleepSession> newSleepSessions =
+        await healthService.getSleepSessions(from, to);
+    log.info('fetchSleepScores: sleepSessions: $newSleepSessions');
     List<SleepDataPoint> newSleepData =
         await healthService.getSleepData(from, to);
     log.info('fetchSleepScores: sleepData: $newSleepData');
@@ -102,19 +107,34 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
             element.from.year == scorefrom.year;
       }).toList();
 
+      List<SleepSession> sleepSessions = newSleepSessions
+          .where(
+            (element) =>
+                element.from.day == scorefrom.day &&
+                element.from.month == scorefrom.month &&
+                element.from.year == scorefrom.year,
+          )
+          .toList();
+
       //orderSleepPoints by hour minute second
       sleepPoints.sort((a, b) => a.from.compareTo(b.from));
       //orderHeartRates by hour minute second
       heartRatesPoints.sort((a, b) => a.from.compareTo(b.from));
 
+      sleepSessions.sort((a, b) => a.from.compareTo(b.from));
+
       log.info('fetchSleepScores: sleep: $sleepPoints');
       log.info('fetchSleepScores: heartRates: $heartRatesPoints');
+      if (sleepSessions.isEmpty) {
+        continue;
+      }
       newScores = [
         SleepScore(
           from: scorefrom,
           to: scoreTo,
           heartRatesDataPoints: heartRatesPoints,
           sleepDataPoints: sleepPoints,
+          sleepSessions: sleepSessions,
         ),
         ...newScores,
       ];

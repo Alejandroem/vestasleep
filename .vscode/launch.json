@@ -6,7 +6,9 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "-v"
+                "-v",
+                "-d",
+                "00008120-001A4D291438201E"
             ]
         },
         {

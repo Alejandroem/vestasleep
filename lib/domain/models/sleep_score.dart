@@ -3,10 +3,12 @@ import 'package:intl/intl.dart';
 
 import 'heart_rate.dart';
 import 'sleep_data_point.dart';
+import 'sleep_session.dart';
 
 class SleepScore {
   DateTime from;
   DateTime to;
+  List<SleepSession> sleepSessions;
   List<HeartRate> heartRatesDataPoints;
   List<SleepDataPoint> sleepDataPoints;
 
@@ -15,12 +17,13 @@ class SleepScore {
     required this.to,
     required this.heartRatesDataPoints,
     required this.sleepDataPoints,
+    required this.sleepSessions,
   });
 
   int sessionTotalMins() {
     int minutes = 0;
-    for (var point in sleepDataPoints) {
-      minutes += point.to.difference(point.from).inMinutes;
+    for (var session in sleepSessions) {
+      minutes += session.to.difference(session.from).inMinutes;
     }
     return minutes;
   }
@@ -184,18 +187,18 @@ class SleepScore {
   }
 
   String sessionStart() {
-    if (sleepDataPoints.isEmpty) return "";
-    return DateFormat.jm().format(sleepDataPoints.first.from);
+    return DateFormat.jm().format(sleepSessions.first.from);
   }
 
   String sessionEnd() {
-    if (sleepDataPoints.isEmpty) return "";
-    return DateFormat.jm().format(sleepDataPoints.last.to);
+    return DateFormat.jm().format(sleepSessions.last.to);
   }
 
   String sessionDuration() {
-    int hours = sessionTotalMins() ~/ 60;
-    int minutes = sessionTotalMins() % 60;
+    int minutes =
+        sleepSessions.last.to.difference(sleepSessions.first.from).inMinutes;
+    int hours = minutes ~/ 60;
+    minutes = minutes % 60;
     return "$hours h $minutes m";
   }
 }

@@ -37,7 +37,7 @@ class SetupProfileCubit extends Cubit<SetupProfileState> {
   ) : super(
           SetupProfileState(
             age: 25,
-            weight: 125,
+            weight: 410,
             height: 5.0,
           ),
         );
