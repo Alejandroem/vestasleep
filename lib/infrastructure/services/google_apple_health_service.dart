@@ -177,13 +177,15 @@ class GoogleAppleHealthService implements HealthService {
         SleepStage sleepType;
         switch (dataPoint.type) {
           case HealthDataType.SLEEP_AWAKE:
+          case HealthDataType.SLEEP_OUT_OF_BED:
             sleepType = SleepStage.awake;
+            break;
+          case HealthDataType.SLEEP_ASLEEP:
+          case HealthDataType.SLEEP_LIGHT:
+            sleepType = SleepStage.asleepCore;
             break;
           case HealthDataType.SLEEP_REM:
             sleepType = SleepStage.rem;
-            break;
-          case HealthDataType.SLEEP_ASLEEP:
-            sleepType = SleepStage.asleep;
             break;
           case HealthDataType.SLEEP_DEEP:
             sleepType = SleepStage.deep;
@@ -203,6 +205,61 @@ class GoogleAppleHealthService implements HealthService {
       log.info("Sleep data points: $sleepDataPoints");
 
       return sleepDataPoints;
+    } else {
+      log.info("Not authorized to read health data returning empty list");
+      return [];
+    }
+  }
+
+  @override
+  Future<List<HeartRate>> getRestingRates(DateTime start, DateTime end) async {
+    HealthFactory health = HealthFactory();
+    List<HealthDataType> types = [
+      HealthDataType.RESTING_HEART_RATE,
+    ];
+
+    final permissions = types.map((e) => HealthDataAccess.READ).toList();
+    log.info("Requesting permissions for $permissions");
+
+    // Check if we have permission
+    bool? hasPermissions =
+        await health.hasPermissions(types, permissions: permissions);
+
+    // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
+    // Hence, we have to request with WRITE as well.
+    hasPermissions = false;
+    log.info("Has permissions: $hasPermissions");
+    bool authorized = false;
+    if (!hasPermissions) {
+      log.info("Requesting authorization for $types");
+      // requesting access to the data types before reading them
+      try {
+        log.info("Requesting authorization for $types");
+        authorized = await health.requestAuthorization(types);
+      } catch (error, stackTrace) {
+        log.severe('Exception in authorize!', error, stackTrace);
+      }
+    }
+
+    if (authorized) {
+      log.info("Authorized to read health data");
+      log.info("Getting health data from $start to $end for $types");
+      List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+        start,
+        end,
+        types,
+      );
+      log.info("Health data for resting heart rate: $healthData");
+      List<HeartRate> heartRates = healthData.map((dataPoint) {
+        log.info("MapingData: Data point: $dataPoint");
+        return HeartRate(
+          (dataPoint.value as NumericHealthValue).numericValue.toInt(),
+          dataPoint.dateFrom,
+          dataPoint.dateFrom.add(const Duration(minutes: 4)),
+        );
+      }).toList();
+      log.info("Resting heart rate data points: $heartRates");
+      return heartRates;
     } else {
       log.info("Not authorized to read health data returning empty list");
       return [];

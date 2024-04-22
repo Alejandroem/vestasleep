@@ -47,7 +47,7 @@ class MockHealthService implements HealthService {
         (index) {
           return getListOfHeartRate(
             DateTime.now(),
-            80,
+            100,
             10,
           );
         },
@@ -90,39 +90,124 @@ class MockHealthService implements HealthService {
   @override
   Future<List<SleepDataPoint>> getSleepData(
       DateTime start, DateTime end) async {
-    var rng = Random();
-    List<SleepDataPoint> sleepData = [];
-    List<SleepStage> stages = SleepStage.values;
-    DateTime current = start;
+    final today = DateTime.now();
+    DateTime yesterdayNight =
+        DateTime(today.year, today.month, today.day - 1, 20, 0, 0, 0, 0);
+    return [
+      SleepDataPoint(
+        from: yesterdayNight,
+        to: yesterdayNight.add(const Duration(hours: 1)),
+        stage: SleepStage.awake,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 1)),
+        to: yesterdayNight.add(const Duration(hours: 2)),
+        stage: SleepStage.rem,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 2)),
+        to: yesterdayNight.add(const Duration(hours: 3)),
+        stage: SleepStage.asleepCore,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 3)),
+        to: yesterdayNight.add(const Duration(hours: 4)),
+        stage: SleepStage.deep,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 4)),
+        to: yesterdayNight.add(const Duration(hours: 5)),
+        stage: SleepStage.asleepCore,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 5)),
+        to: yesterdayNight.add(const Duration(hours: 6)),
+        stage: SleepStage.rem,
+      ),
+      SleepDataPoint(
+        from: yesterdayNight.add(const Duration(hours: 6)),
+        to: yesterdayNight.add(const Duration(hours: 10)),
+        stage: SleepStage.awake,
+      ),
+    ];
+  }
 
-    while (current.isBefore(end)) {
-      SleepStage randomStage = stages[rng.nextInt(stages.length)];
-      DateTime end = current.add(Duration(hours: rng.nextInt(3) + 1));
-      sleepData.add(SleepDataPoint(from: current, to: end, stage: randomStage));
-      current = end;
-    }
-
-    return sleepData;
+  @override
+  Future<List<SleepSession>> getSleepSessions(
+      DateTime start, DateTime end) async {
+    final today = DateTime.now();
+    final yesterdayNight =
+        DateTime(today.year, today.month, today.day - 1, 20, 0, 0, 0, 0);
+    return [
+      SleepSession(
+        from: yesterdayNight,
+        to: yesterdayNight.add(
+          const Duration(
+            hours: 3,
+          ),
+        ),
+      ),
+      SleepSession(
+        from: yesterdayNight.add(
+          const Duration(
+            hours: 4,
+          ),
+        ),
+        to: yesterdayNight.add(
+          const Duration(
+            hours: 10,
+          ),
+        ),
+      ),
+    ];
   }
 
   @override
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
     var rng = Random();
     List<HeartRate> heartRates = [];
-    DateTime current = start;
-    while (current.isBefore(end)) {
+
+    final today = DateTime.now();
+    DateTime yesterdayNight =
+        DateTime(today.year, today.month, today.day - 1, 0, 0, 0, 0, 0);
+    end = yesterdayNight.add(const Duration(hours: 24 + 12));
+    while (yesterdayNight.isBefore(end)) {
+      //Range of adults 35 years 162 to 95
+      int heartRate = rng.nextInt(162 - 95) + 95;
+      if ((yesterdayNight.hour > 20 && yesterdayNight.day == today.day - 1) ||
+          (yesterdayNight.hour < 8 && yesterdayNight.day == today.day)) {
+        //Decreases between 50 to 40 of a normal heart rate
+        heartRate = (rng.nextInt(100 - 60) + 40);
+      }
       heartRates.add(HeartRate(
-        rng.nextInt(40) + 70,
-        current,
-        current.add(const Duration(minutes: 15)),
+        heartRate,
+        yesterdayNight,
+        yesterdayNight.add(const Duration(minutes: 15)),
       ));
-      current = current.add(const Duration(minutes: 15));
+      yesterdayNight = yesterdayNight.add(const Duration(minutes: 15));
     }
     return heartRates;
   }
 
   @override
-  Future<List<SleepSession>> getSleepSessions(DateTime start, DateTime end) async {
-    return [];
+  Future<List<HeartRate>> getRestingRates(DateTime start, DateTime end) async {
+    var rng = Random();
+    List<HeartRate> heartRates = [];
+
+    final today = DateTime.now();
+    DateTime yesterdayNight =
+        DateTime(today.year, today.month, today.day - 1, 0, 0, 0, 0, 0);
+    end = yesterdayNight.add(const Duration(hours: 24 + 12));
+    while (yesterdayNight.isBefore(end)) {
+      //Average heart rate 100 to 60
+      int heartRate = rng.nextInt(100 - 60) + 60;
+      heartRates.add(HeartRate(
+        heartRate,
+        yesterdayNight,
+        yesterdayNight.add(const Duration(minutes: 15)),
+      ));
+      yesterdayNight = yesterdayNight.add(const Duration(minutes: 15));
+    }
+    return heartRates;
   }
 }

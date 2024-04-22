@@ -31,7 +31,7 @@ class SleepScore {
   int _timeAsleep() {
     int minutes = 0;
     for (var point in sleepDataPoints) {
-      if (point.stage != SleepStage.asleep) {
+      if (point.stage != SleepStage.asleepCore) {
         minutes += point.to.difference(point.from).inMinutes;
       }
     }
@@ -62,7 +62,7 @@ class SleepScore {
 
   int getAsleepAwakeScore() {
     if (sessionTotalMins() == 0) return 0;
-    return ((_timeAsleep() / sessionTotalMins()) * 50).toInt();
+    return ((_timeAsleep() / sessionTotalMins()) * 25).toInt();
   }
 
   int _getTotalDeepSleep() {
@@ -99,7 +99,7 @@ class SleepScore {
 
   int getDeepReemScore() {
     if (sessionTotalMins() == 0) return 0;
-    return ((_getTotalRemSleep() / sessionTotalMins()) * 25).toInt();
+    return ((_getTotalRemSleep() / sessionTotalMins()) * 50).toInt();
   }
 
   bool restingHeartHeartRate(int averageHeartRate) {

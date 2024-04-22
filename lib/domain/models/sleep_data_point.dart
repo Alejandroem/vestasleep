@@ -1,7 +1,7 @@
 enum SleepStage {
   awake, //3
   rem, //2
-  asleep, //1
+  asleepCore, //1
   deep, //0
 }
 

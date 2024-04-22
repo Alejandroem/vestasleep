@@ -11,6 +11,7 @@ abstract class HealthService {
   Future<HeartRate> getCurrentRestingHeartRate();
   Future<UserState> getUserState();
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end);
+  Future<List<HeartRate>> getRestingRates(DateTime start, DateTime end);
   Future<List<SleepDataPoint>> getSleepData(DateTime start, DateTime end);
   Future<List<SleepSession>> getSleepSessions(DateTime start, DateTime end);
 }
