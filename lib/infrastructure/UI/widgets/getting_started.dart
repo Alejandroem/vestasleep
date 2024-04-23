@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/cubit/vesta_app_cubit.dart';
+import '../../../domain/services/authentication_service.dart';
 import '../common/vesta_outline_button.dart';
 
 class GettingStarted extends StatelessWidget {
@@ -10,6 +11,12 @@ class GettingStarted extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.logout),
+        onPressed: () {
+          context.read<AuthenticationService>().signOut();
+        },
+      ),
       backgroundColor: const Color(0xff1B1464),
       body: PopScope(
         canPop: false,

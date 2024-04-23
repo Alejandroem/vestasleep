@@ -224,8 +224,8 @@ class EditAddressCubit extends Cubit<EditAddressState> {
         ),
       );
       await usersService.update(user);
-    }
-    //set loading
-    emit(state.copyWith(isLoading: false));
+      //set loading
+      emit(state.copyWith(isLoading: false));
+    }    
   }
 }

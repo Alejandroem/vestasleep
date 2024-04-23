@@ -38,7 +38,7 @@ class VestaAppState {
 }
 
 //TODO BREAKING CHANGE Here we have to figure out if the user already did the onboarding
-class VestaAppCubit extends HydratedCubit<VestaAppState> {
+class VestaAppCubit extends Cubit<VestaAppState> {
   AuthenticationService authenticationService;
   VestaAppCubit(
     this.authenticationService,
