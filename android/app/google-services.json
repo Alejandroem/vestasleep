@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "833843642801",
+    "project_id": "vestasleep-development",
+    "storage_bucket": "vestasleep-development.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833843642801:android:bca7f4877d1cd1745cbd90",
+        "android_client_info": {
+          "package_name": "com.vestasleep.vestasleep"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFelOaABotoTw_LwNufsGy42WJ4c7cV8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
