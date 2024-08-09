@@ -75,7 +75,7 @@ class FirebaseAuthenticationService extends AuthenticationService {
       address: vestaUser?.address,
       contacts: vestaUser?.contacts,
       emergencyResponseEnabled: vestaUser?.emergencyResponseEnabled,
-      hasFinishedOnboarding:vestaUser?.hasFinishedOnboarding
+      hasFinishedOnboarding:true
     );
     // vestaUser?.hasFinishedOnboarding,
   }

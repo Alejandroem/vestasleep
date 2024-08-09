@@ -6,6 +6,7 @@ import '../../domain/models/heart_rate.dart';
 import '../../domain/models/sleep_score.dart';
 import '../../domain/models/sleep_session.dart';
 import '../../domain/services/health_service.dart';
+import 'sleep_score_calculator.dart';
 
 class SleepScoreState {
   final DateTime lastUpdatedAt;
@@ -33,26 +34,35 @@ class SleepScoreState {
 
   String weeklyScore() {
     int score = 0;
-    for (SleepScore sleepScore in scores) {
-      score += sleepScore.getOverallScoreValue();
+    try {
+      for (SleepScore sleepScore in scores) {
+        score += sleepScore.getOverallScoreValue();
+      }
+      return "${score ~/ scores.length}";
+    } catch (e) {
+      return "0";
     }
-    return "${score ~/ scores.length}";
   }
 
   String averageSessionTime() {
-    int minutes = 0;
-    int hours = 0;
-    for (SleepScore sleepScore in scores) {
-      minutes += sleepScore.sessionTotalMins();
+    try {
+      int minutes = 0;
+      int hours = 0;
+      for (SleepScore sleepScore in scores) {
+        minutes += sleepScore.sessionTotalMins();
+      }
+      hours = minutes ~/ scores.length ~/ 60;
+      return "$hours hr ${minutes ~/ scores.length % 60} min";
+    } catch (e) {
+      return "0 hr 0  min";
     }
-    hours = minutes ~/ scores.length ~/ 60;
-    return "$hours hr ${minutes ~/ scores.length % 60} min";
   }
 }
 
 class SleepScoreCubit extends Cubit<SleepScoreState> {
   final log = Logger('SleepScoreCubit');
   final HealthService healthService;
+
   SleepScoreCubit(
     this.healthService,
   ) : super(SleepScoreState(
@@ -63,199 +73,238 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
 
   Future<void> fetchSleepScores() async {
     log.info('fetchSleepScores');
-    emit(state.copyWith(loading: true));
-    DateTime from;
-    DateTime to;
-    List<SleepScore> newScores = [];
-    log.info('fetchSleepScores: state.scores.isEmpty: ${state.scores.isEmpty}');
-    /* DateTime today;
+  /*  SleepScoreCalculator().fetchAndCalculateSleepScores();
+    return;*/
+
+    try {
+      emit(state.copyWith(loading: true));
+      DateTime from;
+      DateTime to;
+      List<SleepScore> newScores = [];
+      log.info(
+          'fetchSleepScores: state.scores.isEmpty: ${state.scores.isEmpty}');
+      /* DateTime today;
     if (state.scores.isEmpty) {
       today = DateTime.now();
     } else {
       today = state.scores.first.from;
     } */
-    //from = DateTime(today.year, today.month, today.day - 7);
-    //to = DateTime(today.year, today.month, today.day, 23, 59, 59);
+      //from = DateTime(today.year, today.month, today.day - 7);
+      //to = DateTime(today.year, today.month, today.day, 23, 59, 59);
 
-    //Lets analize 2 days for now
-    DateTime now = DateTime.now();
-    DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    DateTime sevenDaysAgo = DateTime(now.year, now.month, now.day - 7, 0, 0, 0);
+      //Lets analize 2 days for now
+      DateTime now = DateTime.now();
+      DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+      DateTime sevenDaysAgo = now.subtract(Duration(
+          days: 7));
 
-    from = sevenDaysAgo;
-    to = endOfDay;
+      from = DateTime(
+          sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day, 0, 0, 0);
+      to = endOfDay;
 
-    Map<String, int> DaysHoursAvgHeartRate = {};
+      Map<String, int> DaysHoursAvgHeartRate = {};
 
-    log.info('fetchSleepScores: from: $from, to: $to');
-    List<SleepSession> newSleepSessions =
-        await healthService.getSleepSessions(from, to);
-    log.info('fetchSleepScores: sleepSessions: $newSleepSessions');
-    List<SleepDataPoint> newSleepData =
-        await healthService.getSleepData(from, to);
-    log.info('fetchSleepScores: sleepData: $newSleepData');
-    List<HeartRate> newHeartRates = await healthService.getHeartRates(from, to);
-    log.info('fetchSleepScores: heartRates: $newHeartRates');
+      log.info('fetchSleepScores: from: $from, to: $to');
+      List<SleepSession> newSleepSessions =
+          await healthService.getSleepSessions(from, to);
+      log.info('fetchSleepScores: sleepSessions: $newSleepSessions');
+      List<SleepDataPoint> newSleepData =
+          await healthService.getSleepData(from, to);
+      log.info('fetchSleepScores: sleepData: $newSleepData');
+      List<HeartRate> newHeartRates =
+          await healthService.getHeartRates(from, to);
+      log.info('fetchSleepScores: heartRates: $newHeartRates');
 
-    //TODO Asume they are ordered
-    int currentDay = -1;
-    int currentHour = -1;
-    int totalInDay = 0;
-    for (HeartRate heartRate in newHeartRates) {
-      if (currentDay == -1 && currentHour == -1) {
-        currentDay = heartRate.from.day;
-        currentHour = heartRate.from.hour;
-      }
-      if (heartRate.from.day == heartRate.to.day &&
-          heartRate.from.hour == heartRate.to.hour) {
-        totalInDay++;
-        int summatory = DaysHoursAvgHeartRate["$currentDay-$currentHour"] ?? 0;
-        DaysHoursAvgHeartRate["$currentDay-$currentHour"] =
-            summatory + heartRate.averageHeartRate;
-      }
-      if (currentDay != heartRate.from.day ||
-          currentHour != heartRate.from.hour) {
-        int value = DaysHoursAvgHeartRate["$currentDay-$currentHour"] ?? 0;
-        DaysHoursAvgHeartRate["$currentDay-$currentHour"] =
-            (value / totalInDay).round();
-        currentDay = heartRate.from.day;
-        currentHour = heartRate.from.hour;
-        totalInDay = 0;
-      }
-    }
-    log.info('fetchSleepScores: heartRatesByHours: $DaysHoursAvgHeartRate');
+      //Sleep score should be based on the heart rate
 
-    //WHen user is sleeping:
-
-    var averageRate = DaysHoursAvgHeartRate.values
-            .fold(0, (prev, element) => prev + element) /
-        DaysHoursAvgHeartRate.length;
-
-    // Define a percentage to determine significant decrease (e.g., 10% below average)
-    var thresholdRate = averageRate * 0.90; // 10% below average
-
-    String? startSleep;
-    List<String> sleepPeriods = [];
-
-    // Iterate through heart rates to find sleep periods
-    DaysHoursAvgHeartRate.forEach((hour, rate) {
-      if (rate < thresholdRate && startSleep == null) {
-        // Sleep starts
-        startSleep = hour;
-      } else if (rate >= thresholdRate && startSleep != null) {
-        // Sleep ends
-        sleepPeriods.add("$startSleep to $hour");
-        startSleep = null;
-      }
-    });
-
-    // Handle ongoing sleep at the end of data
-    if (startSleep != null) {
-      sleepPeriods.add("$startSleep to end of data");
-    }
-
-    // Output the results
-    print("Detected sleep periods based on relative heart rate changes:");
-    //end
-
-    List<HeartRate> restingHeartRates =
-        await healthService.getRestingRates(from, to);
-    log.info('fetchSleepScores: restingHeartRates: $newHeartRates');
-
-    int sumOfRestingHeartRates = 0;
-    for (HeartRate rate in restingHeartRates) {
-      sumOfRestingHeartRates += rate.averageHeartRate;
-    }
-    double averageRestingHeartRate =
-        sumOfRestingHeartRates / restingHeartRates.length;
-    log.info(
-        "fetchSleepScores: Average Resting Heart Rate $averageRestingHeartRate");
-
-    // Variables to track transitions
-    String? startDecreasing;
-    String? startIncreasing;
-    List<String> potentialSleepPeriods = [];
-    bool wasAboveAverage =
-        DaysHoursAvgHeartRate.entries.first.value > averageRestingHeartRate;
-
-    // Iterate through heart rates to find transitions
-    DaysHoursAvgHeartRate.forEach((hour, rate) {
-      if (rate < averageRestingHeartRate && wasAboveAverage) {
-        // Transition from above to below average
-        startDecreasing = hour;
-        wasAboveAverage = false;
-      } else if (rate >= averageRestingHeartRate && !wasAboveAverage) {
-        // Transition from below to above average
-        if (startDecreasing != null) {
-          potentialSleepPeriods.add("$startDecreasing to $hour");
+      //TODO Asume they are ordered
+      int currentDay = -1;
+      int currentHour = -1;
+      int totalInDay = 0;
+      for (HeartRate heartRate in newHeartRates) {
+        if (currentDay == -1 && currentHour == -1) {
+          currentDay = heartRate.from.day;
+          currentHour = heartRate.from.hour;
         }
-        wasAboveAverage = true;
+        if (heartRate.from.day == heartRate.to.day &&
+            heartRate.from.hour == heartRate.to.hour) {
+          totalInDay++;
+          int summatory =
+              DaysHoursAvgHeartRate["$currentDay-$currentHour"] ?? 0;
+          DaysHoursAvgHeartRate["$currentDay-$currentHour"] =
+              summatory + heartRate.averageHeartRate;
+        }
+        print("${totalInDay}");
+        if (currentDay != heartRate.from.day ||
+            currentHour != heartRate.from.hour) {
+          int value = DaysHoursAvgHeartRate["$currentDay-$currentHour"] ?? 0;
+          if (totalInDay != 0) {
+            DaysHoursAvgHeartRate["$currentDay-$currentHour"] =
+                (value / totalInDay).round();
+          }
+          currentDay = heartRate.from.day;
+          currentHour = heartRate.from.hour;
+          totalInDay = 0;
+        }
       }
-    });
+      log.info('fetchSleepScores: heartRatesByHours: $DaysHoursAvgHeartRate');
 
-    // Output the results
-    print("Detected potential sleep periods:");
-    potentialSleepPeriods.forEach(print);
+      //WHen user is sleeping:
 
-    log.info('fetchSleepScores: mapping data to scores');
-    for (String potentialSleepPeriod in potentialSleepPeriods) {
-      String start = potentialSleepPeriod.split("to")[0].trim();
-      int startDay = int.parse(start.split("-")[0]);
-      int startHour = int.parse(start.split("-")[1]);
-      String end = potentialSleepPeriod.split("to")[1].trim();
-      int endtDay = int.parse(end.split("-")[0]);
-      int endHour = int.parse(end.split("-")[1]);
+      var averageRate = DaysHoursAvgHeartRate.values
+              .fold(0, (prev, element) => prev + element) /
+          DaysHoursAvgHeartRate.length;
 
-      DateTime scorefrom =
-          DateTime(from.year, from.month, startDay, startHour - 2, 0, 0, 0, 0);
-      DateTime scoreTo =
-          DateTime(from.year, from.month, endtDay, endHour + 2, 0, 0, 0, 0);
+      // Define a percentage to determine significant decrease (e.g., 10% below average)
+      var thresholdRate = averageRate * 0.90; // 10% below average
 
-      log.info(
-          'fetchSleepScores: current score from: $scorefrom, to: $scoreTo');
-      List<SleepDataPoint> sleepPoints = newSleepData.where((element) {
-        return element.from.isAfter(scorefrom) || element.to.isBefore(scoreTo);
-      }).toList();
-      List<HeartRate> heartRatesPoints = newHeartRates.where((element) {
-        return element.from.isAfter(scorefrom) || element.to.isBefore(scoreTo);
-      }).toList();
+      String? startSleep;
+      List<String> sleepPeriods = [];
 
-      List<SleepSession> sleepSessions = newSleepSessions.where((element) {
-        return element.from.isAfter(scorefrom) || element.to.isBefore(scoreTo);
-      }).toList();
+      // Iterate through heart rates to find sleep periods
+      DaysHoursAvgHeartRate.forEach((hour, rate) {
+        if (rate < thresholdRate && startSleep == null) {
+          // Sleep starts
+          startSleep = hour;
+        } else if (rate >= thresholdRate && startSleep != null) {
+          // Sleep ends
+          sleepPeriods.add("$startSleep to $hour");
+          startSleep = null;
+        }
+      });
 
-      //orderSleepPoints by hour minute second
-      sleepPoints.sort((a, b) => a.from.compareTo(b.from));
-      //orderHeartRates by hour minute second
-      heartRatesPoints.sort((a, b) => a.from.compareTo(b.from));
-
-      sleepSessions.sort((a, b) => a.from.compareTo(b.from));
-
-      log.info('fetchSleepScores: sleep: $sleepPoints');
-      log.info('fetchSleepScores: heartRates: $heartRatesPoints');
-      if (sleepSessions.isEmpty) {
-        continue;
+      // Handle ongoing sleep at the end of data
+      if (startSleep != null) {
+        sleepPeriods.add("$startSleep to end of data");
       }
-      newScores = [
-        SleepScore(
-          from: scorefrom,
-          to: scoreTo,
-          heartRatesDataPoints: heartRatesPoints,
-          sleepDataPoints: sleepPoints,
-          sleepSessions: sleepSessions,
-        ),
-        ...newScores,
-      ];
+
+      // Output the results
+      //print("Detected sleep periods based on relative heart rate changes:");
+      //end
+
+      List<HeartRate> restingHeartRates =
+          await healthService.getRestingRates(from, to);
+      //print('fetchSleepScores: restingHeartRates: $restingHeartRates');
+
+      int sumOfRestingHeartRates = 0;
+      for (HeartRate rate in restingHeartRates) {
+        sumOfRestingHeartRates += rate.averageHeartRate;
+      }
+      //print('fetchSleepScores: summ: $sumOfRestingHeartRates');
+      double averageRestingHeartRate = 0;
+      if (restingHeartRates.length > 0) {
+        averageRestingHeartRate =
+            sumOfRestingHeartRates / restingHeartRates.length;
+      }
+
+      print(
+          "fetchSleepScores: Average Resting Heart Rate $averageRestingHeartRate");
+
+      // Variables to track transitions
+      String? startDecreasing;
+      String? startIncreasing;
+      List<String> potentialSleepPeriods = [];
+      bool wasAboveAverage =
+          DaysHoursAvgHeartRate.entries.first.value > averageRestingHeartRate;
+
+      // Iterate through heart rates to find transitions
+      DaysHoursAvgHeartRate.forEach((hour, rate) {
+        if ((rate < averageRestingHeartRate) && wasAboveAverage) {
+          // Transition from above to below average
+          startDecreasing = hour;
+          wasAboveAverage = false;
+        } else if (rate >= averageRestingHeartRate && !wasAboveAverage) {
+          // Transition from below to above average
+          if (startDecreasing != null) {
+            potentialSleepPeriods.add("$startDecreasing to $hour");
+          }
+          wasAboveAverage = true;
+        }
+      });
+
+      // Output the results
+      print("Detected potential sleep periods:");
+      potentialSleepPeriods.forEach(print);
+
+      log.info('fetchSleepScores: mapping data to scores');
+      for (String potentialSleepPeriod in potentialSleepPeriods) {
+        print("potential ${potentialSleepPeriod}");
+        String start = potentialSleepPeriod.split("to")[0].trim();
+        int startDay = int.parse(start.split("-")[0]);
+        int startHour = int.parse(start.split("-")[1]);
+        String end = potentialSleepPeriod.split("to")[1].trim();
+        int endtDay = int.parse(end.split("-")[0]);
+        int endHour = int.parse(end.split("-")[1]);
+        //need to check here binod
+        DateTime scorefrom =
+            DateTime(from.year, from.month, startDay, startHour, 0, 0, 0, 0)
+                .subtract(Duration(hours: 2));
+        DateTime scoreTo =
+            DateTime(from.year, from.month, endtDay, endHour, 0, 0, 0, 0)
+                .add(Duration(hours: 2));
+
+        log.info(
+            'fetchSleepScores: current score from: $scorefrom, to: $scoreTo');
+        List<SleepDataPoint> sleepPoints = newSleepData.where((element) {
+          return element.from.isAfter(scorefrom) ||
+              element.to.isBefore(scoreTo);
+        }).toList();
+        List<HeartRate> heartRatesPoints = newHeartRates.where((element) {
+          return element.from.isAfter(scorefrom) ||
+              element.to.isBefore(scoreTo);
+        }).toList();
+
+        List<SleepSession> sleepSessions = newSleepSessions.where((element) {
+          return element.from.isAfter(scorefrom) ||
+              element.to.isBefore(scoreTo);
+        }).toList();
+
+        //orderSleepPoints by hour minute second
+        if (sleepPoints.length > 1) {
+          sleepPoints.sort((a, b) => a.from.compareTo(b.from));
+        }
+        //orderHeartRates by hour minute second
+        if (heartRatesPoints.length > 1) {
+          heartRatesPoints.sort((a, b) => a.from.compareTo(b.from));
+        }
+        if (sleepSessions.length > 1) {
+          sleepSessions.sort((a, b) => a.from.compareTo(b.from));
+        }
+
+        log.info('fetchSleepScores: sleep: $sleepPoints');
+        log.info('fetchSleepScores: heartRates: $heartRatesPoints');
+        if (sleepSessions.isEmpty) {
+          continue;
+        }
+        newScores = [
+          SleepScore(
+            from: scorefrom,
+            to: scoreTo,
+            heartRatesDataPoints: heartRatesPoints,
+            sleepDataPoints: sleepPoints,
+            sleepSessions: sleepSessions,
+          ),
+          ...newScores,
+        ];
+      }
+
+      log.info('fetchSleepScores: scores: $newScores');
+
+      List<SleepScore> scores = [...state.scores, ...newScores];
+      if (scores.length > 1) {
+        scores.sort((a, b) => a.from.compareTo(b.from));
+      }
+      emit(state.copyWith(
+        scores: scores,
+        loading: false,
+        lastUpdatedAt: DateTime.now(),
+      ));
+    } catch (e, s) {
+      print(s);
     }
-
-    log.info('fetchSleepScores: scores: $newScores');
-
-    List<SleepScore> scores = [...state.scores, ...newScores];
-    scores.sort((a, b) => a.from.compareTo(b.from));
-    emit(state.copyWith(
-      scores: scores,
-      loading: false,
-      lastUpdatedAt: DateTime.now(),
-    ));
   }
+
+
+
+
 }

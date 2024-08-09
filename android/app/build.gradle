@@ -69,18 +69,18 @@ android {
                     storePassword keystoreProperties['storePassword']
                 }
                 debug {
-                    storeFile file('debug.keystore')
-                    storePassword 'android'
-                    keyAlias 'androiddebugkey'
-                    keyPassword 'android'
+                    //storeFile file('debug.keystore')
+                    //storePassword 'android'
+                    //keyAlias 'androiddebugkey'
+                    //keyPassword 'android'
                 }
             }
             else {
                 debug {
-                    storeFile file('debug.keystore')
+                    /*storeFile file('debug.keystore')
                     storePassword 'android'
                     keyAlias 'androiddebugkey'
-                    keyPassword 'android'
+                    keyPassword 'android'*/
                 }
             }
         }

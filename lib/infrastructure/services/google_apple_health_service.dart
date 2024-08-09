@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:health/health.dart';
 import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:vestasleep/mock/sleep_session_data.dart';
 
 import '../../domain/models/heart_rate.dart';
 import '../../domain/models/sleep_data_point.dart';
 import '../../domain/models/sleep_session.dart';
 import '../../domain/models/user_state.dart';
 import '../../domain/services/health_service.dart';
+import '../../mock/heart_data.dart';
 
 class GoogleAppleHealthService implements HealthService {
   final log = Logger('GoogleAppleHealthService');
@@ -19,8 +22,9 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<bool> requestPermissions() async {
-    HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
-
+    // HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+    var health = Health();
+    Health().configure(useHealthConnectIfAvailable: true);
     await Permission.activityRecognition.request();
 
     final types = [
@@ -35,11 +39,11 @@ class GoogleAppleHealthService implements HealthService {
 
     // Check if we have permission
     bool? hasPermissions =
-        await health.hasPermissions(types, permissions: permissions);
+        await health.hasPermissions(types, permissions: permissions) ?? false;
 
     // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
     // Hence, we have to request with WRITE as well.
-    hasPermissions = false;
+    //hasPermissions = false;
 
     bool authorized = false;
     if (!hasPermissions) {
@@ -49,6 +53,9 @@ class GoogleAppleHealthService implements HealthService {
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
+    } else {
+      //authorized = await health.requestAuthorization(types);
+      authorized = true;
     }
 
     return authorized;
@@ -62,8 +69,8 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<Stream<HeartRate>> getHeartRateStream(Duration delta) async {
-    HealthFactory health = HealthFactory();
-
+    // HealthFactory health = HealthFactory();
+    var health = Health();
     heartRateStreamController ??= StreamController<HeartRate>();
 
     if (_heartRateTimer != null) {
@@ -77,9 +84,9 @@ class GoogleAppleHealthService implements HealthService {
         log.info(
             "Getting heart rate data from health kit from $startTime to $endTime");
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          startTime,
-          endTime,
-          [
+          startTime: startTime,
+          endTime: endTime,
+          types: [
             HealthDataType.HEART_RATE,
           ],
         );
@@ -131,26 +138,32 @@ class GoogleAppleHealthService implements HealthService {
   Future<List<SleepDataPoint>> getSleepData(
       DateTime start, DateTime end) async {
     //GET Awake REM light and deep sleep
-    HealthFactory health = HealthFactory();
+    // HealthFactory health = HealthFactory();
+    Health health = Health();
     List<HealthDataType> types = [
       HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_REM,
       HealthDataType.SLEEP_ASLEEP,
       HealthDataType.SLEEP_DEEP,
     ];
-
+/*
+HealthDataType.SLEEP_AWAKE,
+ HealthDataType.SLEEP_REM,
+      HealthDataType.SLEEP_ASLEEP,
+      HealthDataType.SLEEP_DEEP,
+ */
     final permissions = types.map((e) => HealthDataAccess.READ).toList();
     log.info("Requesting permissions for $permissions");
 
     // Check if we have permission
     bool? hasPermissions =
-        await health.hasPermissions(types, permissions: permissions);
+        await health.hasPermissions(types, permissions: permissions) ?? false;
 
     log.info("Has permissions: $hasPermissions");
 
     // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
     // Hence, we have to request with WRITE as well.
-    hasPermissions = false;
+    // hasPermissions = false;
 
     bool authorized = false;
     if (!hasPermissions) {
@@ -161,16 +174,23 @@ class GoogleAppleHealthService implements HealthService {
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
+    } else {
+      authorized = true; // await health.requestAuthorization(types);
     }
 
     if (authorized) {
       log.info("Authorized to read health data");
-      log.info("Getting health data from $start to $end for $types");
-      List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
-      );
+      //log.info("Getting health data from $start to $end for $types");
+      List<HealthDataPoint> healthData = [];
+      try {
+        healthData = await health.getHealthDataFromTypes(
+          startTime: start,
+          endTime: end,
+          types: types,
+        );
+      } catch (e, s) {
+        print(s);
+      }
       log.info("Health data for sleep: $healthData");
       List<SleepDataPoint> sleepDataPoints = healthData.map((dataPoint) {
         log.info("MapingData: Data point: $dataPoint");
@@ -202,6 +222,9 @@ class GoogleAppleHealthService implements HealthService {
           stage: sleepType,
         );
       }).toList();
+      var data =
+          sleepDataPoints.map((heartRate) => heartRate.toJson()).toList();
+      var da = json.encode(data).toString();
       log.info("Sleep data points: $sleepDataPoints");
 
       return sleepDataPoints;
@@ -213,7 +236,8 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<List<HeartRate>> getRestingRates(DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    //HealthFactory health = HealthFactory();
+    var health = Health();
     List<HealthDataType> types = [
       HealthDataType.RESTING_HEART_RATE,
     ];
@@ -239,19 +263,21 @@ class GoogleAppleHealthService implements HealthService {
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
+    } else {
+      authorized = true; // await health.requestAuthorization(types);
     }
 
     if (authorized) {
       log.info("Authorized to read health data");
-      log.info("Getting health data from $start to $end for $types");
+      print("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
       log.info("Health data for resting heart rate: $healthData");
       List<HeartRate> heartRates = healthData.map((dataPoint) {
-        log.info("MapingData: Data point: $dataPoint");
+        print("MapingData: Data point: $dataPoint");
         return HeartRate(
           (dataPoint.value as NumericHealthValue).numericValue.toInt(),
           dataPoint.dateFrom,
@@ -268,7 +294,10 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    //HealthFactory health = HealthFactory();
+   // return HeartSampleData().getHeartRates();
+    return HeartSampleData().getHeartRates();
+    var health = Health();
     List<HealthDataType> types = [
       HealthDataType.HEART_RATE,
     ];
@@ -294,18 +323,21 @@ class GoogleAppleHealthService implements HealthService {
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
+    } else {
+      authorized = await health.requestAuthorization(types);
     }
 
     if (authorized) {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
+      var data = Health().removeDuplicates(healthData);
       log.info("Health data for heart rate: $healthData");
-      List<HeartRate> heartRates = healthData.map((dataPoint) {
+      List<HeartRate> heartRates = data.map((dataPoint) {
         log.info("MapingData: Data point: $dataPoint");
         return HeartRate(
           (dataPoint.value as NumericHealthValue).numericValue.toInt(),
@@ -314,6 +346,11 @@ class GoogleAppleHealthService implements HealthService {
         );
       }).toList();
       log.info("Heart rate data points: $heartRates");
+      // var hrates = json.encode(heartRates);
+      var dataS = heartRates.map((heartRate) => heartRate.toJson()).toList();
+      var da = json.encode(dataS).toString();
+
+      ///print(hrates);
       return heartRates;
     } else {
       log.info("Not authorized to read health data returning empty list");
@@ -324,7 +361,10 @@ class GoogleAppleHealthService implements HealthService {
   @override
   Future<List<SleepSession>> getSleepSessions(
       DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    //HealthFactory health = HealthFactory();
+
+    //return SleepSessionData().getSleepSessions();
+    var health = Health();
     List<HealthDataType> types = [HealthDataType.SLEEP_IN_BED];
     if (Platform.isAndroid) {
       types = [
@@ -337,11 +377,11 @@ class GoogleAppleHealthService implements HealthService {
 
     // Check if we have permission
     bool? hasPermissions =
-        await health.hasPermissions(types, permissions: permissions);
+        await health.hasPermissions(types, permissions: permissions) ?? false;
 
     // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
     // Hence, we have to request with WRITE as well.
-    hasPermissions = false;
+    //hasPermissions = false;
     log.info("Has permissions: $hasPermissions");
     bool authorized = false;
     if (!hasPermissions) {
@@ -353,15 +393,17 @@ class GoogleAppleHealthService implements HealthService {
       } catch (error, stackTrace) {
         log.severe('Exception in authorize!', error, stackTrace);
       }
+    } else {
+      authorized = await health.requestAuthorization(types);
     }
 
     if (authorized) {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
 
       log.info("Health data for sleep session: $healthData");
@@ -372,6 +414,7 @@ class GoogleAppleHealthService implements HealthService {
           to: dataPoint.dateTo,
         );
       }).toList();
+
       log.info("Sleep session data points: $sleepSessions");
       return sleepSessions;
     } else {

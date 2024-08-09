@@ -196,7 +196,7 @@ class MockHealthService implements HealthService {
 
     final today = DateTime.now();
     DateTime yesterdayNight =
-        DateTime(today.year, today.month, today.day - 1, 0, 0, 0, 0, 0);
+        DateTime(today.year, today.month, today.day, 0, 0, 0, 0, 0).subtract(Duration(days: 1));
     end = yesterdayNight.add(const Duration(hours: 24 + 12));
     while (yesterdayNight.isBefore(end)) {
       //Average heart rate 100 to 60

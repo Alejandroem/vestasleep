@@ -8,29 +8,31 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Text(
-                'Welcome!',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'M PLUS 1',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 24,
-                  letterSpacing: 0.24,
+    return SingleChildScrollView(
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'Welcome!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'M PLUS 1',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 24,
+                    letterSpacing: 0.24,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        SleepChart(),
-        HeartRateChart(),
-      ],
+            ],
+          ),
+          SleepChart(),
+          HeartRateChart(),
+        ],
+      ),
     );
   }
 }

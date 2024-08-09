@@ -20,4 +20,20 @@ class SleepDataPoint {
   String toString() {
     return 'SleepDataPoint{from: $from, to: $to, stage: $stage}';
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'stage': stage.name,
+      'from': from.toIso8601String(),
+      'to': to.toIso8601String(),
+    };
+  }
+
+  factory SleepDataPoint.fromJson(Map<String, dynamic> json) {
+    return SleepDataPoint(
+      from: DateTime.parse(json['from']),
+      to: DateTime.parse(json['to']),
+      stage: SleepStage.values.firstWhere((e) => e.name == json['stage']),
+    );
+  }
 }

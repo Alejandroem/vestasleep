@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:health/health.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -11,7 +12,7 @@ import 'infrastructure/UI/widgets/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  Health().configure(useHealthConnectIfAvailable: true);
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: await getApplicationDocumentsDirectory(),
   );
