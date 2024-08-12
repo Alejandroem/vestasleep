@@ -73,9 +73,9 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
 
   Future<void> fetchSleepScores() async {
     log.info('fetchSleepScores');
-  /*  SleepScoreCalculator().fetchAndCalculateSleepScores();
-    return;*/
-
+   /* SleepScoreCalculator().fetchAndCalculateSleepScores();
+    return;
+*/
     try {
       emit(state.copyWith(loading: true));
       DateTime from;

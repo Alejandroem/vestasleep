@@ -296,7 +296,6 @@ HealthDataType.SLEEP_AWAKE,
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
     //HealthFactory health = HealthFactory();
    // return HeartSampleData().getHeartRates();
-    return HeartSampleData().getHeartRates();
     var health = Health();
     List<HealthDataType> types = [
       HealthDataType.HEART_RATE,

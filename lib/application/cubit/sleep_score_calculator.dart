@@ -7,7 +7,8 @@ import '../../mock/heart_data.dart';
 class SleepScoreCalculator {
   final Health health = Health();
 
-  Future<Map<DateTime, Map<String, double>>> fetchAndCalculateSleepScores() async {
+  Future<Map<DateTime, Map<String, double>>>
+      fetchAndCalculateSleepScores() async {
     Map<DateTime, Map<String, double>> sleepData = {};
 
     try {
@@ -18,7 +19,8 @@ class SleepScoreCalculator {
       final permissions = types.map((e) => HealthDataAccess.READ).toList();
 
       // Check if we have permission
-      bool? hasPermissions = await health.hasPermissions(types, permissions: permissions)??false;
+      bool? hasPermissions =
+          await health.hasPermissions(types, permissions: permissions) ?? false;
       if (!hasPermissions) {
         bool isAuthorized = await health.requestAuthorization(types);
         if (!isAuthorized) {
@@ -31,28 +33,41 @@ class SleepScoreCalculator {
 
       // Fetch data for a broader range to determine sleep heart rate pattern
       DateTime startDateForPattern = endDate.subtract(Duration(days: 30));
-      List<HeartRate> patternHeartRateData = await fetchHeartRateData(startDateForPattern, endDate);
+      List<HeartRate> patternHeartRateData =
+          await fetchHeartRateData(startDateForPattern, endDate);
 
       // Determine sleep heart rate range based on the user's pattern
-      var sleepHeartRateRange = determineSleepHeartRateRange(patternHeartRateData);
+      var sleepHeartRateRange =
+          determineSleepHeartRateRange(patternHeartRateData);
       int SLEEP_HEART_RATE_MIN = sleepHeartRateRange['min'] ?? 40;
       int SLEEP_HEART_RATE_MAX = sleepHeartRateRange['max'] ?? 65;
+      if (SLEEP_HEART_RATE_MAX > 65) {
+        SLEEP_HEART_RATE_MAX = 65;
+      }
+      if (SLEEP_HEART_RATE_MAX > 65) {
+        SLEEP_HEART_RATE_MIN = 40;
+      }
 
-   /*   int SLEEP_HEART_RATE_MIN = 60;
+      /*   int SLEEP_HEART_RATE_MIN = 60;
       int SLEEP_HEART_RATE_MAX = 120;*/
 
       for (int i = 0; i < 7; i++) {
-        DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day).subtract(Duration(days: i + 1));
+        DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day)
+            .subtract(Duration(days: i + 1));
         DateTime nextDate = startDate.add(Duration(days: 1));
-        List<HeartRate> dailyHeartRateData = await fetchHeartRateData(startDate, nextDate);
+        List<HeartRate> dailyHeartRateData =
+            await fetchHeartRateData(startDate, nextDate);
         dailyHeartRateData = removeDuplicates(dailyHeartRateData);
 
-        dailyHeartRateData= dailyHeartRateData.toSet().toList();
-        double sleepScore = calculateDailySleepScore(dailyHeartRateData, SLEEP_HEART_RATE_MIN, SLEEP_HEART_RATE_MAX);
-        double sleepTime = calculateDailySleepTime(dailyHeartRateData, SLEEP_HEART_RATE_MIN, SLEEP_HEART_RATE_MAX);
+        dailyHeartRateData = dailyHeartRateData.toSet().toList();
+        double sleepScore = calculateDailySleepScore(
+            dailyHeartRateData, SLEEP_HEART_RATE_MIN, SLEEP_HEART_RATE_MAX);
+        double sleepTime = calculateDailySleepTime(
+            dailyHeartRateData, SLEEP_HEART_RATE_MIN, SLEEP_HEART_RATE_MAX);
 
         // Debugging: Check the calculated sleep time and heart rate data
-        print('Date: $startDate, Sleep Time: $sleepTime, Sleep Score: $sleepScore');
+        print(
+            'Date: $startDate, Sleep Time: $sleepTime, Sleep Score: $sleepScore');
         print('Heart Rate Data: $dailyHeartRateData');
 
         sleepData[startDate] = {
@@ -66,7 +81,6 @@ class SleepScoreCalculator {
     print(sleepData);
     return sleepData;
   }
-
 
   List<HeartRate> removeDuplicates(List<HeartRate> heartRateData) {
     Set<String> seen = Set();
@@ -83,11 +97,11 @@ class SleepScoreCalculator {
     return uniqueData;
   }
 
-  double calculateDailySleepTime(List<HeartRate> heartRateData, int SLEEP_HEART_RATE_MIN, int SLEEP_HEART_RATE_MAX) {
+  double calculateDailySleepTime(List<HeartRate> heartRateData,
+      int SLEEP_HEART_RATE_MIN, int SLEEP_HEART_RATE_MAX) {
     if (heartRateData.isEmpty) {
       return 0.0;
     }
-
 
     double totalSleepTimeSeconds = 0.0;
 
@@ -100,11 +114,14 @@ class SleepScoreCalculator {
 
       if (currentData.averageHeartRate >= SLEEP_HEART_RATE_MIN &&
           currentData.averageHeartRate <= SLEEP_HEART_RATE_MAX) {
-        if (currentData.from == currentData.to && i < heartRateData.length - 1) {
+        if (currentData.from == currentData.to &&
+            i < heartRateData.length - 1) {
           var nextData = heartRateData[i + 1];
-          totalSleepTimeSeconds += nextData.from.difference(currentData.from).inSeconds;
+          totalSleepTimeSeconds +=
+              nextData.from.difference(currentData.from).inSeconds;
         } else {
-          totalSleepTimeSeconds += currentData.to.difference(currentData.from).inSeconds;
+          totalSleepTimeSeconds +=
+              currentData.to.difference(currentData.from).inSeconds;
         }
       }
     }
@@ -115,32 +132,36 @@ class SleepScoreCalculator {
     return totalSleepTimeHours;
   }
 
-  Future<List<HeartRate>> fetchHeartRateData(DateTime startDate, DateTime endDate) async {
- /*   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+  Future<List<HeartRate>> fetchHeartRateData(
+      DateTime startDate, DateTime endDate) async {
+    List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
       startTime: startDate,
       endTime: endDate,
       types: [HealthDataType.HEART_RATE],
     );
-   var data = Health().removeDuplicates(healthData);
+    var data = Health().removeDuplicates(healthData);
     List<HeartRate> heartRateData = data.map((dataPoint) {
       return HeartRate(
         (dataPoint.value as NumericHealthValue).numericValue.toInt(),
         dataPoint.dateFrom,
         dataPoint.dateTo,
       );
-    }).toList();*/
+    }).toList();
 
-    List<HeartRate> heartRateData = HeartSampleData().getHeartRateByRange(startDate, endDate);
+    //List<HeartRate> heartRateData = HeartSampleData().getHeartRateByRange(startDate, endDate);
     return heartRateData;
   }
 
-  double calculateDailySleepScore(List<HeartRate> heartRateData, int SLEEP_HEART_RATE_MIN, int SLEEP_HEART_RATE_MAX) {
+  double calculateDailySleepScore(List<HeartRate> heartRateData,
+      int SLEEP_HEART_RATE_MIN, int SLEEP_HEART_RATE_MAX) {
     if (heartRateData.isEmpty) {
       return 0.0;
     }
 
     List<int> sleepHeartRates = heartRateData
-        .where((data) => data.averageHeartRate >= SLEEP_HEART_RATE_MIN && data.averageHeartRate <= SLEEP_HEART_RATE_MAX)
+        .where((data) =>
+            data.averageHeartRate >= SLEEP_HEART_RATE_MIN &&
+            data.averageHeartRate <= SLEEP_HEART_RATE_MAX)
         .map((data) => data.averageHeartRate)
         .toList();
 
@@ -149,7 +170,8 @@ class SleepScoreCalculator {
     }
 
     // Calculate average heart rate during sleep
-    double avgSleepHeartRate = sleepHeartRates.reduce((a, b) => a + b) / sleepHeartRates.length;
+    double avgSleepHeartRate =
+        sleepHeartRates.reduce((a, b) => a + b) / sleepHeartRates.length;
 
     // Compute sleep score (example formula, adjust as needed)
     double sleepScore = (100 - avgSleepHeartRate) / 100 * 100;
@@ -157,18 +179,20 @@ class SleepScoreCalculator {
     return sleepScore;
   }
 
-  Map<String, int> determineSleepHeartRateRange(List<HeartRate> heartRateData) {
-    // Assuming periods of low heart rate correspond to sleep
-    List<int> sortedHeartRates = heartRateData.map((data) => data.averageHeartRate).toList()..sort();
+  Map<String, int?> determineSleepHeartRateRange(
+      List<HeartRate> heartRateData) {
+    if (heartRateData.isEmpty) {
+      return {'min': null, 'max': null}; // Return nulls to indicate no data
+    }
 
-    // Assuming bottom 10% heart rates correspond to sleep periods
-    int sleepDataCount = (sortedHeartRates.length * 0.1).toInt();
-    List<int> sleepHeartRates = sortedHeartRates.take(sleepDataCount).toList();
+    // Extract heart rate values from the data
+    List<int> heartRates =
+        heartRateData.map((data) => data.averageHeartRate).toList();
 
-    int minSleepHeartRate = sleepHeartRates.reduce((a, b) => a < b ? a : b);
-    int maxSleepHeartRate = sleepHeartRates.reduce((a, b) => a > b ? a : b);
+    // Calculate the minimum and maximum heart rate during sleep
+    int minSleepHeartRate = heartRates.reduce((a, b) => a < b ? a : b);
+    int maxSleepHeartRate = heartRates.reduce((a, b) => a > b ? a : b);
 
     return {'min': minSleepHeartRate, 'max': maxSleepHeartRate};
   }
-
 }

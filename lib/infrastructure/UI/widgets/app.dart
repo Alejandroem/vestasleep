@@ -90,7 +90,7 @@ class App extends StatelessWidget {
                 create: (context) => BottomNavigationCubit(),
               ),
             ],
-            child:  SleepScoreScreen(),
+            child: SleepScoreScreen(),
           ),
         ),
       ),
