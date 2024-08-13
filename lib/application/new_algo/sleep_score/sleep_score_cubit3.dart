@@ -8,12 +8,11 @@ import 'dart:math';
 
 import 'package:vestasleep/application/new_algo/model/daily_sleep_data.dart';
 import 'package:vestasleep/application/new_algo/model/sleep_session.dart';
-import 'package:vestasleep/application/new_algo/model/sleep_session_score.dart';
 
-class SleepScoreCubit extends Cubit<SleepScoreState> {
+class SleepScoreCubit3 extends Cubit<SleepScoreState> {
   final Health healthFactory;
 
-  SleepScoreCubit(this.healthFactory) : super(SleepScoreInitial());
+  SleepScoreCubit3(this.healthFactory) : super(SleepScoreInitial());
 
   Future<void> fetchSleepData() async {
     emit(SleepScoreLoading());
@@ -26,8 +25,7 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         HealthDataType.SLEEP_ASLEEP,
         HealthDataType.SLEEP_AWAKE,
         HealthDataType.HEART_RATE,
-        HealthDataType.SLEEP_REM,
-        HealthDataType.SLEEP_ASLEEP_CORE
+        HealthDataType.SLEEP_REM
       ];
       if (Platform.isAndroid) {
         types = [
@@ -69,8 +67,7 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
             HealthDataType.SLEEP_IN_BED,
             HealthDataType.SLEEP_ASLEEP,
             HealthDataType.SLEEP_AWAKE,
-            HealthDataType.SLEEP_REM,
-            HealthDataType.SLEEP_ASLEEP_CORE
+            HealthDataType.SLEEP_REM
           ];
         }
         List<HealthDataPoint> sleepData =
@@ -86,18 +83,11 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         // Process heart rate data with splitting logic
         heartRateData = processHeartRateData(heartRateData);
 
-        /* List<SleepSession> sessions = processSleepData(sleepData);
+        List<SleepSession> sessions = processSleepData(sleepData);
         List<DailySleepData> dailySleepData =
             calculateDailySleepData(sessions, heartRateData);
 
-        emit(SleepScoreLoaded(dailySleepData));*/
-
-        List<SleepSession> sessions = processSleepData(sleepData);
-        List<SleepSessionScore> sessionScores =
-            calculateSessionScores(sessions, heartRateData);
-        final sortedSessionScores = sessionScores
-          ..sort((a, b) => b.session.from.compareTo(a.session.from));
-        emit(SleepSessionScoreLoaded(sortedSessionScores));
+        emit(SleepScoreLoaded(dailySleepData));
       } else {
         emit(SleepScoreError("Authorization not granted"));
       }
@@ -190,86 +180,80 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
   }
 
   List<SleepSession> processSleepData(List<HealthDataPoint> sleepData) {
+    // Remove duplicates before processing
     sleepData = removeDuplicates(sleepData);
 
-    List<SleepSession> sessions = [];
-    DateTime? sleepStart;
-    DateTime? sleepEnd;
-    Duration timeAsleep = Duration.zero;
-    Duration timeInRem = Duration.zero;
-    Duration timeAwake = Duration.zero;
-    Duration breakDuration = Duration.zero;
-    Duration maxAllowedBreak =
-        Duration(hours: 1); // Threshold to merge sessions
+    Map<DateTime, List<HealthDataPoint>> groupedSleepData = {};
 
-    sleepData.sort((a, b) => a.dateFrom.compareTo(b.dateFrom));
-
-    DateTime? lastAsleepEndTime;
-
+    // Process and group sleep data by date (ignoring time)
     for (var dataPoint in sleepData) {
-      if (dataPoint.type == HealthDataType.SLEEP_IN_BED ||
-          dataPoint.type == HealthDataType.SLEEP_SESSION) {
-        if (sleepStart == null) {
-          sleepStart = dataPoint.dateFrom;
-        } else {
-          // Calculate the duration since the last session ended
-          final durationSinceLastSession =
-              dataPoint.dateFrom.difference(sleepEnd!);
+      // Split data point if it spans midnight
+      List<HealthDataPoint> splitPoints = splitDataPointAtMidnight(dataPoint);
 
-          // If the break is longer than maxAllowedBreak, finalize the current session
-          if (durationSinceLastSession > maxAllowedBreak) {
-            // Finalize the current session
-            sessions.add(SleepSession(
-              from: sleepStart,
-              to: sleepEnd,
-              asleepDuration: timeAsleep,
-              remDuration: timeInRem,
-              awakeDuration: timeAwake,
-              inBedDuration: sleepEnd
-                  .difference(sleepStart), // Calculate based on start and end
-            ));
-
-            // Reset for a new session
-            sleepStart = dataPoint.dateFrom;
-            timeAsleep = Duration.zero;
-            timeInRem = Duration.zero;
-            timeAwake = Duration.zero;
-            breakDuration = Duration.zero;
-          }
+      for (var point in splitPoints) {
+        DateTime date = DateTime(
+            point.dateFrom.year, point.dateFrom.month, point.dateFrom.day);
+        if (!groupedSleepData.containsKey(date)) {
+          groupedSleepData[date] = [];
         }
-
-        sleepEnd = dataPoint.dateTo;
-      } else if (dataPoint.type == HealthDataType.SLEEP_ASLEEP ||
-          dataPoint.type == HealthDataType.SLEEP_ASLEEP_CORE) {
-        if (lastAsleepEndTime == null ||
-            dataPoint.dateFrom.isAfter(lastAsleepEndTime)) {
-          // No overlap or a new segment, add duration
-          timeAsleep += dataPoint.dateTo.difference(dataPoint.dateFrom);
-          lastAsleepEndTime = dataPoint.dateTo;
-        } else if (dataPoint.dateTo.isAfter(lastAsleepEndTime)) {
-          // Handle overlapping period, only add the non-overlapping part
-          timeAsleep += dataPoint.dateTo.difference(lastAsleepEndTime);
-          lastAsleepEndTime = dataPoint.dateTo;
-        }
-      } else if (dataPoint.type == HealthDataType.SLEEP_REM) {
-        timeInRem += dataPoint.dateTo.difference(dataPoint.dateFrom);
-      } else if (dataPoint.type == HealthDataType.SLEEP_AWAKE) {
-        timeAwake += dataPoint.dateTo.difference(dataPoint.dateFrom);
+        groupedSleepData[date]!.add(point);
       }
     }
 
-    // Add the last session if it exists
-    if (sleepStart != null && sleepEnd != null) {
-      sessions.add(SleepSession(
-        from: sleepStart,
-        to: sleepEnd,
-        asleepDuration: timeAsleep,
-        remDuration: timeInRem,
-        awakeDuration: timeAwake,
-        inBedDuration:
-            sleepEnd.difference(sleepStart), // Calculate based on start and end
-      ));
-    }
+    List<SleepSession> sessions = [];
+    groupedSleepData.forEach((date, dataPoints) {
+      DateTime? sleepStart;
+      DateTime? sleepEnd;
+      Duration timeInBed = Duration.zero;
+      Duration timeAsleep = Duration.zero;
+      Duration timeInRem = Duration.zero;
+      Duration timeAwake = Duration.zero;
+
+      // Sort data points to ensure correct chronological processing
+      dataPoints.sort((a, b) => a.dateFrom.compareTo(b.dateFrom));
+
+      for (var dataPoint in dataPoints) {
+        if (dataPoint.type == HealthDataType.SLEEP_IN_BED ||
+            dataPoint.type == HealthDataType.SLEEP_SESSION) {
+          // Accumulate the time in bed
+          timeInBed += dataPoint.dateTo.difference(dataPoint.dateFrom);
+          // Set the sleep start time if it's the first in-bed data point
+          if (sleepStart == null) {
+            sleepStart = dataPoint.dateFrom;
+          }
+          // Update the sleep end time to the latest in-bed data point
+          sleepEnd = dataPoint.dateTo;
+        } else if (dataPoint.type == HealthDataType.SLEEP_ASLEEP) {
+          // Accumulate the duration spent asleep
+          timeAsleep += dataPoint.dateTo.difference(dataPoint.dateFrom);
+        } else if (dataPoint.type == HealthDataType.SLEEP_REM) {
+          // Accumulate the duration spent in REM sleep
+          timeInRem += dataPoint.dateTo.difference(dataPoint.dateFrom);
+        } else if (dataPoint.type == HealthDataType.SLEEP_AWAKE) {
+          // Accumulate the duration spent awake
+          timeAwake += dataPoint.dateTo.difference(dataPoint.dateFrom);
+        }
+      }
+
+      // If no SLEEP_ASLEEP data is available, assume all time in bed was spent asleep
+      if (timeAsleep == Duration.zero &&
+          sleepStart != null &&
+          sleepEnd != null) {
+        //timeAsleep = sleepEnd.difference(sleepStart) - timeAwake;
+      }
+
+      // Validate that we have a valid session
+      if (sleepStart != null && sleepEnd != null) {
+        sessions.add(SleepSession(
+          from: sleepStart,
+          to: sleepEnd,
+          asleepDuration: timeAsleep,
+          remDuration: timeInRem,
+          awakeDuration: timeAwake,
+          inBedDuration: timeInBed,
+        ));
+      }
+    });
 
     return sessions;
   }
@@ -394,44 +378,6 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
     }
   }
 
-  List<SleepSessionScore> calculateSessionScores(
-      List<SleepSession> sessions, List<HealthDataPoint> heartRateData) {
-    List<SleepSessionScore> sessionScores = [];
-
-    for (var session in sessions) {
-      double sleepEfficiency = calculateSleepEfficiency(
-          session.asleepDuration, session.inBedDuration);
-      double durationScore = calculateDurationScore(session.inBedDuration);
-      double remScore =
-          calculateRemScore(session.remDuration, session.asleepDuration);
-      double interruptionScore =
-          calculateInterruptionScore(session.awakeDuration);
-      double averageHeartRate =
-          calculateAverageHeartRate(heartRateData, session.from, session.to);
-      double heartRateScore = calculateHeartRateScore(averageHeartRate);
-      double sleepScore = calculateSleepScore(sleepEfficiency, durationScore,
-          remScore, interruptionScore, heartRateScore);
-
-      String grade = gradeSleepScore(sleepScore);
-
-      sessionScores.add(SleepSessionScore(
-        session: session,
-        sleepScore: sleepScore,
-        grade: grade,
-      ));
-    }
-
-    return sessionScores;
-  }
-
-  double calculateOverallScore(List<SleepSessionScore> sessionScores) {
-    if (sessionScores.isEmpty) return 0;
-
-    double totalScore =
-        sessionScores.fold(0, (sum, score) => sum + score.sleepScore);
-    return totalScore / sessionScores.length;
-  }
-
   double calculateSleepScore(double sleepEfficiency, double durationScore,
       double remScore, double interruptionScore, double heartRateScore) {
     return (sleepEfficiency * 0.2) +
@@ -479,15 +425,6 @@ class SleepScoreError extends SleepScoreState {
 
   @override
   List<Object> get props => [message];
-}
-
-class SleepSessionScoreLoaded extends SleepScoreState {
-  final List<SleepSessionScore> sessionScores;
-
-  SleepSessionScoreLoaded(this.sessionScores);
-
-  @override
-  List<Object> get props => [sessionScores];
 }
 
 class SleepSession {
