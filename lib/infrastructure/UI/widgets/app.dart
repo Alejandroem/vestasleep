@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vestasleep/application/heart_algo/sleep_Session/sleep_session_screen.dart';
 import 'package:vestasleep/application/new_algo/sleep_score/sleep_score_screen.dart';
+import 'package:vestasleep/application/session_heart_rate/sleep_session_heart_screen.dart';
 
 import '../../../application/bloc/alarm/alarm_bloc.dart';
 import '../../../application/bloc/heart_rate/heart_rate_bloc.dart';
@@ -90,7 +92,7 @@ class App extends StatelessWidget {
                 create: (context) => BottomNavigationCubit(),
               ),
             ],
-            child: SleepScoreScreen(),
+            child: SleepSessionByHeartScreen(),
           ),
         ),
       ),

@@ -452,6 +452,8 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
       return "Poor";
     }
   }
+
+
 }
 
 class SleepScoreState extends Equatable {
