@@ -24,12 +24,15 @@ class SleepSessionByHeartScreen extends StatelessWidget {
               itemCount: state.sleepSessions.length,
               itemBuilder: (context, index) {
                 final session = state.sleepSessions[index];
+                final sessionDuration =
+                _formatDuration(session.to.difference(session.from));
                 return ListTile(
                   title: Text(
                       'Session from ${_formatDateTime(session.from)} to ${_formatDateTime(session.to)}'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text('Session Duration: $sessionDuration'),
                       Text(
                           'Asleep Duration: ${_formatDuration(session.asleepDuration)}'),
                       Text(

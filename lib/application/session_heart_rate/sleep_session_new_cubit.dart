@@ -73,22 +73,22 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
           ];
         }
         List<HealthDataPoint> sleepData =
-        await healthFactory.getHealthDataFromTypes(
-            startTime: startDate, endTime: endDate, types: mTypes);
+            await healthFactory.getHealthDataFromTypes(
+                startTime: startDate, endTime: endDate, types: mTypes);
 
         // Fetch heart rate data
         List<HealthDataPoint> heartRateData = await healthFactory
             .getHealthDataFromTypes(
-            startTime: startDate,
-            endTime: endDate,
-            types: [HealthDataType.HEART_RATE]);
+                startTime: startDate,
+                endTime: endDate,
+                types: [HealthDataType.HEART_RATE]);
 
         // Convert heart rate data to the HeartRate model
         List<HeartRate> heartRates = heartRateData.map((point) {
           return HeartRate(
             timestamp: point.dateFrom,
-            heartRate: (point.value as NumericHealthValue).numericValue
-                .toDouble(),
+            heartRate:
+                (point.value as NumericHealthValue).numericValue.toDouble(),
           );
         }).toList();
 
@@ -97,7 +97,7 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
 
         // Process the data and emit the result
         List<SleepSessionData> sleepSessions =
-        _createSleepSessionsBasedOnHeartRates(sleepData, heartRates);
+            _createSleepSessionsBasedOnHeartRates(sleepData, heartRates);
 
         emit(SleepSessionLoaded(sleepSessions: sleepSessions));
       }
@@ -114,31 +114,31 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     Duration timeAsleep = Duration.zero;
     Duration timeInRem = Duration.zero;
     Duration timeAwake = Duration.zero;
-    const Duration maxAllowedOutOfRangeDuration = Duration(minutes: 10); // Threshold duration
+    const Duration maxAllowedBreak =
+        Duration(minutes: 30); // Threshold duration
 
     // Calculate initial heart rate statistics during sleep
     var sleepHeartRates = _getHeartRatesDuringSleep(sleepData, heartRateData);
 
-    double minHeartRate = sleepHeartRates.isNotEmpty
+    double minSleepHeartRate = sleepHeartRates.isNotEmpty
         ? sleepHeartRates.reduce((a, b) => a < b ? a : b)
         : 40;
-    double maxHeartRate = sleepHeartRates.isNotEmpty
+    double maxSleepHeartRate = sleepHeartRates.isNotEmpty
         ? sleepHeartRates.reduce((a, b) => a > b ? a : b)
         : 80;
 
-
     for (var hr in heartRateData) {
       // Check if the heart rate lies within the sleep range
-      if (hr.heartRate >= minHeartRate && hr.heartRate <= maxHeartRate) {
+      if (hr.heartRate >= minSleepHeartRate && hr.heartRate <= maxSleepHeartRate) {
         if (sessionStart == null) {
           sessionStart = hr.timestamp;
         }
         sessionEnd = hr.timestamp;
-      } else {
+      } else {//90
         // If the current heart rate is out of range and the difference between
         // the current time and the last sessionEnd exceeds the threshold, finalize the session
         if (sessionEnd != null &&
-            hr.timestamp.difference(sessionEnd) > maxAllowedOutOfRangeDuration) {
+            hr.timestamp.difference(sessionEnd) > maxAllowedBreak) {
           // Finalize the current session
           _recalculateDurations(
             sleepData,
@@ -172,30 +172,32 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
 
     // Add the last session if it exists
     if (sessionStart != null && sessionEnd != null) {
-      _recalculateDurations(
-        sleepData,
-        sessionStart,
-        sessionEnd,
-        timeAsleep,
-        timeInRem,
-        timeAwake,
-      );
-      double avgHeartRate = _calculateAverageHeartRateForSession(
-          heartRateData, sessionStart, sessionEnd);
-      sessions.add(SleepSessionData(
-        from: sessionStart,
-        to: sessionEnd,
-        asleepDuration: timeAsleep,
-        remDuration: timeInRem,
-        awakeDuration: timeAwake,
-        inBedDuration: sessionEnd.difference(sessionStart),
-        averageHeartRate: avgHeartRate,
-      ));
+      final sessionDuration = sessionEnd.difference(sessionStart);
+      if (sessionDuration.inMinutes > 0) {
+        _recalculateDurations(
+          sleepData,
+          sessionStart,
+          sessionEnd,
+          timeAsleep,
+          timeInRem,
+          timeAwake,
+        );
+        double avgHeartRate = _calculateAverageHeartRateForSession(
+            heartRateData, sessionStart, sessionEnd);
+        sessions.add(SleepSessionData(
+          from: sessionStart,
+          to: sessionEnd,
+          asleepDuration: timeAsleep,
+          remDuration: timeInRem,
+          awakeDuration: timeAwake,
+          inBedDuration: sessionEnd.difference(sessionStart),
+          averageHeartRate: avgHeartRate,
+        ));
+      }
     }
 
     return sessions;
   }
-
 
   List<double> _getHeartRatesDuringSleep(
       List<HealthDataPoint> sleepData, List<HeartRate> heartRateData) {
@@ -204,7 +206,8 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     for (var sleepPoint in sleepData) {
       if (sleepPoint.type == HealthDataType.SLEEP_ASLEEP ||
           sleepPoint.type == HealthDataType.SLEEP_ASLEEP_CORE ||
-          sleepPoint.type == HealthDataType.SLEEP_IN_BED || sleepPoint.type == HealthDataType.SLEEP_SESSION) {
+          sleepPoint.type == HealthDataType.SLEEP_IN_BED ||
+          sleepPoint.type == HealthDataType.SLEEP_SESSION) {
         for (var hr in heartRateData) {
           // Include heart rates that are exactly at the boundaries as well
           if (!hr.timestamp.isBefore(sleepPoint.dateFrom) &&
@@ -218,16 +221,14 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     return sleepHeartRates;
   }
 
-
-
   void _recalculateDurations(
-      List<HealthDataPoint> sleepData,
-      DateTime sessionStart,
-      DateTime sessionEnd,
-      Duration timeAsleep,
-      Duration timeInRem,
-      Duration timeAwake,
-      ) {
+    List<HealthDataPoint> sleepData,
+    DateTime sessionStart,
+    DateTime sessionEnd,
+    Duration timeAsleep,
+    Duration timeInRem,
+    Duration timeAwake,
+  ) {
     timeAsleep = Duration.zero;
     timeInRem = Duration.zero;
     timeAwake = Duration.zero;
@@ -235,10 +236,13 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     for (var sleepPoint in sleepData) {
       if (sleepPoint.dateFrom.isBefore(sessionEnd) &&
           sleepPoint.dateTo.isAfter(sessionStart)) {
-        DateTime effectiveStart =
-        sleepPoint.dateFrom.isBefore(sessionStart) ? sessionStart : sleepPoint.dateFrom;
-        DateTime effectiveEnd =
-        sleepPoint.dateTo.isAfter(sessionEnd) ? sessionEnd : sleepPoint.dateTo;
+        // Adjust the effective start time to be sessionStart if dateFrom is before sessionStart
+        DateTime effectiveStart = sleepPoint.dateFrom.isBefore(sessionStart)
+            ? sessionStart
+            : sleepPoint.dateFrom;
+        DateTime effectiveEnd = sleepPoint.dateTo.isAfter(sessionEnd)
+            ? sessionEnd
+            : sleepPoint.dateTo;
 
         if (sleepPoint.type == HealthDataType.SLEEP_ASLEEP ||
             sleepPoint.type == HealthDataType.SLEEP_ASLEEP_CORE) {
@@ -252,11 +256,12 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     }
   }
 
-
-  double _calculateAverageHeartRateForSession(
-      List<HeartRate> heartRateData, DateTime sessionStart, DateTime sessionEnd) {
+  double _calculateAverageHeartRateForSession(List<HeartRate> heartRateData,
+      DateTime sessionStart, DateTime sessionEnd) {
     final sessionHeartRates = heartRateData
-        .where((hr) => hr.timestamp.isAfter(sessionStart) && hr.timestamp.isBefore(sessionEnd))
+        .where((hr) =>
+            hr.timestamp.isAfter(sessionStart) &&
+            hr.timestamp.isBefore(sessionEnd))
         .map((hr) => hr.heartRate)
         .toList();
 
