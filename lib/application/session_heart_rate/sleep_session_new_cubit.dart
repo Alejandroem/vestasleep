@@ -11,8 +11,14 @@ import 'model/sleep_break.dart';
 
 class SleepSessionNewCubit extends Cubit<SleepSessionState> {
   final Health healthFactory;
+  bool isFilteringEnabled = true; // Default to filtering enabled
 
   SleepSessionNewCubit(this.healthFactory) : super(SleepSessionInitial());
+
+  void toggleFiltering() {
+    isFilteringEnabled = !isFilteringEnabled;
+    emit(SleepSessionFilteringToggled(isFilteringEnabled));
+  }
 
   Future<void> loadSleepSessions() async {
     emit(SleepSessionLoading());
@@ -52,9 +58,9 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
       }
 
       if (requested) {
-        DateTime endDate = DateTime.now();
+        DateTime endDate = DateTime.now().subtract(Duration(days: 1));
         DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day)
-            .subtract(Duration(days: 7));
+            .subtract(Duration(days: 2));
         List<HealthDataType> mTypes = [];
         if (Platform.isAndroid) {
           mTypes = [
@@ -83,6 +89,12 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
                 startTime: startDate,
                 endTime: endDate,
                 types: [HealthDataType.HEART_RATE]);
+        // If filtering is enabled, filter the heart rates
+        if (isFilteringEnabled) {
+          heartRateData = heartRateData
+              .where((hr) => _isWithinAnySleepSession(hr.dateFrom, sleepData))
+              .toList();
+        }
 
         // Convert heart rate data to the HeartRate model
         List<HeartRate> heartRates = heartRateData.map((point) {
@@ -108,17 +120,28 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
 
   List<SleepSessionData> _createSleepSessionsBasedOnHeartRates(
       List<HealthDataPoint> sleepData, List<HeartRate> heartRateData) {
+    // Sort the heart rate data by timestamp to ensure correct processing order
+    // Filter out heart rates that are not within any sleep session data
+    /*heartRateData = heartRateData
+        .where((hr) => _isWithinAnySleepSession(hr.timestamp, sleepData))
+        .toList();*/
+
+    heartRateData.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
     List<SleepSessionData> sessions = [];
     DateTime? sessionStart;
     DateTime? sessionEnd;
+    DateTime? lastHeartRateTimestamp;
     Duration timeAsleep = Duration.zero;
     Duration timeInRem = Duration.zero;
     Duration timeAwake = Duration.zero;
     const Duration maxAllowedBreak =
-        Duration(minutes: 30); // Threshold duration
+        Duration(minutes: 30); // Threshold duration for session breaks
+    const Duration breakThreshold =
+        Duration(minutes: 5); // Minimum duration for a break to be recorded
+    const Duration maxAllowedGap =
+        Duration(hours: 1); // Maximum allowed gap between heart rates
     List<SleepBreak> breaks = [];
-    // Sort the heart rate data by timestamp to ensure correct processing order
-    heartRateData.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     // Calculate initial heart rate statistics during sleep
     var sleepHeartRates = _getHeartRatesDuringSleep(sleepData, heartRateData);
@@ -129,8 +152,11 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     double maxSleepHeartRate = sleepHeartRates.isNotEmpty
         ? sleepHeartRates.reduce((a, b) => a > b ? a : b)
         : 80;
-    if (maxSleepHeartRate > 80) {
-      maxSleepHeartRate = 80;
+    print("MIN:${minSleepHeartRate}===MAX:${maxSleepHeartRate}");
+
+    // Apply additional heart rate logic
+    if (maxSleepHeartRate > 90) {
+      maxSleepHeartRate = 90;
     }
     if (minSleepHeartRate <= 0) {
       minSleepHeartRate = 40;
@@ -147,15 +173,61 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
           sessionStart = hr.timestamp;
           print('Session started at $sessionStart');
         }
-        sessionEnd =
-            hr.timestamp; // Consider the timestamp as the session end time
-        print('Session updated to end at $sessionEnd');
 
-        // If there was a break within the threshold, save it
-        if (lastOutOfRangeTime != null) {
-          breaks.add(SleepBreak(start: lastOutOfRangeTime, end: hr.timestamp));
-          lastOutOfRangeTime = null; // Reset after adding the break
-          print('Break added from $lastOutOfRangeTime to ${hr.timestamp}');
+        // Check for large gaps between consecutive heart rate timestamps
+        if (lastHeartRateTimestamp != null &&
+            hr.timestamp.difference(lastHeartRateTimestamp) > maxAllowedGap) {
+          // End the session with the last valid heart rate timestamp
+          sessionEnd = lastHeartRateTimestamp;
+          print(
+              'Ending session due to large gap from $sessionStart to $sessionEnd');
+
+          final sessionDuration = sessionEnd!.difference(sessionStart!);
+          if (sessionDuration.inMinutes > 0) {
+            _recalculateDurations(
+              sleepData,
+              sessionStart,
+              sessionEnd,
+              timeAsleep,
+              timeInRem,
+              timeAwake,
+            );
+            double avgHeartRate = _calculateAverageHeartRateForSession(
+                heartRateData, sessionStart, sessionEnd);
+            sessions.add(SleepSessionData(
+              from: sessionStart,
+              to: sessionEnd,
+              asleepDuration: timeAsleep,
+              remDuration: timeInRem,
+              awakeDuration: timeAwake,
+              inBedDuration: sessionDuration,
+              averageHeartRate: avgHeartRate,
+              breaks: breaks, // Include the list of breaks
+            ));
+            print('Session added with duration: $sessionDuration');
+          }
+
+          // Reset for a new session
+          sessionStart = hr.timestamp;
+          timeAsleep = Duration.zero;
+          timeInRem = Duration.zero;
+          timeAwake = Duration.zero;
+          breaks = [];
+        }
+
+        sessionEnd = hr
+            .timestamp; // Update the session end to the current heart rate timestamp
+        lastHeartRateTimestamp =
+            hr.timestamp; // Track the last heart rate timestamp
+
+        // If there was an out-of-range break detected earlier, it should now be recorded if it exceeds the threshold
+        if (lastOutOfRangeTime != null && lastOutOfRangeTime != sessionEnd) {
+          final breakDuration = sessionEnd.difference(lastOutOfRangeTime);
+          if (breakDuration > breakThreshold) {
+            breaks.add(SleepBreak(start: lastOutOfRangeTime, end: sessionEnd));
+            print('Break added from $lastOutOfRangeTime to $sessionEnd');
+          }
+          lastOutOfRangeTime = null;
         }
       } else {
         // Handle out-of-range heart rates with duration threshold
@@ -165,10 +237,10 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
           if (hr.timestamp.difference(sessionEnd) <= maxAllowedBreak) {
             // This is a valid break within the session
             lastOutOfRangeTime = sessionEnd;
-            print('Break started at $sessionEnd');
+            print('Break detected starting at $sessionEnd');
           } else {
             // If out-of-range duration exceeds the threshold, finalize the session
-            final sessionDuration = sessionEnd.difference(sessionStart);
+            final sessionDuration = sessionEnd!.difference(sessionStart!);
 
             if (sessionDuration.inMinutes > 0) {
               print('Finalizing session from $sessionStart to $sessionEnd');
@@ -244,7 +316,23 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     }
 
     print('Total sessions created: ${sessions.length}');
+    // Reverse the session list before returning
+    if (sessions.length > 0) {
+      sessions = sessions.reversed.toList();
+    }
     return sessions;
+  }
+
+  bool _isWithinAnySleepSession(
+      DateTime timestamp, List<HealthDataPoint> sleepData) {
+    // Check if the timestamp is within any sleep session data
+    for (var sleepPoint in sleepData) {
+      if (timestamp.isAfter(sleepPoint.dateFrom) &&
+          timestamp.isBefore(sleepPoint.dateTo)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 /*  List<SleepSessionData> _createSleepSessionsBasedOnHeartRates(
@@ -429,6 +517,15 @@ class SleepSessionLoaded extends SleepSessionState {
 
   @override
   List<Object> get props => [sleepSessions];
+}
+
+class SleepSessionFilteringToggled extends SleepSessionState {
+  final bool isFilteringEnabled;
+
+  SleepSessionFilteringToggled(this.isFilteringEnabled);
+
+  @override
+  List<Object> get props => [isFilteringEnabled];
 }
 
 class SleepSessionError extends SleepSessionState {
