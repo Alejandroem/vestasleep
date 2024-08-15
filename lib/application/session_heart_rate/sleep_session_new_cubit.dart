@@ -58,9 +58,9 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
       }
 
       if (requested) {
-        DateTime endDate = DateTime.now().subtract(Duration(days: 1));
+        DateTime endDate = DateTime.now();
         DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day)
-            .subtract(Duration(days: 2));
+            .subtract(Duration(days: 4));
         List<HealthDataType> mTypes = [];
         if (Platform.isAndroid) {
           mTypes = [
