@@ -54,7 +54,7 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
       if (requested) {
         DateTime endDate = DateTime.now();
         DateTime startDate = DateTime(endDate.year, endDate.month, endDate.day)
-            .subtract(Duration(days: 3));
+            .subtract(Duration(days: 7));
         List<HealthDataType> mTypes = [];
         if (Platform.isAndroid) {
           mTypes = [
@@ -87,8 +87,7 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
         // Convert heart rate data to the HeartRate model
         List<HeartRate> heartRates = heartRateData.map((point) {
           return HeartRate(
-            dateFrom: point.dateFrom,
-            dateTo: point.dateTo,
+            timestamp: point.dateFrom,
             bpm: (point.value as NumericHealthValue).numericValue.toDouble(),
           );
         }).toList();
@@ -118,6 +117,8 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     const Duration maxAllowedBreak =
         Duration(minutes: 30); // Threshold duration
     List<SleepBreak> breaks = [];
+    // Sort the heart rate data by timestamp to ensure correct processing order
+    heartRateData.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     // Calculate initial heart rate statistics during sleep
     var sleepHeartRates = _getHeartRatesDuringSleep(sleepData, heartRateData);
@@ -128,39 +129,46 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     double maxSleepHeartRate = sleepHeartRates.isNotEmpty
         ? sleepHeartRates.reduce((a, b) => a > b ? a : b)
         : 80;
-
+    if (maxSleepHeartRate > 80) {
+      maxSleepHeartRate = 80;
+    }
+    if (minSleepHeartRate <= 0) {
+      minSleepHeartRate = 40;
+    }
 
     DateTime? lastOutOfRangeTime;
 
     for (var hr in heartRateData) {
-      print(
-          'Processing heart rate: ${hr.bpm} at ${hr.dateFrom} - ${hr.dateTo}');
+      print('Processing heart rate: ${hr.bpm} at ${hr.timestamp}');
 
       // Check if the heart rate lies within the sleep range
       if (hr.bpm >= minSleepHeartRate && hr.bpm <= maxSleepHeartRate) {
         if (sessionStart == null) {
-          sessionStart = hr.dateFrom;
+          sessionStart = hr.timestamp;
           print('Session started at $sessionStart');
         }
-        sessionEnd = hr.dateTo; // Consider the end of the heart rate data point
+        sessionEnd =
+            hr.timestamp; // Consider the timestamp as the session end time
         print('Session updated to end at $sessionEnd');
 
         // If there was a break within the threshold, save it
         if (lastOutOfRangeTime != null) {
-          breaks.add(SleepBreak(start: lastOutOfRangeTime, end: hr.dateFrom));
+          breaks.add(SleepBreak(start: lastOutOfRangeTime, end: hr.timestamp));
           lastOutOfRangeTime = null; // Reset after adding the break
-          print('Break added from $lastOutOfRangeTime to ${hr.dateFrom}');
+          print('Break added from $lastOutOfRangeTime to ${hr.timestamp}');
         }
       } else {
         // Handle out-of-range heart rates with duration threshold
-        if (sessionEnd != null) {
-          if (hr.dateFrom.difference(sessionEnd) <= maxAllowedBreak) {
+        if (sessionEnd != null &&
+            sessionStart != null &&
+            sessionEnd.isAfter(sessionStart)) {
+          if (hr.timestamp.difference(sessionEnd) <= maxAllowedBreak) {
             // This is a valid break within the session
             lastOutOfRangeTime = sessionEnd;
             print('Break started at $sessionEnd');
           } else {
             // If out-of-range duration exceeds the threshold, finalize the session
-            final sessionDuration = sessionEnd!.difference(sessionStart!);
+            final sessionDuration = sessionEnd.difference(sessionStart);
 
             if (sessionDuration.inMinutes > 0) {
               print('Finalizing session from $sessionStart to $sessionEnd');
@@ -186,7 +194,7 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
               ));
               print('Session added with duration: $sessionDuration');
             } else {
-              print('Skipped session with zero duration.');
+              print('Skipped session with zero or negative duration.');
             }
 
             // Reset for the next potential session
@@ -203,7 +211,9 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     }
 
     // Add the last session if it exists and has a non-zero duration
-    if (sessionStart != null && sessionEnd != null) {
+    if (sessionStart != null &&
+        sessionEnd != null &&
+        sessionEnd.isAfter(sessionStart)) {
       final sessionDuration = sessionEnd.difference(sessionStart);
       if (sessionDuration.inMinutes > 0) {
         print('Finalizing last session from $sessionStart to $sessionEnd');
@@ -229,7 +239,7 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
         ));
         print('Final session added with duration: $sessionDuration');
       } else {
-        print('Skipped final session with zero duration.');
+        print('Skipped final session with zero or negative duration.');
       }
     }
 
@@ -329,7 +339,6 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
 
     return sessions;
   }*/
-
   List<double> _getHeartRatesDuringSleep(
       List<HealthDataPoint> sleepData, List<HeartRate> heartRateData) {
     List<double> sleepHeartRates = [];
@@ -340,9 +349,9 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
           sleepPoint.type == HealthDataType.SLEEP_IN_BED ||
           sleepPoint.type == HealthDataType.SLEEP_SESSION) {
         for (var hr in heartRateData) {
-          // Include heart rates that overlap with the sleep period
-          if (hr.dateFrom.isBefore(sleepPoint.dateTo) &&
-              hr.dateTo.isAfter(sleepPoint.dateFrom)) {
+          // Include heart rates that are exactly at the boundaries as well
+          if (!hr.timestamp.isBefore(sleepPoint.dateFrom) &&
+              !hr.timestamp.isAfter(sleepPoint.dateTo)) {
             sleepHeartRates.add(hr.bpm);
           }
         }
@@ -391,7 +400,8 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
       DateTime sessionStart, DateTime sessionEnd) {
     final sessionHeartRates = heartRateData
         .where((hr) =>
-            hr.dateFrom.isBefore(sessionEnd) && hr.dateTo.isAfter(sessionStart))
+            hr.timestamp.isAfter(sessionStart) &&
+            hr.timestamp.isBefore(sessionEnd))
         .map((hr) => hr.bpm)
         .toList();
 
