@@ -1,3 +1,5 @@
+import 'model/sleep_break.dart';
+
 class SleepSessionData {
   final DateTime from;
   final DateTime to;
@@ -7,6 +9,8 @@ class SleepSessionData {
   final Duration inBedDuration;
   final List<double>? heartRates;
   final double averageHeartRate;
+  final List<SleepBreak> breaks; // List of breaks within the session
+
 
   SleepSessionData({
     required this.from,
@@ -16,6 +20,7 @@ class SleepSessionData {
     required this.awakeDuration,
     required this.inBedDuration,
     this.heartRates,
-    required this.averageHeartRate
+    required this.averageHeartRate,
+    required this.breaks,
   });
 }
