@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health/health.dart';
 import 'package:intl/intl.dart';
 import 'package:vestasleep/application/session_heart_rate/sleep_session_new_cubit.dart';
 
 class SleepSessionByHeartScreen extends StatelessWidget {
+  final TextEditingController _breakController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -15,10 +18,50 @@ class SleepSessionByHeartScreen extends StatelessWidget {
           title: Text('Sleep Sessions by Heart Rates'),
         ),
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              BlocBuilder<SleepSessionNewCubit, SleepSessionState>(
+                builder: (context, state) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _breakController,
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(fontSize: 10),
+                          decoration: InputDecoration(
+                              labelText: 'Max Allowed Break (in minutes)',
+                              hintText: 'Enter break duration',
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.all(8)),
+                          onSubmitted: (value) {
+                            final cubit = context.read<SleepSessionNewCubit>();
+                            final breakDuration = int.tryParse(value) ?? 60;
+                            cubit.updateMaxAllowedBreak(breakDuration);
+                            cubit
+                                .loadSleepSessions(); // Reload data after updating break duration
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            final cubit = context.read<SleepSessionNewCubit>();
+                            final breakDuration =
+                                int.tryParse(_breakController.text) ?? 60;
+                            cubit.updateMaxAllowedBreak(breakDuration);
+                            cubit.loadSleepSessions();
+                          },
+                          child: Text("Update"))
+                    ],
+                  );
+                },
+              ),
+              SizedBox(height: 5,),
               BlocBuilder<SleepSessionNewCubit, SleepSessionState>(
                 builder: (context, state) {
                   final cubit = context.read<SleepSessionNewCubit>();

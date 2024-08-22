@@ -12,12 +12,17 @@ import 'model/sleep_break.dart';
 class SleepSessionNewCubit extends Cubit<SleepSessionState> {
   final Health healthFactory;
   bool isFilteringEnabled = true; // Default to filtering enabled
+  Duration maxAllowedBreak = Duration(hours: 1); // Default to 1 hour
 
   SleepSessionNewCubit(this.healthFactory) : super(SleepSessionInitial());
 
   void toggleFiltering() {
     isFilteringEnabled = !isFilteringEnabled;
     emit(SleepSessionFilteringToggled(isFilteringEnabled));
+  }
+
+  void updateMaxAllowedBreak(int minutes) {
+    maxAllowedBreak = Duration(minutes: minutes);
   }
 
   Future<void> loadSleepSessions() async {
@@ -135,8 +140,8 @@ class SleepSessionNewCubit extends Cubit<SleepSessionState> {
     Duration timeAsleep = Duration.zero;
     Duration timeInRem = Duration.zero;
     Duration timeAwake = Duration.zero;
-    const Duration maxAllowedBreak =
-        Duration(minutes: 30); // Threshold duration for session breaks
+    // const Duration maxAllowedBreak =
+    //     Duration(minutes: 30); // Threshold duration for session breaks
     const Duration breakThreshold =
         Duration(minutes: 5); // Minimum duration for a break to be recorded
     const Duration maxAllowedGap =
