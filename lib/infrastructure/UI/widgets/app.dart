@@ -93,7 +93,7 @@ class App extends StatelessWidget {
                 create: (context) => BottomNavigationCubit(),
               ),
             ],
-            child: SleepSessionByHeartScreen(),
+            child: Home(),
           ),
         ),
       ),

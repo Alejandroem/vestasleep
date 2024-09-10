@@ -140,18 +140,29 @@ class GoogleAppleHealthService implements HealthService {
     //GET Awake REM light and deep sleep
     // HealthFactory health = HealthFactory();
     Health health = Health();
-    List<HealthDataType> types = [
-      HealthDataType.SLEEP_AWAKE,
+    List<HealthDataType> types = [];
+/*
+  HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_REM,
       HealthDataType.SLEEP_ASLEEP,
       HealthDataType.SLEEP_DEEP,
-    ];
-/*
-HealthDataType.SLEEP_AWAKE,
- HealthDataType.SLEEP_REM,
-      HealthDataType.SLEEP_ASLEEP,
-      HealthDataType.SLEEP_DEEP,
  */
+    if (Platform.isAndroid) {
+      types = [
+        HealthDataType.SLEEP_ASLEEP,
+        HealthDataType.SLEEP_AWAKE,
+        HealthDataType.SLEEP_REM,
+        HealthDataType.SLEEP_DEEP,
+      ];
+    } else {
+      types = [
+        HealthDataType.SLEEP_ASLEEP,
+        HealthDataType.SLEEP_AWAKE,
+        HealthDataType.SLEEP_REM,
+        HealthDataType.SLEEP_ASLEEP_CORE,
+        HealthDataType.SLEEP_DEEP,
+      ];
+    }
     final permissions = types.map((e) => HealthDataAccess.READ).toList();
     log.info("Requesting permissions for $permissions");
 
@@ -295,7 +306,7 @@ HealthDataType.SLEEP_AWAKE,
   @override
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
     //HealthFactory health = HealthFactory();
-   // return HeartSampleData().getHeartRates();
+    // return HeartSampleData().getHeartRates();
     var health = Health();
     List<HealthDataType> types = [
       HealthDataType.HEART_RATE,
