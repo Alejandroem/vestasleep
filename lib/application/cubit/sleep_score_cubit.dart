@@ -9,9 +9,6 @@ import '../../domain/models/sleep_session.dart';
 import '../../domain/services/health_service.dart';
 import '../session_heart_rate/model/sleep_break.dart';
 
-//import '../session_heart_rate/sleep_session_data.dart';
-//import 'sleep_score_calculator.dart';
-
 class SleepScoreState {
   final DateTime lastUpdatedAt;
   final List<SleepScore> scores;
@@ -77,32 +74,14 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         ));
 
   Future<void> fetchSleepScores() async {
-    /* SleepScoreCalculator().fetchAndCalculateSleepScores();
-    return;
-*/
     try {
       emit(state.copyWith(loading: true));
       DateTime from;
       DateTime to;
       List<SleepScore> newScores = [];
-      log.info(
-          'fetchSleepScores: state.scores.isEmpty: ${state.scores.isEmpty}');
-      /* DateTime today;
-    if (state.scores.isEmpty) {
-      today = DateTime.now();
-    } else {
-      today = state.scores.first.from;
-    } */
-      //from = DateTime(today.year, today.month, today.day - 7);
-      //to = DateTime(today.year, today.month, today.day, 23, 59, 59);
 
-      //Lets analize 2 days for now
       to = DateTime.now();
       from = DateTime(to.year, to.month, to.day).subtract(Duration(days: 15));
-
-      /*  from = DateTime(
-          sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day, 0, 0, 0);
-      to = endOfDay;*/
 
       log.info('fetchSleepScores: from: $from, to: $to');
       List<SleepSession> sleepSessionData =
@@ -174,77 +153,9 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
     return sessionSleepPoints;
   }
 
-  List<SleepScore> _createSleepScores(
-    List<HealthDataPoint> sleepData,
-    List<HeartRate> heartRateData,
-    DateTime from,
-    DateTime to,
-  ) {
-    List<SleepScore> sleepScores = [];
-
-    /* for (var session in sessions) {
-      SleepScore sleepScore = SleepScore(
-        from: session.from,
-        to: session.to,
-        heartRatesDataPoints: heartRateData,
-        sleepDataPoints: _getSleepDataPoints(sleepData, session.from, session.to),
-        sleepSessions: [SleepSession(from: session.from, to: session.to)],
-      );
-      sleepScores.add(sleepScore);
-    }*/
-
-    return sleepScores;
-  }
-
-  List<SleepDataPoint> _getSleepDataPoints(List<HealthDataPoint> sleepData,
-      DateTime sessionStart, DateTime sessionEnd) {
-    List<SleepDataPoint> sleepDataPoints = [];
-
-    for (var sleepPoint in sleepData) {
-      if (sleepPoint.dateFrom.isBefore(sessionEnd) &&
-          sleepPoint.dateTo.isAfter(sessionStart)) {
-        // Adjust the sleepPoint's start and end times to fit within the session
-        DateTime effectiveStart = sleepPoint.dateFrom.isBefore(sessionStart)
-            ? sessionStart
-            : sleepPoint.dateFrom;
-        DateTime effectiveEnd = sleepPoint.dateTo.isAfter(sessionEnd)
-            ? sessionEnd
-            : sleepPoint.dateTo;
-
-        // Determine the sleep stage from the HealthDataPoint type
-        SleepStage stage;
-        if (sleepPoint.type == HealthDataType.SLEEP_ASLEEP ||
-            sleepPoint.type == HealthDataType.SLEEP_ASLEEP_CORE) {
-          stage = SleepStage.asleepCore;
-        } else if (sleepPoint.type == HealthDataType.SLEEP_REM) {
-          stage = SleepStage.rem;
-        } else if (sleepPoint.type == HealthDataType.SLEEP_AWAKE) {
-          stage = SleepStage.awake;
-        } else {
-          // If it's any other type, you can skip it or handle it differently
-          continue;
-        }
-
-        // Add the sleep data point for the adjusted time range
-        sleepDataPoints.add(SleepDataPoint(
-          from: effectiveStart,
-          to: effectiveEnd,
-          stage: stage,
-        ));
-      }
-    }
-
-    return sleepDataPoints;
-  }
-
   List<SleepSessionData> _createSleepSessionsBasedOnHeartRates(
       List<SleepSession> sleepData, List<HeartRate> heartRateData) {
     // Sort the heart rate data by timestamp to ensure correct processing order
-    // Filter out heart rates that are not within any sleep session data
-    /*heartRateData = heartRateData
-        .where((hr) => _isWithinAnySleepSession(hr.timestamp, sleepData))
-        .toList();*/
-
     heartRateData.sort((a, b) => a.to.compareTo(b.to));
 
     List<SleepSessionData> sessions = [];
