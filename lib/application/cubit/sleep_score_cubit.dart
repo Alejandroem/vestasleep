@@ -117,12 +117,12 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         ];
       });
 
-      List<SleepScore> scores = [...state.scores, ...newScores];
-      if (scores.length > 1) {
-        scores.sort((a, b) => a.from.compareTo(b.from));
+      //List<SleepScore> scores = [...state.scores, ...newScores];
+      if (newScores.length > 1) {
+        newScores.sort((a, b) => a.from.compareTo(b.from));
       }
       emit(state.copyWith(
-        scores: scores,
+        scores: newScores,
         loading: false,
         lastUpdatedAt: DateTime.now(),
       ));
@@ -137,7 +137,6 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
         .where(
             (hr) => hr.to.isAfter(sessionStart) && hr.from.isBefore(sessionEnd))
         .toList();
-
     return sessionHeartRates;
   }
 
@@ -180,7 +179,7 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
     int maxSleepHeartRate = sleepHeartRates.isNotEmpty
         ? sleepHeartRates.reduce((a, b) => a > b ? a : b)
         : 80;
-    print("MIN:${minSleepHeartRate}===MAX:${maxSleepHeartRate}");
+    //print("MIN:${minSleepHeartRate}===MAX:${maxSleepHeartRate}");
 
     // Apply additional heart rate logic
     if (maxSleepHeartRate > 90) {

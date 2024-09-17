@@ -334,7 +334,7 @@ class GoogleAppleHealthService implements HealthService {
         log.severe('Exception in authorize!', error, stackTrace);
       }
     } else {
-      authorized = await health.requestAuthorization(types);
+      authorized = true;//await health.requestAuthorization(types);
     }
 
     if (authorized) {
@@ -404,7 +404,7 @@ class GoogleAppleHealthService implements HealthService {
         log.severe('Exception in authorize!', error, stackTrace);
       }
     } else {
-      authorized = await health.requestAuthorization(types);
+      authorized = true;//await health.requestAuthorization(types);
     }
 
     if (authorized) {
