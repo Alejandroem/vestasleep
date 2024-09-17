@@ -81,7 +81,7 @@ class SleepScoreCubit extends Cubit<SleepScoreState> {
       List<SleepScore> newScores = [];
 
       to = DateTime.now();
-      from = DateTime(to.year, to.month, to.day).subtract(Duration(days: 15));
+      from = DateTime(to.year, to.month, to.day).subtract(Duration(days: 7));
 
       log.info('fetchSleepScores: from: $from, to: $to');
       List<SleepSession> sleepSessionData =
