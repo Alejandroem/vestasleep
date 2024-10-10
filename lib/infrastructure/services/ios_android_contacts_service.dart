@@ -1,3 +1,4 @@
+import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
 
@@ -22,8 +23,9 @@ class IosAndroidContactsService extends ContactsService {
 
   @override
   Future<VestaContact> pickContact() async {
-    final FlutterContactPicker contactPicker = FlutterContactPicker();
-    Contact? contact = await contactPicker.selectContact();
+    final FlutterNativeContactPicker _contactPicker =
+        FlutterNativeContactPicker();
+    final contact = await _contactPicker.selectContact();
 
     if (contact == null) {
       throw Exception('No contact selected');
@@ -32,7 +34,7 @@ class IosAndroidContactsService extends ContactsService {
     return VestaContact(
       name: contact.fullName ?? '',
       email: "",
-      phone: contact.phoneNumbers?.first ?? '',
+      phone: (contact.phoneNumbers ?? []).first,
     );
   }
 }

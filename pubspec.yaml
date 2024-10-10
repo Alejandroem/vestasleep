@@ -27,8 +27,6 @@ dependencies:
   sentry_logging: ^7.18.0
   logging: ^1.0.2
 
-
-
   health: ^10.2.0
   #health:
   #  path: ./health
@@ -40,7 +38,7 @@ dependencies:
   flutter_contacts: ^1.1.7+1
   flutter_native_contact_picker: ^0.0.6
   equatable: ^2.0.5
-  flutter_local_notifications: ^16.3.2
+  flutter_local_notifications: ^17.2.3
   telephony: ^0.2.0
   audioplayers: ^5.2.1
   flutter_launcher_icons: ^0.13.1

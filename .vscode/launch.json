@@ -6,15 +6,14 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "-v",
                 "-d",
-                "00008120-001A4D291438201E"
+                "SM A546E"
             ]
         },
         {
             "name": "ios vestasleep attach",
             "request": "attach",
-            "type": "dart"            
+            "type": "dart"
         },
         {
             "name": "vestasleep fvm",
@@ -27,7 +26,7 @@
             ]
         },
         {
-            "name":"Attach ios",
+            "name": "Attach ios",
             "request": "attach",
             "type": "dart",
             //flutter: The Dart VM service is listening on http://127.0.0.1:62016/j8F4SGsMqOI=/
@@ -47,7 +46,7 @@
             ]
         },
         {
-            "name":"attach android",
+            "name": "attach android",
             "request": "attach",
             "type": "dart",
             "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK            
