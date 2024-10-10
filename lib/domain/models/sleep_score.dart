@@ -6,9 +6,9 @@ import 'sleep_data_point.dart';
 import 'sleep_session.dart';
 
 class SleepScore {
-  DateTime from;
-  DateTime to;
-  List<SleepSession> sleepSessions;
+  DateTime from; //you calculated
+  DateTime to; // you calculated
+  List<SleepSession> sleepSessions; //get all of the data, and then filter by from and to
   List<HeartRate> heartRatesDataPoints;
   List<SleepDataPoint> sleepDataPoints;
 

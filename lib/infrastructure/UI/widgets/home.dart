@@ -87,6 +87,8 @@ class Home extends StatelessWidget {
             child = const Landing();
             break;
         }
+        //TODO remove this
+        child = const VestaHome();
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) {

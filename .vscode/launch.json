@@ -4,69 +4,7 @@
         {
             "name": "vestasleep",
             "request": "launch",
-            "type": "dart",
-            "args": [
-                "-v",
-                "-d",
-                "00008120-001A4D291438201E"
-            ]
-        },
-        {
-            "name": "ios vestasleep attach",
-            "request": "attach",
-            "type": "dart"            
-        },
-        {
-            "name": "vestasleep fvm",
-            "request": "launch",
-            "type": "dart",
-            "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK            
-            "args": [
-                "-d",
-                "SM A536E"
-            ]
-        },
-        {
-            "name":"Attach ios",
-            "request": "attach",
-            "type": "dart",
-            //flutter: The Dart VM service is listening on http://127.0.0.1:62016/j8F4SGsMqOI=/
-            "args": [
-                "--host-vmservice-port",
-                "http://127.0.0.1:62016/j8F4SGsMqOI=/"
-            ]
-        },
-        {
-            "name": "vestasleep",
-            "request": "launch",
-            "type": "dart",
-            "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK            
-            "args": [
-                "-d",
-                "I"
-            ]
-        },
-        {
-            "name":"attach android",
-            "request": "attach",
-            "type": "dart",
-            "flutterSdkPath": "${workspaceFolder}\\.fvm\\flutter_sdk", // Path to FVM Flutter SDK            
-            "args": [
-                "-d",
-                "SM A536E"
-            ]
-        },
-        {
-            "name": "vestasleep (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "vestasleep (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
+            "type": "dart"
+        }       
     ]
 }

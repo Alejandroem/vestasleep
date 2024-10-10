@@ -19,7 +19,7 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<bool> requestPermissions() async {
-    HealthFactory health = HealthFactory(useHealthConnectIfAvailable: true);
+    Health health = Health();
 
     await Permission.activityRecognition.request();
 
@@ -62,7 +62,7 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<Stream<HeartRate>> getHeartRateStream(Duration delta) async {
-    HealthFactory health = HealthFactory();
+    Health health = Health();
 
     heartRateStreamController ??= StreamController<HeartRate>();
 
@@ -77,9 +77,9 @@ class GoogleAppleHealthService implements HealthService {
         log.info(
             "Getting heart rate data from health kit from $startTime to $endTime");
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          startTime,
-          endTime,
-          [
+          startTime: startTime,
+          endTime: endTime,
+          types: [
             HealthDataType.HEART_RATE,
           ],
         );
@@ -131,7 +131,7 @@ class GoogleAppleHealthService implements HealthService {
   Future<List<SleepDataPoint>> getSleepData(
       DateTime start, DateTime end) async {
     //GET Awake REM light and deep sleep
-    HealthFactory health = HealthFactory();
+    Health health = Health();
     List<HealthDataType> types = [
       HealthDataType.SLEEP_AWAKE,
       HealthDataType.SLEEP_REM,
@@ -167,9 +167,9 @@ class GoogleAppleHealthService implements HealthService {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
       log.info("Health data for sleep: $healthData");
       List<SleepDataPoint> sleepDataPoints = healthData.map((dataPoint) {
@@ -213,7 +213,7 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<List<HeartRate>> getRestingRates(DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    Health health = Health();
     List<HealthDataType> types = [
       HealthDataType.RESTING_HEART_RATE,
     ];
@@ -245,9 +245,9 @@ class GoogleAppleHealthService implements HealthService {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
       log.info("Health data for resting heart rate: $healthData");
       List<HeartRate> heartRates = healthData.map((dataPoint) {
@@ -268,7 +268,7 @@ class GoogleAppleHealthService implements HealthService {
 
   @override
   Future<List<HeartRate>> getHeartRates(DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    Health health = Health();
     List<HealthDataType> types = [
       HealthDataType.HEART_RATE,
     ];
@@ -300,9 +300,9 @@ class GoogleAppleHealthService implements HealthService {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
       log.info("Health data for heart rate: $healthData");
       List<HeartRate> heartRates = healthData.map((dataPoint) {
@@ -324,13 +324,13 @@ class GoogleAppleHealthService implements HealthService {
   @override
   Future<List<SleepSession>> getSleepSessions(
       DateTime start, DateTime end) async {
-    HealthFactory health = HealthFactory();
+    Health health = Health();
     List<HealthDataType> types = [HealthDataType.SLEEP_IN_BED];
-    if (Platform.isAndroid) {
+    /* if (Platform.isAndroid) {
       types = [
         HealthDataType.SLEEP_SESSION,
       ];
-    }
+    } */
 
     final permissions = types.map((e) => HealthDataAccess.READ).toList();
     log.info("Requesting permissions for $permissions");
@@ -359,9 +359,9 @@ class GoogleAppleHealthService implements HealthService {
       log.info("Authorized to read health data");
       log.info("Getting health data from $start to $end for $types");
       List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-        start,
-        end,
-        types,
+        startTime: start,
+        endTime: end,
+        types: types,
       );
 
       log.info("Health data for sleep session: $healthData");
