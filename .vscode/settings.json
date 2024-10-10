@@ -1,21 +1,17 @@
 {
   "dart.flutterSdkPath": ".fvm/versions/stable",
-  //exclude heatlh folder
   "dart.flutterTestAdditionalArgs": [
     "--exclude",
     "health"
   ],
-  //exclude heatlh folder from problems
   "dart.flutterAnalyzeAdditionalArgs": [
     "--exclude",
     "health"
   ],
-  //exclude heatlh folder from formatting
   "dart.flutterFormatExtraArgs": [
     "--exclude",
     "health"
   ],
-  //exclude heatlh folder from formatting
   "dart.flutterCreateIOSLanguage": "swift",
-  "yaml.schemaStore.enable": false,
+  "yaml.schemaStore.enable": false
 }
